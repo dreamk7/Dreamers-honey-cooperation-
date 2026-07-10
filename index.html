@@ -864,7 +864,24 @@
     .equipment-card:hover, .product-card:hover, .team-card:hover { transform: translateY(-8px); border-color: var(--gold); }
     .clickable-area { cursor: pointer; }
     .equipment-image, .team-image { width: 100%; height: 200px; object-fit: cover; display: block; }
-    .product-img { background: linear-gradient(135deg, #FDF3E6, #FFF8F0); padding: 30px; font-size: 3.2rem; text-align: center; cursor: pointer; }
+    .product-img {
+      background: linear-gradient(135deg, #FDF3E6, #FFF8F0);
+      padding: 30px;
+      font-size: 3.2rem;
+      text-align: center;
+      cursor: pointer;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .product-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
     .equipment-card h3, .product-card h3, .team-card h3 { font-size: 1.25rem; font-weight: 700; margin: 16px 0 6px; color: #2a3a1f; }
     .team-position { font-size: 0.85rem; color: var(--gold); font-weight: 600; margin-bottom: 10px; }
     .equipment-details, .product-details, .team-details { display: none; padding: 0 16px 20px; color: #4a3a2a; font-size: 0.85rem; line-height: 1.5; }
@@ -1951,49 +1968,37 @@ window.addEventListener('click', (e) => {
     return card;
   }
 
+  // ===== FIXED PRODUCTS ARRAY WITH CORRECT IMAGE PATHS =====
   const products = [
-  { 
-    name: "pollen", 
-    price: "$18.90", 
-    desc: "pollen.", 
-    image: "dreamers/assets/pollen.jpeg" 
-  },
-  { 
-    name: "propolis", 
-    price: "$42.00", 
-    desc: "propolis.", 
-    image: "dreamers/assets/propolis.jpeg" 
-  },
-  { 
-    name: "bee venom", 
-    price: "$24.50", 
-    desc: "bee venom.", 
-    image: "dreamers/assets/venom.jpeg" 
-  },
-  { 
-    name: "royal jelly", 
-    price: "$15.75", 
-    desc: "original royaljelly.", 
-    image: "dreamers/assets/royal-jelly.jpg" 
-  },
-  { 
-    name: "honey comb", 
-    price: "$32.00", 
-    desc: "pure honey comb.", 
-    image: "dreamers/assets/comb.jpeg" 
-  },
-  { 
-    name: "bee bleeders", 
-    price: "$19.25", 
-    desc: "Ceylon cinnamon infused.", 
-    image: "/dreamers/assets/bee bleed.jpeg" 
-  }
-];
+    { name: "Pollen", price: "$18.90", desc: "Nutrient-rich bee pollen granules.", image: "dreamers/assets/pollen.jpeg" },
+    { name: "Propolis", price: "$42.00", desc: "Pure propolis tincture.", image: "dreamers/assets/propolis.jpeg" },
+    { name: "Bee Venom", price: "$24.50", desc: "High-quality bee venom extract.", image: "dreamers/assets/venom.jpeg" },
+    { name: "Royal Jelly", price: "$15.75", desc: "Fresh royal jelly from our hives.", image: "dreamers/assets/royal-jelly.jpg" },
+    { name: "Honey Comb", price: "$32.00", desc: "Pure raw honeycomb, naturally harvested.", image: "dreamers/assets/comb.jpeg" },
+    { name: "Bee Bread", price: "$19.25", desc: "Fermented bee bread superfood.", image: "dreamers/assets/bee bleed.jpeg" }
+  ];
+
   function renderProductCard(p, idx) {
     const card = document.createElement('div');
     card.className = 'product-card';
     card.setAttribute('role', 'listitem');
-    card.innerHTML = `<div class="clickable-area"><div class="product-img"><span style="font-size:2.5rem;">${p.icon}</span></div></div><h3>${p.name}</h3><div class="product-details"><div class="product-price">${p.price}</div><div>${p.desc}</div></div><div class="action-icons"><i class="fas fa-heart action-icon heart-icon" aria-label="Like"></i><i class="fas fa-shopping-cart action-icon cart-icon" aria-label="Add to cart"></i></div>`;
+    // Use an img tag inside product-img for consistent display
+    card.innerHTML = `
+      <div class="clickable-area">
+        <div class="product-img">
+          <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Crect width=%22300%22 height=%22300%22 fill=%22%23FDF3E6%22/%3E%3Ctext x=%22150%22 y=%22160%22 text-anchor=%22middle%22 fill=%22%23E9A23B%22 font-size=%2232%22%3E🍯%3C/text%3E%3Ctext x=%22150%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23997a3a%22 font-size=%2216%22%3E${encodeURIComponent(p.name)}%3C/text%3E%3C/svg%3E'">
+        </div>
+      </div>
+      <h3>${p.name}</h3>
+      <div class="product-details">
+        <div class="product-price">${p.price}</div>
+        <div>${p.desc}</div>
+      </div>
+      <div class="action-icons">
+        <i class="fas fa-heart action-icon heart-icon" aria-label="Like"></i>
+        <i class="fas fa-shopping-cart action-icon cart-icon" aria-label="Add to cart"></i>
+      </div>
+    `;
     const clickArea = card.querySelector('.clickable-area');
     const detailsDiv = card.querySelector('.product-details');
     const actionIcons = card.querySelector('.action-icons');
