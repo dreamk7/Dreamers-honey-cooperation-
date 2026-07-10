@@ -37,7 +37,7 @@
       font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #0a1a0f 0%, #0d2d1a 20%, #1a3d2a 40%, #2d4a2a 55%, #1a3d2a 70%, #0d2d1a 85%, #0a1a0f 100%);
       color: #ffffff;
-      padding-top: 0; /* removed padding, header is now part of flow */
+      padding-top: 0; 
       overflow-x: hidden;
       position: relative;
       min-height: 100vh;
@@ -996,14 +996,15 @@
 </button>
 
 <!-- ============================================================
-     HEADER – logo from images/logo.png, no gap
+     HEADER – logo from dreamers/assets/logo.png
      ============================================================ -->
 <div class="main-header" id="mainHeader">
   <div class="container header-row">
     <!-- TOP ROW: Logo + Company Name + Slogan -->
     <div class="header-top">
       <div class="logo-section">
-        <img class="logo-img" src="dreamers/assets/image 1.jpg" alt="dreamers honey"
+        <img class="logo-img" src="dreamers/assets/logo.png" alt="dreamers honey" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22 viewBox=%220 0 50 50%22%3E%3Crect width=%2250%22 height=%2250%22 rx=%2212%22 fill=%22%23FFD966%22/%3E%3Ctext x=%2225%22 y=%2234%22 text-anchor=%22middle%22 font-size=%2228%22%3E🐝%3C/text%3E%3C/svg%3E'">
+        <div class="logo-text-wrapper">
           <span class="company-name-top">DREAMERS HONEY</span>
           <span class="company-name-bottom">COOPERATION</span>
           <div class="slogan-wrapper">
@@ -1072,7 +1073,7 @@
   <!-- HERO -->
   <section class="hero" id="home">
     <div class="hero-background">
-      <img id="heroImage" src="https://images.pexels.com/photos/7540324/pexels-photo-7540324.jpeg?auto=compress&cs=tinysrgb" alt="Beekeeping equipment - bee veil and hat" loading="lazy" decoding="async">
+      <img id="heroImage" src="dreamers/assets/background.jpg" alt="Beekeeping equipment - bee veil and hat" loading="lazy" decoding="async">
     </div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
@@ -1371,14 +1372,14 @@
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
   fadeSections.forEach(section => sectionObserver.observe(section));
 
-  // ===== HERO IMAGE ROTATION =====
+  // ===== HERO IMAGE ROTATION (using background.jpg from assets) =====
   const slides = [
-    { image: "https://images.pexels.com/photos/7540324/pexels-photo-7540324.jpeg?auto=compress&cs=tinysrgb", badge: "🐝 Protective Gear", title: 'Protect the <span class="gold">bees</span><br>Preserve our <span class="gold">future</span>', description: 'A bee veil and hat provide essential protection during hive inspections. The fine mesh keeps bees away from your face for safe beekeeping. 🐝' },
-    { image: "https://images.pexels.com/photos/7753566/pexels-photo-7753566.jpeg?auto=compress&cs=tinysrgb", badge: "🍯 Harvesting Equipment", title: 'Extract <span class="gold">honey</span><br>With <span class="gold">precision</span>', description: 'A honey extractor uses centrifugal force to spin honey out of the frames without damaging the comb. It is an essential tool for any beekeeper looking to harvest pure unheated honey efficiently. 🍯' },
-    { image: "https://images.pexels.com/photos/6745575/pexels-photo-6745575.jpeg?auto=compress&cs=tinysrgb", badge: "🔥 Essential Tools", title: 'Master the <span class="gold">craft</span><br>With the right <span class="gold">tools</span>', description: 'A bee smoker produces cool smoke that calms bees during hive inspections. It triggers a feeding response making the bees less defensive and allowing you to work safely with your colonies. 🔥' },
-    { image: "https://images.pexels.com/photos/675089/pexels-photo-675089.jpeg?auto=compress&cs=tinysrgb", badge: "🏠 Hive Systems", title: 'Build a <span class="gold">home</span><br>For your <span class="gold">bees</span>', description: 'The Langstroth hive is the most popular beehive design worldwide. Its modular boxes with removable frames make it easy to inspect manage and harvest honey from your bee colonies. 🏠' },
-    { image: "https://images.pexels.com/photos/6745568/pexels-photo-6745568.jpeg?auto=compress&cs=tinysrgb", badge: "🔧 Maintenance Tools", title: 'Care for your <span class="gold">hive</span><br>With the right <span class="gold">tools</span>', description: 'A hive tool is the beekeeper\'s multi-purpose tool used to pry apart frames scrape off propolis and lift heavy honey supers. It is an indispensable tool for every hive inspection. 🔧' },
-    { image: "https://images.pexels.com/photos/210541/pexels-photo-210541.jpeg?auto=compress&cs=tinysrgb", badge: "🧤 Safety First", title: 'Protect <span class="gold">yourself</span><br>While you protect the <span class="gold">bees</span>', description: 'Leather beekeeping gloves protect your hands from stings while providing the dexterity needed for delicate hive work. Premium goatskin offers the perfect balance of protection and flexibility. 🧤' }
+    { image: "dreamers/assets/background.jpg", badge: "🐝 Protective Gear", title: 'Protect the <span class="gold">bees</span><br>Preserve our <span class="gold">future</span>', description: 'A bee veil and hat provide essential protection during hive inspections. The fine mesh keeps bees away from your face for safe beekeeping. 🐝' },
+    { image: "dreamers/assets/background.jpg", badge: "🍯 Harvesting Equipment", title: 'Extract <span class="gold">honey</span><br>With <span class="gold">precision</span>', description: 'A honey extractor uses centrifugal force to spin honey out of the frames without damaging the comb. It is an essential tool for any beekeeper looking to harvest pure unheated honey efficiently. 🍯' },
+    { image: "dreamers/assets/background.jpg", badge: "🔥 Essential Tools", title: 'Master the <span class="gold">craft</span><br>With the right <span class="gold">tools</span>', description: 'A bee smoker produces cool smoke that calms bees during hive inspections. It triggers a feeding response making the bees less defensive and allowing you to work safely with your colonies. 🔥' },
+    { image: "dreamers/assets/background.jpg", badge: "🏠 Hive Systems", title: 'Build a <span class="gold">home</span><br>For your <span class="gold">bees</span>', description: 'The Langstroth hive is the most popular beehive design worldwide. Its modular boxes with removable frames make it easy to inspect manage and harvest honey from your bee colonies. 🏠' },
+    { image: "dreamers/assets/background.jpg", badge: "🔧 Maintenance Tools", title: 'Care for your <span class="gold">hive</span><br>With the right <span class="gold">tools</span>', description: 'A hive tool is the beekeeper\'s multi-purpose tool used to pry apart frames scrape off propolis and lift heavy honey supers. It is an indispensable tool for every hive inspection. 🔧' },
+    { image: "dreamers/assets/background.jpg", badge: "🧤 Safety First", title: 'Protect <span class="gold">yourself</span><br>While you protect the <span class="gold">bees</span>', description: 'Leather beekeeping gloves protect your hands from stings while providing the dexterity needed for delicate hive work. Premium goatskin offers the perfect balance of protection and flexibility. 🧤' }
   ];
   let currentIndex = 0, isTransitioning = false, rotateInterval = null, isFirstLoad = true;
   const heroImage = document.getElementById('heroImage'), heroBadge = document.getElementById('heroBadge'), heroTitle = document.getElementById('heroTitle'), heroDescription = document.getElementById('heroDescription');
@@ -1514,7 +1515,6 @@
 
   // ===== NAV MENU =====
   const navMenu = document.getElementById('navMenu');
-  // Toggle nav when clicking on nav wrapper (since toggle icon removed)
   document.addEventListener('click', (e) => {
     const isNavLink = e.target.closest('.nav-links a');
     if (isNavLink) return;
@@ -1523,7 +1523,6 @@
       navMenu.classList.toggle('open');
     }
   });
-  // Close nav when clicking outside
   document.addEventListener('click', (e) => {
     if (navMenu.classList.contains('open')) {
       const isClickInside = navMenu.contains(e.target) || e.target.closest('.nav-wrapper');
@@ -1581,12 +1580,12 @@
   }
 
   const equipmentItems = [
-    { name: "Bee Veil", desc: "Professional-grade mesh veil with wide brim.", image: "https://images.pexels.com/photos/7540324/pexels-photo-7540324.jpeg?auto=compress&cs=tinysrgb&w=600" },
-    { name: "Leather Gloves", desc: "Premium goatskin gloves, sting-resistant.", image: "https://images.pexels.com/photos/210541/pexels-photo-210541.jpeg?auto=compress&cs=tinysrgb&w=600" },
-    { name: "Bee Smoker", desc: "Stainless steel smoker with heat shield.", image: "https://images.pexels.com/photos/6745575/pexels-photo-6745575.jpeg?auto=compress&cs=tinysrgb&w=600" },
-    { name: "Hive Tool", desc: "Heavy-duty stainless steel tool.", image: "https://images.pexels.com/photos/6745568/pexels-photo-6745568.jpeg?auto=compress&cs=tinysrgb&w=600" },
-    { name: "Langstroth Hive", desc: "Complete modular beehive system.", image: "https://images.pexels.com/photos/675089/pexels-photo-675089.jpeg?auto=compress&cs=tinysrgb&w=600" },
-    { name: "Honey Extractor", desc: "2-frame manual centrifugal extractor.", image: "https://images.pexels.com/photos/7753566/pexels-photo-7753566.jpeg?auto=compress&cs=tinysrgb&w=600" }
+    { name: "Bee Veil", desc: "Professional-grade mesh veil with wide brim.", image: "dreamers/assets/equipment.jpg" },
+    { name: "Leather Gloves", desc: "Premium goatskin gloves, sting-resistant.", image: "dreamers/assets/equipment.jpg" },
+    { name: "Bee Smoker", desc: "Stainless steel smoker with heat shield.", image: "dreamers/assets/equipment.jpg" },
+    { name: "Hive Tool", desc: "Heavy-duty stainless steel tool.", image: "dreamers/assets/equipment.jpg" },
+    { name: "Langstroth Hive", desc: "Complete modular beehive system.", image: "dreamers/assets/equipment.jpg" },
+    { name: "Honey Extractor", desc: "2-frame manual centrifugal extractor.", image: "dreamers/assets/equipment.jpg" }
   ];
   function renderEquipmentCard(item, idx) {
     const card = document.createElement('div');
@@ -1629,12 +1628,12 @@
   }
 
   const teamMembers = [
-    {name:"dream king",position:"Founder & Chief Beekeeper",bio:"PhD in Entomology.",image:"https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600"},
-    {name:"mr.sean",position:"Head of Apiary Operations",bio:"Third-generation beekeeper.",image:"https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600"},
-    {name:"Ms B tracy",position:"Education Director",bio:"Former science teacher.",image:"https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=600"},
-    {name:"Layton",position:"Research Lead",bio:"Biologist specializing in native bees.",image:"https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600"},
-    {name:"patience",position:"Community Partnerships",bio:"Works with farmers across West Africa.",image:"https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600"},
-    {name:"James",position:"Sustainability Coordinator",bio:"Manages carbon-neutral shipping.",image:"https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=600"}
+    {name:"dream king",position:"Founder & Chief Beekeeper",bio:"PhD in Entomology.",image:"dreamers/assets/team.jpg"},
+    {name:"mr.sean",position:"Head of Apiary Operations",bio:"Third-generation beekeeper.",image:"dreamers/assets/team.jpg"},
+    {name:"Ms B tracy",position:"Education Director",bio:"Former science teacher.",image:"dreamers/assets/team.jpg"},
+    {name:"Layton",position:"Research Lead",bio:"Biologist specializing in native bees.",image:"dreamers/assets/team.jpg"},
+    {name:"patience",position:"Community Partnerships",bio:"Works with farmers across West Africa.",image:"dreamers/assets/team.jpg"},
+    {name:"James",position:"Sustainability Coordinator",bio:"Manages carbon-neutral shipping.",image:"dreamers/assets/team.jpg"}
   ];
   function renderTeamCard(m, idx) {
     const card = document.createElement('div');
