@@ -1952,13 +1952,43 @@ window.addEventListener('click', (e) => {
   }
 
   const products = [
-    {name:"Wildflower Nectar",price:"$18.90",desc:"Raw multi-floral honey.",icon:"🌸"},
-    {name:"Manuka Gold",price:"$42.00",desc:"Premium UMF 10+ Manuka.",icon:"🌿"},
-    {name:"Lavender Infused",price:"$24.50",desc:"Creamed honey with lavender.",icon:"💜"},
-    {name:"Bee Pollen Crunch",price:"$15.75",desc:"Sun-dried pollen granules.",icon:"⚡"},
-    {name:"Beeswax Candles",price:"$32.00",desc:"Hand-dipped pure beeswax.",icon:"🕯️"},
-    {name:"Cinnamon Spice",price:"$19.25",desc:"Ceylon cinnamon infused.",icon:"🔥"}
-  ];
+  { 
+    name: "Wildflower Nectar", 
+    price: "$18.90", 
+    desc: "Raw multi-floral honey.", 
+    image: "dreamers/assets/products/wildflower.jpg" 
+  },
+  { 
+    name: "Manuka Gold", 
+    price: "$42.00", 
+    desc: "Premium UMF 10+ Manuka.", 
+    image: "dreamers/assets/products/manuka.jpg" 
+  },
+  { 
+    name: "Lavender Infused", 
+    price: "$24.50", 
+    desc: "Creamed honey with lavender.", 
+    image: "dreamers/assets/products/lavender.jpg" 
+  },
+  { 
+    name: "Bee Pollen Crunch", 
+    price: "$15.75", 
+    desc: "Sun-dried pollen granules.", 
+    image: "dreamers/assets/products/pollen.jpg" 
+  },
+  { 
+    name: "Beeswax Candles", 
+    price: "$32.00", 
+    desc: "Hand-dipped pure beeswax.", 
+    image: "dreamers/assets/products/candles.jpg" 
+  },
+  { 
+    name: "Cinnamon Spice", 
+    price: "$19.25", 
+    desc: "Ceylon cinnamon infused.", 
+    image: "dreamers/assets/products/cinnamon.jpg" 
+  }
+];
   function renderProductCard(p, idx) {
     const card = document.createElement('div');
     card.className = 'product-card';
