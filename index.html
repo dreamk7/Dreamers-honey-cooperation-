@@ -1721,37 +1721,114 @@
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = field.name;
-        input.value = field.value;
-        form.appendChild(input);
-      });
-      
-      document.body.appendChild(form);
-      form.submit();
+// ===== SIGN IN FUNCTIONALITY - STAYS ON WEBSITE =====
+const signinModal = document.getElementById('signinModal');
+const signInBtn = document.getElementById('signInBtn');
+const modalSigninBtn = document.getElementById('modalSigninBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const signinEmailInput = document.getElementById('signinEmail');
+const signinStatus = document.getElementById('signinStatus');
+
+function openSignInModal() { 
+  signinModal.style.display = 'flex'; 
+  signinEmailInput.value = ''; 
+  if (signinStatus) signinStatus.textContent = '';
+}
+
+function closeSignInModal() { 
+  signinModal.style.display = 'none'; 
+}
+
+signInBtn.addEventListener('click', openSignInModal);
+closeModalBtn.addEventListener('click', closeSignInModal);
+
+modalSigninBtn.addEventListener('click', async () => {
+  const email = signinEmailInput.value.trim();
+  
+  // Validate email
+  if (!email || !emailRegex.test(email)) {
+    if (signinStatus) {
+      signinStatus.textContent = '❌ Please enter a valid email address.';
+      signinStatus.style.color = '#ff6b6b';
+    }
+    return;
+  }
+  
+  // Save user locally
+  currentUserEmail = email;
+  localStorage.setItem('hiveharvest_user', email);
+  
+  // Show status
+  if (signinStatus) {
+    signinStatus.textContent = '📧 Sending sign-in request...';
+    signinStatus.style.color = '#FFD966';
+  }
+  
+  // Send email via hidden form (background submission)
+  try {
+    // Create hidden iframe to handle form submission without navigation
+    const iframe = document.createElement('iframe');
+    iframe.name = 'formSubmitIframe';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    
+    // Create form and target the iframe
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://formsubmit.co/dreamk868@gmail.com';
+    form.target = 'formSubmitIframe';
+    
+    const fields = [
+      { name: 'email', value: email },
+      { name: '_subject', value: '🐝 New User Sign-In - HiveHarvest' },
+      { name: '_template', value: 'table' },
+      { name: '_autoresponse', value: `Welcome to HiveHarvest, ${email}! 🐝\n\nThank you for signing in. You'll now receive updates about our products, beekeeping tips, and seasonal sales.\n\n— The dreamers honey team` },
+      { name: 'message', value: `User ${email} has signed in to HiveHarvest at ${new Date().toLocaleString()}.` }
+    ];
+    
+    fields.forEach(field => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = field.name;
+      input.value = field.value;
+      form.appendChild(input);
+    });
+    
+    document.body.appendChild(form);
+    form.submit();
+    
+    // Clean up after submission
+    setTimeout(() => {
       document.body.removeChild(form);
-      
-      if (signinStatus) {
-        signinStatus.textContent = '✅ Email sent!';
-        signinStatus.style.color = '#51cf66';
-      }
-      alert(`✅ Sign in successful! Welcome ${email}. A confirmation email has been sent.`);
-    } catch (error) {
-      if (signinStatus) {
-        signinStatus.textContent = '⚠️ Signed in, but email could not be sent.';
-        signinStatus.style.color = '#ffd43b';
-      }
-      alert(`✅ Sign in successful! Welcome ${email}. (Email notification could not be sent, but you are signed in.)`);
+      document.body.removeChild(iframe);
+    }, 2000);
+    
+    if (signinStatus) {
+      signinStatus.textContent = '✅ Sign-in request sent! Check your email.';
+      signinStatus.style.color = '#51cf66';
     }
     
-    // Close modal after 1.5 seconds
-    setTimeout(() => {
-      closeSignInModal();
-    }, 1500);
-  });
+    // Show success message and close modal
+    alert('✅ Sign-in request sent! Please check your email for confirmation.');
+    
+  } catch (error) {
+    if (signinStatus) {
+      signinStatus.textContent = '⚠️ Signed in, but email could not be sent.';
+      signinStatus.style.color = '#ffd43b';
+    }
+    alert(`✅ Sign in successful! Welcome ${email}. (Email notification could not be sent, but you are signed in.)`);
+  }
+  
+  // Close modal after delay
+  setTimeout(() => {
+    closeSignInModal();
+  }, 2000);
+});
 
-  // Close modal when clicking outside
-  window.addEventListener('click', (e) => {
-    if (e.target === signinModal) closeSignInModal();
-  });
+// Close modal when clicking outside
+window.addEventListener('click', (e) => {
+  if (e.target === signinModal) closeSignInModal();
+});
 
   // ===== REGISTER MODAL =====
   const registerModal = document.getElementById('registerModal');
