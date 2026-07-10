@@ -1,3 +1,6 @@
+Here is the complete updated HTML code. I have fixed the sign-in process so that users remain on your website and receive a simple "Sign-in request sent" message, without any other changes to the site's functionality.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1656,7 +1659,7 @@
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   let currentUserEmail = localStorage.getItem('hiveharvest_user') || null;
 
-  // ===== SIGN IN FUNCTIONALITY - FIXED TO SEND EMAILS =====
+  // ===== SIGN IN FUNCTIONALITY - STAYS ON WEBSITE =====
   const signinModal = document.getElementById('signinModal');
   const signInBtn = document.getElementById('signInBtn');
   const modalSigninBtn = document.getElementById('modalSigninBtn');
@@ -1685,8 +1688,6 @@
       if (signinStatus) {
         signinStatus.textContent = '❌ Please enter a valid email address.';
         signinStatus.style.color = '#ff6b6b';
-      } else {
-        alert("❌ Please enter a valid email address.");
       }
       return;
     }
@@ -1697,17 +1698,23 @@
     
     // Show status
     if (signinStatus) {
-      signinStatus.textContent = '✅ Signing in...';
+      signinStatus.textContent = '📧 Sending sign-in request...';
       signinStatus.style.color = '#FFD966';
     }
     
-    // Send confirmation email via FormSubmit using regular form POST
+    // Send email via hidden iframe (background submission)
     try {
-      // Create a hidden form to submit to FormSubmit
+      // Create hidden iframe to handle form submission without navigation
+      const iframe = document.createElement('iframe');
+      iframe.name = 'formSubmitIframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+      
+      // Create form and target the iframe
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = 'https://formsubmit.co/dreamk868@gmail.com';
-      form.target = '_blank'; // Opens in new tab to avoid page reload
+      form.target = 'formSubmitIframe';
       
       const fields = [
         { name: 'email', value: email },
@@ -1721,114 +1728,45 @@
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = field.name;
-// ===== SIGN IN FUNCTIONALITY - STAYS ON WEBSITE =====
-const signinModal = document.getElementById('signinModal');
-const signInBtn = document.getElementById('signInBtn');
-const modalSigninBtn = document.getElementById('modalSigninBtn');
-const closeModalBtn = document.getElementById('closeModalBtn');
-const signinEmailInput = document.getElementById('signinEmail');
-const signinStatus = document.getElementById('signinStatus');
-
-function openSignInModal() { 
-  signinModal.style.display = 'flex'; 
-  signinEmailInput.value = ''; 
-  if (signinStatus) signinStatus.textContent = '';
-}
-
-function closeSignInModal() { 
-  signinModal.style.display = 'none'; 
-}
-
-signInBtn.addEventListener('click', openSignInModal);
-closeModalBtn.addEventListener('click', closeSignInModal);
-
-modalSigninBtn.addEventListener('click', async () => {
-  const email = signinEmailInput.value.trim();
-  
-  // Validate email
-  if (!email || !emailRegex.test(email)) {
-    if (signinStatus) {
-      signinStatus.textContent = '❌ Please enter a valid email address.';
-      signinStatus.style.color = '#ff6b6b';
+        input.value = field.value;
+        form.appendChild(input);
+      });
+      
+      document.body.appendChild(form);
+      form.submit();
+      
+      // Clean up after submission
+      setTimeout(() => {
+        document.body.removeChild(form);
+        document.body.removeChild(iframe);
+      }, 2000);
+      
+      if (signinStatus) {
+        signinStatus.textContent = '✅ Sign-in request sent! Check your email.';
+        signinStatus.style.color = '#51cf66';
+      }
+      
+      // Show success message
+      alert('✅ Sign-in request sent! Please check your email for confirmation.');
+      
+    } catch (error) {
+      if (signinStatus) {
+        signinStatus.textContent = '⚠️ Signed in, but email could not be sent.';
+        signinStatus.style.color = '#ffd43b';
+      }
+      alert(`✅ Sign in successful! Welcome ${email}. (Email notification could not be sent, but you are signed in.)`);
     }
-    return;
-  }
-  
-  // Save user locally
-  currentUserEmail = email;
-  localStorage.setItem('hiveharvest_user', email);
-  
-  // Show status
-  if (signinStatus) {
-    signinStatus.textContent = '📧 Sending sign-in request...';
-    signinStatus.style.color = '#FFD966';
-  }
-  
-  // Send email via hidden form (background submission)
-  try {
-    // Create hidden iframe to handle form submission without navigation
-    const iframe = document.createElement('iframe');
-    iframe.name = 'formSubmitIframe';
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
     
-    // Create form and target the iframe
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://formsubmit.co/dreamk868@gmail.com';
-    form.target = 'formSubmitIframe';
-    
-    const fields = [
-      { name: 'email', value: email },
-      { name: '_subject', value: '🐝 New User Sign-In - HiveHarvest' },
-      { name: '_template', value: 'table' },
-      { name: '_autoresponse', value: `Welcome to HiveHarvest, ${email}! 🐝\n\nThank you for signing in. You'll now receive updates about our products, beekeeping tips, and seasonal sales.\n\n— The dreamers honey team` },
-      { name: 'message', value: `User ${email} has signed in to HiveHarvest at ${new Date().toLocaleString()}.` }
-    ];
-    
-    fields.forEach(field => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = field.name;
-      input.value = field.value;
-      form.appendChild(input);
-    });
-    
-    document.body.appendChild(form);
-    form.submit();
-    
-    // Clean up after submission
+    // Close modal after delay
     setTimeout(() => {
-      document.body.removeChild(form);
-      document.body.removeChild(iframe);
+      closeSignInModal();
     }, 2000);
-    
-    if (signinStatus) {
-      signinStatus.textContent = '✅ Sign-in request sent! Check your email.';
-      signinStatus.style.color = '#51cf66';
-    }
-    
-    // Show success message and close modal
-    alert('✅ Sign-in request sent! Please check your email for confirmation.');
-    
-  } catch (error) {
-    if (signinStatus) {
-      signinStatus.textContent = '⚠️ Signed in, but email could not be sent.';
-      signinStatus.style.color = '#ffd43b';
-    }
-    alert(`✅ Sign in successful! Welcome ${email}. (Email notification could not be sent, but you are signed in.)`);
-  }
-  
-  // Close modal after delay
-  setTimeout(() => {
-    closeSignInModal();
-  }, 2000);
-});
+  });
 
-// Close modal when clicking outside
-window.addEventListener('click', (e) => {
-  if (e.target === signinModal) closeSignInModal();
-});
+  // Close modal when clicking outside
+  window.addEventListener('click', (e) => {
+    if (e.target === signinModal) closeSignInModal();
+  });
 
   // ===== REGISTER MODAL =====
   const registerModal = document.getElementById('registerModal');
