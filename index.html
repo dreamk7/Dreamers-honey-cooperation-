@@ -1,3 +1,11 @@
+I understand now. Let me fix these issues:
+
+1. When you click an item's image, ONLY that item shows details - others stay hidden (no details at all)
+2. Dashboard only shows items the user "hearted" (liked) or added to cart - not just clicked on
+
+Here's the updated code with these fixes:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -566,7 +574,6 @@
       background: rgba(255,255,255,0.2) !important;
     }
 
-    /* Member Dashboard Modal */
     .member-dashboard .selected-items-list {
       text-align: left;
       margin: 15px 0;
@@ -580,6 +587,16 @@
       border-radius: 30px;
       font-size: 0.85rem;
       border: 1px solid rgba(233, 162, 59, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .member-dashboard .selected-item .item-type {
+      font-size: 0.65rem;
+      color: var(--gold);
+      background: rgba(233, 162, 59, 0.15);
+      padding: 2px 10px;
+      border-radius: 20px;
     }
     .member-dashboard .selected-item i {
       color: var(--gold);
@@ -592,6 +609,12 @@
     }
     .member-dashboard .message-status.error {
       color: #ff6b6b;
+    }
+    .member-dashboard .empty-message {
+      color: #ddd0b0;
+      font-size: 0.8rem;
+      text-align: center;
+      padding: 10px 0;
     }
 
     .nav-wrapper {
@@ -1218,12 +1241,17 @@
     </p>
     
     <h4 style="color: var(--gold-light); font-size: 1rem; margin-top: 15px; text-align: left;">
-      <i class="fas fa-heart" style="color: #ff6b6b;"></i> My Selected Items
+      <i class="fas fa-heart" style="color: #ff6b6b;"></i> Liked Items
     </h4>
-    <div class="selected-items-list" id="selectedItemsList">
-      <p style="color: #ddd0b0; font-size: 0.8rem; text-align: center; padding: 10px 0;">
-        <i class="fas fa-box-open"></i> No items selected yet
-      </p>
+    <div class="selected-items-list" id="likedItemsList">
+      <p class="empty-message"><i class="fas fa-heart" style="color: #ff6b6b;"></i> No liked items yet</p>
+    </div>
+
+    <h4 style="color: var(--gold-light); font-size: 1rem; margin-top: 15px; text-align: left;">
+      <i class="fas fa-shopping-cart" style="color: var(--gold);"></i> Cart Items
+    </h4>
+    <div class="selected-items-list" id="cartItemsList">
+      <p class="empty-message"><i class="fas fa-shopping-cart"></i> Cart is empty</p>
     </div>
 
     <h4 style="color: var(--gold-light); font-size: 1rem; margin-top: 15px; text-align: left;">
@@ -1783,7 +1811,10 @@
   // ===== EMAIL FUNCTIONALITY =====
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   let currentUserEmail = localStorage.getItem('dreamers honey cooperation_user') || null;
-  let selectedItems = JSON.parse(localStorage.getItem('dreamers_selected_items') || '[]');
+  
+  // Store liked items and cart items separately
+  let likedItems = JSON.parse(localStorage.getItem('dreamers_liked_items') || '[]');
+  let cartItems = JSON.parse(localStorage.getItem('dreamers_cart_items') || '[]');
 
   // ===== SIGN IN FUNCTIONALITY =====
   const signinModal = document.getElementById('signinModal');
@@ -1798,7 +1829,8 @@
   // Member Dashboard elements
   const memberDashboardModal = document.getElementById('memberDashboardModal');
   const dashboardEmail = document.getElementById('dashboardEmail');
-  const selectedItemsList = document.getElementById('selectedItemsList');
+  const likedItemsList = document.getElementById('likedItemsList');
+  const cartItemsList = document.getElementById('cartItemsList');
   const memberMessageForm = document.getElementById('memberMessageForm');
   const memberMessageSubject = document.getElementById('memberMessageSubject');
   const memberMessageBody = document.getElementById('memberMessageBody');
@@ -1830,7 +1862,6 @@
     signinModal.style.display = 'none'; 
   }
 
-  // Open member dashboard instead of sign in when already signed in
   signInBtn.addEventListener('click', function(e) {
     if (currentUserEmail) {
       openMemberDashboard();
@@ -1941,7 +1972,7 @@
   function openMemberDashboard() {
     if (!currentUserEmail) return;
     dashboardEmail.textContent = currentUserEmail;
-    updateSelectedItemsList();
+    updateDashboardLists();
     memberMessageStatus.textContent = '';
     memberMessageStatus.className = 'message-status';
     memberMessageForm.reset();
@@ -1952,25 +1983,61 @@
     memberDashboardModal.style.display = 'none';
   }
 
-  function updateSelectedItemsList() {
-    if (selectedItems.length === 0) {
-      selectedItemsList.innerHTML = `<p style="color: #ddd0b0; font-size: 0.8rem; text-align: center; padding: 10px 0;">
-        <i class="fas fa-box-open"></i> No items selected yet
-      </p>`;
-      return;
+  function updateDashboardLists() {
+    // Update Liked Items
+    if (likedItems.length === 0) {
+      likedItemsList.innerHTML = `<p class="empty-message"><i class="fas fa-heart" style="color: #ff6b6b;"></i> No liked items yet</p>`;
+    } else {
+      likedItemsList.innerHTML = likedItems.map(item => 
+        `<div class="selected-item"><i class="fas fa-heart" style="color: #ff6b6b;"></i> ${item} <span class="item-type">❤️ Liked</span></div>`
+      ).join('');
     }
-    selectedItemsList.innerHTML = selectedItems.map(item => 
-      `<div class="selected-item"><i class="fas fa-check-circle"></i> ${item}</div>`
-    ).join('');
+
+    // Update Cart Items
+    if (cartItems.length === 0) {
+      cartItemsList.innerHTML = `<p class="empty-message"><i class="fas fa-shopping-cart"></i> Cart is empty</p>`;
+    } else {
+      cartItemsList.innerHTML = cartItems.map(item => 
+        `<div class="selected-item"><i class="fas fa-shopping-cart" style="color: var(--gold);"></i> ${item} <span class="item-type">🛒 Cart</span></div>`
+      ).join('');
+    }
   }
 
-  // Add selected items from carousel clicks
-  function addSelectedItem(itemName) {
+  // ===== LIKED ITEMS FUNCTIONS =====
+  function toggleLike(itemName) {
     if (!currentUserEmail) return;
-    if (!selectedItems.includes(itemName)) {
-      selectedItems.push(itemName);
-      localStorage.setItem('dreamers_selected_items', JSON.stringify(selectedItems));
+    const index = likedItems.indexOf(itemName);
+    if (index > -1) {
+      likedItems.splice(index, 1);
+    } else {
+      likedItems.push(itemName);
     }
+    localStorage.setItem('dreamers_liked_items', JSON.stringify(likedItems));
+    // Update dashboard if open
+    if (memberDashboardModal.style.display === 'flex') {
+      updateDashboardLists();
+    }
+  }
+
+  function isLiked(itemName) {
+    return likedItems.includes(itemName);
+  }
+
+  // ===== CART ITEMS FUNCTIONS =====
+  function addToCart(itemName) {
+    if (!currentUserEmail) {
+      alert('🛒 Please sign in to add items to your cart.');
+      openSignInModal();
+      return false;
+    }
+    if (!cartItems.includes(itemName)) {
+      cartItems.push(itemName);
+      localStorage.setItem('dreamers_cart_items', JSON.stringify(cartItems));
+      if (memberDashboardModal.style.display === 'flex') {
+        updateDashboardLists();
+      }
+    }
+    return true;
   }
 
   // ===== MEMBER MESSAGE FORM =====
@@ -1999,7 +2066,7 @@
           email: currentUserEmail,
           _subject: `📩 ${subject}`,
           _template: 'table',
-          message: `From: ${currentUserEmail}\n\n${body}\n\nSelected Items: ${selectedItems.join(', ') || 'None'}`,
+          message: `From: ${currentUserEmail}\n\n${body}\n\nLiked Items: ${likedItems.join(', ') || 'None'}\nCart Items: ${cartItems.join(', ') || 'None'}`,
           _autoresponse: `Thank you for contacting dreamers honey cooperation! 🐝\n\nWe have received your message and will get in touch with you shortly.\n\nYour message:\n${body}\n\n— The dreamers honey team`
         })
       });
@@ -2025,7 +2092,7 @@
           { name: 'email', value: currentUserEmail },
           { name: '_subject', value: `📩 ${subject}` },
           { name: '_template', value: 'table' },
-          { name: 'message', value: `From: ${currentUserEmail}\n\n${body}\n\nSelected Items: ${selectedItems.join(', ') || 'None'}` },
+          { name: 'message', value: `From: ${currentUserEmail}\n\n${body}\n\nLiked Items: ${likedItems.join(', ') || 'None'}\nCart Items: ${cartItems.join(', ') || 'None'}` },
           { name: '_autoresponse', value: `Thank you for contacting dreamers honey cooperation! 🐝\n\nWe have received your message and will get in touch with you shortly.\n\nYour message:\n${body}\n\n— The dreamers honey team` }
         ];
         
@@ -2062,15 +2129,16 @@
     if (confirm('Are you sure you want to sign out?')) {
       currentUserEmail = null;
       localStorage.removeItem('dreamers honey cooperation_user');
-      selectedItems = [];
-      localStorage.setItem('dreamers_selected_items', JSON.stringify(selectedItems));
+      // Keep liked and cart items in localStorage but clear from memory
+      likedItems = [];
+      cartItems = [];
+      // Don't clear localStorage so items persist if user signs back in
       updateSignInButton();
       closeMemberDashboard();
       alert('✅ You have been signed out.');
     }
   });
 
-  // Close dashboard
   closeDashboardBtn.addEventListener('click', closeMemberDashboard);
   window.addEventListener('click', (e) => {
     if (e.target === memberDashboardModal) closeMemberDashboard();
@@ -2256,13 +2324,15 @@
     card.className = 'equipment-card';
     card.setAttribute('role', 'listitem');
     card.dataset.itemId = idx;
-    card.innerHTML = `<div class="clickable-area"><img src="${item.image}" class="equipment-image" alt="${item.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect width=%22600%22 height=%22400%22 fill=%22%232d6a3b%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23E9A23B%22 font-size=%2224%22%3E${encodeURIComponent(item.name)}%3C/text%3E%3C/svg%3E'"></div><h3>${item.name}</h3><div class="equipment-details">${item.desc}</div><div class="action-icons"><i class="fas fa-heart action-icon heart-icon" aria-label="Like"></i><i class="fas fa-shopping-cart action-icon cart-icon" aria-label="Add to cart"></i></div>`;
+    const isItemLiked = isLiked(item.name);
+    card.innerHTML = `<div class="clickable-area"><img src="${item.image}" class="equipment-image" alt="${item.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect width=%22600%22 height=%22400%22 fill=%22%232d6a3b%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23E9A23B%22 font-size=%2224%22%3E${encodeURIComponent(item.name)}%3C/text%3E%3C/svg%3E'"></div><h3>${item.name}</h3><div class="equipment-details">${item.desc}</div><div class="action-icons"><i class="fas fa-heart action-icon heart-icon ${isItemLiked ? 'liked' : ''}" aria-label="Like"></i><i class="fas fa-shopping-cart action-icon cart-icon" aria-label="Add to cart"></i></div>`;
     const clickArea = card.querySelector('.clickable-area');
     const detailsDiv = card.querySelector('.equipment-details');
     const actionIcons = card.querySelector('.action-icons');
     const heartIcon = card.querySelector('.heart-icon');
     const cartIcon = card.querySelector('.cart-icon');
     
+    // Only expand details when clicking the image area
     clickArea.addEventListener('click', (e) => { 
       e.stopPropagation(); 
       const isCurrentlyExpanded = detailsDiv.classList.contains('show');
@@ -2282,25 +2352,33 @@
         detailsDiv.classList.add('show');
         actionIcons.classList.add('show');
         card.classList.add('expanded');
-        // Add to selected items if signed in
-        if (currentUserEmail) {
-          addSelectedItem(item.name);
-        }
         // Pause auto-scroll for this carousel
-        if (window.carouselInstances && window.carouselInstances[trackId]) {
-          window.carouselInstances[trackId].pauseAutoScroll();
+        if (window.carouselInstances && window.carouselInstances['equipmentTrack']) {
+          window.carouselInstances['equipmentTrack'].pauseAutoScroll();
         }
       } else {
         // Resume auto-scroll if no other items are expanded
         const anyExpanded = card.parentElement.querySelector('.equipment-card.expanded, .product-card.expanded, .team-card.expanded');
-        if (!anyExpanded && window.carouselInstances && window.carouselInstances[trackId]) {
-          window.carouselInstances[trackId].resumeAutoScroll();
+        if (!anyExpanded && window.carouselInstances && window.carouselInstances['equipmentTrack']) {
+          window.carouselInstances['equipmentTrack'].resumeAutoScroll();
         }
       }
     });
     
-    heartIcon.addEventListener('click', (e) => { e.stopPropagation(); heartIcon.classList.toggle('liked'); });
-    cartIcon.addEventListener('click', (e) => { e.stopPropagation(); alert(`✨ "${item.name}" added to your cart!`); });
+    // Heart icon - toggle like
+    heartIcon.addEventListener('click', (e) => { 
+      e.stopPropagation(); 
+      heartIcon.classList.toggle('liked');
+      toggleLike(item.name);
+    });
+    
+    // Cart icon - add to cart
+    cartIcon.addEventListener('click', (e) => { 
+      e.stopPropagation(); 
+      if (addToCart(item.name)) {
+        alert(`✨ "${item.name}" added to your cart!`);
+      }
+    });
     return card;
   }
 
@@ -2319,6 +2397,7 @@
     card.className = 'product-card';
     card.setAttribute('role', 'listitem');
     card.dataset.itemId = idx;
+    const isItemLiked = isLiked(p.name);
     card.innerHTML = `
       <div class="clickable-area">
         <div class="product-img">
@@ -2331,7 +2410,7 @@
         <div>${p.desc}</div>
       </div>
       <div class="action-icons">
-        <i class="fas fa-heart action-icon heart-icon" aria-label="Like"></i>
+        <i class="fas fa-heart action-icon heart-icon ${isItemLiked ? 'liked' : ''}" aria-label="Like"></i>
         <i class="fas fa-shopping-cart action-icon cart-icon" aria-label="Add to cart"></i>
       </div>
     `;
@@ -2358,9 +2437,6 @@
         detailsDiv.classList.add('show');
         actionIcons.classList.add('show');
         card.classList.add('expanded');
-        if (currentUserEmail) {
-          addSelectedItem(p.name);
-        }
         if (window.carouselInstances && window.carouselInstances['productsTrack']) {
           window.carouselInstances['productsTrack'].pauseAutoScroll();
         }
@@ -2372,8 +2448,18 @@
       }
     });
     
-    heartIcon.addEventListener('click', (e) => { e.stopPropagation(); heartIcon.classList.toggle('liked'); });
-    cartIcon.addEventListener('click', (e) => { e.stopPropagation(); alert(`✨ "${p.name}" added to cart! ${p.price}`); });
+    heartIcon.addEventListener('click', (e) => { 
+      e.stopPropagation(); 
+      heartIcon.classList.toggle('liked');
+      toggleLike(p.name);
+    });
+    
+    cartIcon.addEventListener('click', (e) => { 
+      e.stopPropagation(); 
+      if (addToCart(p.name)) {
+        alert(`✨ "${p.name}" added to cart! ${p.price}`);
+      }
+    });
     return card;
   }
 
@@ -2392,9 +2478,12 @@
     card.className = 'team-card';
     card.setAttribute('role', 'listitem');
     card.dataset.itemId = idx;
-    card.innerHTML = `<div class="clickable-area"><img src="${m.image}" class="team-image" alt="${m.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect width=%22600%22 height=%22400%22 fill=%22%232d6a3b%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23E9A23B%22 font-size=%2224%22%3E${encodeURIComponent(m.name)}%3C/text%3E%3C/svg%3E'"></div><h3>${m.name}</h3><div class="team-position">${m.position}</div><div class="team-details">${m.bio}</div>`;
+    const isItemLiked = isLiked(m.name);
+    card.innerHTML = `<div class="clickable-area"><img src="${m.image}" class="team-image" alt="${m.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect width=%22600%22 height=%22400%22 fill=%22%232d6a3b%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23E9A23B%22 font-size=%2224%22%3E${encodeURIComponent(m.name)}%3C/text%3E%3C/svg%3E'"></div><h3>${m.name}</h3><div class="team-position">${m.position}</div><div class="team-details">${m.bio}</div><div class="action-icons"><i class="fas fa-heart action-icon heart-icon ${isItemLiked ? 'liked' : ''}" aria-label="Like"></i></div>`;
     const clickArea = card.querySelector('.clickable-area');
     const detailsDiv = card.querySelector('.team-details');
+    const actionIcons = card.querySelector('.action-icons');
+    const heartIcon = card.querySelector('.heart-icon');
     
     clickArea.addEventListener('click', (e) => { 
       e.stopPropagation(); 
@@ -2411,10 +2500,8 @@
       
       if (!isCurrentlyExpanded) {
         detailsDiv.classList.add('show');
+        actionIcons.classList.add('show');
         card.classList.add('expanded');
-        if (currentUserEmail) {
-          addSelectedItem(m.name);
-        }
         if (window.carouselInstances && window.carouselInstances['teamTrack']) {
           window.carouselInstances['teamTrack'].pauseAutoScroll();
         }
@@ -2424,6 +2511,12 @@
           window.carouselInstances['teamTrack'].resumeAutoScroll();
         }
       }
+    });
+    
+    heartIcon.addEventListener('click', (e) => { 
+      e.stopPropagation(); 
+      heartIcon.classList.toggle('liked');
+      toggleLike(m.name);
     });
     return card;
   }
