@@ -979,10 +979,11 @@
     .action-icon:hover { transform: scale(1.2); }
     .heart-icon.liked { color: #ff4444 !important; }
 
+    /* Only the expanded card gets this style - REMOVED transform to prevent all cards from expanding */
     .equipment-card.expanded, .product-card.expanded, .team-card.expanded {
       border-color: var(--gold);
       box-shadow: 0 0 0 3px rgba(233, 162, 59, 0.3), 0 8px 30px rgba(0,0,0,0.2);
-      transform: scale(1.02);
+      /* Removed transform: scale(1.02) - only border changes */
     }
 
     .nav-buttons { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
@@ -1804,7 +1805,6 @@
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   let currentUserEmail = localStorage.getItem('dreamers honey cooperation_user') || null;
   
-  // Store liked items and cart items separately
   let likedItems = JSON.parse(localStorage.getItem('dreamers_liked_items') || '[]');
   let cartItems = JSON.parse(localStorage.getItem('dreamers_cart_items') || '[]');
 
@@ -1976,7 +1976,6 @@
   }
 
   function updateDashboardLists() {
-    // Update Liked Items
     if (likedItems.length === 0) {
       likedItemsList.innerHTML = `<p class="empty-message"><i class="fas fa-heart" style="color: #ff6b6b;"></i> No liked items yet</p>`;
     } else {
@@ -1985,7 +1984,6 @@
       ).join('');
     }
 
-    // Update Cart Items
     if (cartItems.length === 0) {
       cartItemsList.innerHTML = `<p class="empty-message"><i class="fas fa-shopping-cart"></i> Cart is empty</p>`;
     } else {
@@ -2005,7 +2003,6 @@
       likedItems.push(itemName);
     }
     localStorage.setItem('dreamers_liked_items', JSON.stringify(likedItems));
-    // Update dashboard if open
     if (memberDashboardModal.style.display === 'flex') {
       updateDashboardLists();
     }
@@ -2121,10 +2118,8 @@
     if (confirm('Are you sure you want to sign out?')) {
       currentUserEmail = null;
       localStorage.removeItem('dreamers honey cooperation_user');
-      // Keep liked and cart items in localStorage but clear from memory
       likedItems = [];
       cartItems = [];
-      // Don't clear localStorage so items persist if user signs back in
       updateSignInButton();
       closeMemberDashboard();
       alert('✅ You have been signed out.');
@@ -2324,7 +2319,6 @@
     const heartIcon = card.querySelector('.heart-icon');
     const cartIcon = card.querySelector('.cart-icon');
     
-    // Only expand details when clicking the image area
     clickArea.addEventListener('click', (e) => { 
       e.stopPropagation(); 
       const isCurrentlyExpanded = detailsDiv.classList.contains('show');
@@ -2344,12 +2338,10 @@
         detailsDiv.classList.add('show');
         actionIcons.classList.add('show');
         card.classList.add('expanded');
-        // Pause auto-scroll for this carousel
         if (window.carouselInstances && window.carouselInstances['equipmentTrack']) {
           window.carouselInstances['equipmentTrack'].pauseAutoScroll();
         }
       } else {
-        // Resume auto-scroll if no other items are expanded
         const anyExpanded = card.parentElement.querySelector('.equipment-card.expanded, .product-card.expanded, .team-card.expanded');
         if (!anyExpanded && window.carouselInstances && window.carouselInstances['equipmentTrack']) {
           window.carouselInstances['equipmentTrack'].resumeAutoScroll();
@@ -2357,14 +2349,12 @@
       }
     });
     
-    // Heart icon - toggle like
     heartIcon.addEventListener('click', (e) => { 
       e.stopPropagation(); 
       heartIcon.classList.toggle('liked');
       toggleLike(item.name);
     });
     
-    // Cart icon - add to cart
     cartIcon.addEventListener('click', (e) => { 
       e.stopPropagation(); 
       if (addToCart(item.name)) {
