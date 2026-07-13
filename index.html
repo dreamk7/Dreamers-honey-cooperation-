@@ -2593,7 +2593,7 @@
   const learnBodyDiv = document.getElementById('learnBody');
   function toggleLearn() { learnHeaderDiv.classList.toggle('open'); learnBodyDiv.classList.toggle('open'); const isOpen = learnHeaderDiv.classList.contains('open'); learnHeaderDiv.setAttribute('aria-expanded', isOpen); }
   learnHeaderDiv.addEventListener('click', toggleLearn);
-  learnHeaderDiv.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleLearn(); } });
+  learnHeaderDiv.addEventListener('keydown', (e) => { if (e.key === 'Enter'|| e.key === ' ') { e.preventDefault(); toggleLearn(); } });
 </script>
 </body>
 </html>
