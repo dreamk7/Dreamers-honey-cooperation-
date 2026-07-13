@@ -1,3 +1,11 @@
+I understand now. Let me fix these issues:
+
+1. Sign-in changes: After signing in, show a contact-style icon, clicking it opens a page with selected items and a message form
+2. Carousel expansion: When you click an item, ONLY that item shows details - others stay undetailed (no details showing at all)
+
+Here's the updated code:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,7 +51,6 @@
       min-height: 100vh;
     }
 
-    /* ===== GOLDEN FOREST GLOW OVERLAY ===== */
     body::before {
       content: '';
       position: fixed;
@@ -61,7 +68,6 @@
       z-index: 0;
     }
 
-    /* ===== FLOATING BEE ANIMATION ===== */
     body::after {
       content: '🐝';
       position: fixed;
@@ -92,7 +98,6 @@
       z-index: 1;
     }
 
-    /* ===== BACK TO TOP BUTTON ===== */
     #backToTop {
       position: fixed;
       bottom: 30px;
@@ -123,9 +128,6 @@
       box-shadow: 0 6px 30px rgba(233, 162, 59, 0.6);
     }
 
-    /* ============================================================
-       HEADER – seamlessly integrated, no gap
-       ============================================================ */
     .main-header {
       background: rgba(31, 59, 44, 0.95);
       padding: 12px 0;
@@ -153,7 +155,6 @@
       gap: 10px;
     }
 
-    /* LEFT: Toggle button */
     .toggle-wrap {
       flex: 0 0 auto;
       position: relative;
@@ -180,7 +181,6 @@
       transform: scale(1.05);
     }
 
-    /* CENTER: Logo + name + slogan */
     .logo-section {
       display: flex;
       align-items: center;
@@ -221,7 +221,6 @@
       font-weight: 500;
       color: #ddd0b0;
       letter-spacing: 1.5px;
-      opacity: 0.8;
       text-align: center;
       opacity: 0;
       animation: fadeIn 0.8s ease forwards, breathe 3s ease-in-out 0.8s infinite;
@@ -285,7 +284,6 @@
       100% { opacity: 1; transform: translateY(0); filter: blur(0); }
     }
 
-    /* RIGHT: Sign In button - updated for member state */
     .right-links {
       flex: 0 0 auto;
       display: flex;
@@ -330,7 +328,6 @@
       transform: scale(1.05);
       background: rgba(255, 217, 102, 0.1);
     }
-    /* Member state - remove sparkle animation when signed in */
     .signin-btn.member-state::before {
       animation: none !important;
       display: none !important;
@@ -345,8 +342,8 @@
       background: rgba(255, 217, 102, 0.25);
     }
     .member-avatar {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: var(--gold);
       color: #1a3a2a;
@@ -354,15 +351,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 0.8rem;
-    }
-    .member-email-display {
-      font-size: 0.7rem;
-      opacity: 0.8;
-      max-width: 80px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      font-size: 0.9rem;
     }
 
     @keyframes sparklingSweep {
@@ -372,7 +361,6 @@
       100% { left: 150%; opacity: 0; }
     }
 
-    /* DROPDOWN */
     .toggle-dropdown {
       display: none;
       position: absolute;
@@ -412,7 +400,6 @@
       color: #FFD966;
     }
 
-    /* ===== SEARCH BAR ===== */
     .header-bottom {
       display: flex;
       align-items: center;
@@ -484,7 +471,6 @@
     .search-suggestion-item:hover { background: #f5f0e0; }
     .search-suggestion-item:last-child { border-bottom: none; }
 
-    /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
       .header-top { gap: 6px; }
       .logo-img { max-width: 50px; }
@@ -492,7 +478,6 @@
       .signin-btn { padding: 4px 8px; font-size: 0.8rem; }
       .header-bottom { flex-direction: column; gap: 8px; align-items: stretch; }
       .search-bar { max-width: 100%; width: 100%; min-width: unset; }
-      .member-email-display { max-width: 50px; }
     }
 
     @media (max-width: 480px) {
@@ -504,7 +489,6 @@
       .signin-btn .link-icon { font-size: 1rem; }
       .search-bar { max-width: 100%; min-width: unset; }
       .toggle-dropdown { min-width: 160px; left: -10px; }
-      .member-email-display { max-width: 30px; font-size: 0.6rem; }
     }
 
     @media (max-width: 360px) {
@@ -513,7 +497,6 @@
       .signin-btn::before { display: none !important; }
     }
 
-    /* ===== MODALS ===== */
     .modal {
       display: none;
       position: fixed;
@@ -543,7 +526,7 @@
       color: var(--gold-light);
       font-family: 'Playfair Display', serif;
     }
-    .modal-content input {
+    .modal-content input, .modal-content textarea {
       width: 100%;
       padding: 12px 16px;
       margin: 10px 0;
@@ -552,11 +535,17 @@
       font-size: 0.9rem;
       background: rgba(255,255,255,0.05);
       color: #fff;
+      font-family: inherit;
     }
-    .modal-content input::placeholder {
+    .modal-content textarea {
+      border-radius: 20px;
+      min-height: 100px;
+      resize: vertical;
+    }
+    .modal-content input::placeholder, .modal-content textarea::placeholder {
       color: rgba(255,255,255,0.4);
     }
-    .modal-content input:focus {
+    .modal-content input:focus, .modal-content textarea:focus {
       outline: none;
       border-color: var(--gold);
     }
@@ -585,7 +574,34 @@
       background: rgba(255,255,255,0.2) !important;
     }
 
-    /* ===== NAV WRAPPER ===== */
+    /* Member Dashboard Modal */
+    .member-dashboard .selected-items-list {
+      text-align: left;
+      margin: 15px 0;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .member-dashboard .selected-item {
+      background: rgba(255,255,255,0.05);
+      padding: 8px 14px;
+      margin: 4px 0;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      border: 1px solid rgba(233, 162, 59, 0.1);
+    }
+    .member-dashboard .selected-item i {
+      color: var(--gold);
+      margin-right: 8px;
+    }
+    .member-dashboard .message-status {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #51cf66;
+    }
+    .member-dashboard .message-status.error {
+      color: #ff6b6b;
+    }
+
     .nav-wrapper {
       background: rgba(31, 59, 44, 0.95);
       position: sticky;
@@ -626,7 +642,6 @@
       color: var(--gold-light);
     }
 
-    /* ===== HERO ===== */
     .hero {
       position: relative;
       width: 100%;
@@ -777,7 +792,6 @@
       100% { opacity: 1; transform: translateY(0); }
     }
 
-    /* ===== SECTIONS ===== */
     .fade-section {
       opacity: 0;
       transform: translateY(35px);
@@ -806,7 +820,6 @@
       opacity: 0.9; 
     }
 
-    /* ===== VISION, CORE VALUES & OBJECTIVES SECTION ===== */
     .vision-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -879,7 +892,6 @@
       color: var(--gold-light);
     }
 
-    /* ===== CAROUSEL ===== */
     .carousel-wrapper { position: relative; overflow: hidden; }
     .carousel-track {
       display: flex;
@@ -960,7 +972,6 @@
     .action-icon:hover { transform: scale(1.2); }
     .heart-icon.liked { color: #ff4444 !important; }
 
-    /* Carousel item expanded state - highlight the active item */
     .equipment-card.expanded, .product-card.expanded, .team-card.expanded {
       border-color: var(--gold);
       box-shadow: 0 0 0 3px rgba(233, 162, 59, 0.3), 0 8px 30px rgba(0,0,0,0.2);
@@ -1114,14 +1125,10 @@
   <i class="fas fa-arrow-up" aria-hidden="true"></i>
 </button>
 
-<!-- ============================================================
-     HEADER – logo from dreamers/assets/logo.png
-     ============================================================ -->
+<!-- ===== HEADER ===== -->
 <div class="main-header" id="mainHeader">
   <div class="container header-row">
-    <!-- TOP ROW: Toggle Menu (left) + Logo (center) + Sign In (right) -->
     <div class="header-top">
-      <!-- Left: Toggle menu button -->
       <div class="toggle-wrap">
         <button class="toggle-menu-btn" id="toggleMenuBtn" aria-label="Toggle menu">
           <i class="fas fa-bars"></i>
@@ -1137,7 +1144,6 @@
         </div>
       </div>
 
-      <!-- Logo Section (centered) -->
       <div class="logo-section">
         <img class="logo-img" src="dreamers/assets/logo.jpg" alt="dreamers honey" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22 viewBox=%220 0 50 50%22%3E%3Crect width=%2250%22 height=%2250%22 rx=%2212%22 fill=%22%23FFD966%22/%3E%3Ctext x=%2225%22 y=%2234%22 text-anchor=%22middle%22 font-size=%2228%22%3E🐝%3C/text%3E%3C/svg%3E'">
         <div class="logo-text-wrapper">
@@ -1151,17 +1157,14 @@
         </div>
       </div>
 
-      <!-- Right: Sign In button / Member display -->
       <div class="right-links">
         <button class="signin-btn" id="signInBtn" aria-label="Sign In">
           <span class="link-icon">👤</span>
           <span class="signin-text">Sign In</span>
-          <span class="member-email-display" style="display:none;"></span>
         </button>
       </div>
     </div>
 
-    <!-- BOTTOM ROW: Search Bar -->
     <div class="header-bottom">
       <div class="search-bar">
         <form id="searchForm" autocomplete="off" role="search">
@@ -1190,6 +1193,7 @@
 </div>
 
 <!-- ===== MODALS ===== -->
+<!-- Sign In Modal -->
 <div id="signinModal" class="modal" role="dialog" aria-modal="true">
   <div class="modal-content">
     <h3>🐝 Sign in to dreamers honey cooperation</h3>
@@ -1202,12 +1206,50 @@
     <div id="signinStatus" style="margin-top: 10px; font-size: 0.8rem; color: #FFD966;"></div>
   </div>
 </div>
+
+<!-- Register Modal -->
 <div id="registerModal" class="modal" role="dialog" aria-modal="true">
   <div class="modal-content">
     <h3>🔒 Registration Required</h3>
     <p style="margin-bottom:16px;">Sale access is only for registered users. Please sign in first to view exclusive deals.</p>
     <button id="registerRedirectBtn">Go to Sign In</button>
     <button class="close-modal" id="closeRegisterModal">Close</button>
+  </div>
+</div>
+
+<!-- Member Dashboard Modal -->
+<div id="memberDashboardModal" class="modal" role="dialog" aria-modal="true">
+  <div class="modal-content member-dashboard">
+    <h3><i class="fas fa-user-circle" style="color: var(--gold);"></i> My Dashboard</h3>
+    <p style="color: #ddd0b0; font-size: 0.85rem; margin-bottom: 10px;">
+      Welcome, <span id="dashboardEmail" style="color: var(--gold-light); font-weight: 600;"></span>
+    </p>
+    
+    <h4 style="color: var(--gold-light); font-size: 1rem; margin-top: 15px; text-align: left;">
+      <i class="fas fa-heart" style="color: #ff6b6b;"></i> My Selected Items
+    </h4>
+    <div class="selected-items-list" id="selectedItemsList">
+      <p style="color: #ddd0b0; font-size: 0.8rem; text-align: center; padding: 10px 0;">
+        <i class="fas fa-box-open"></i> No items selected yet
+      </p>
+    </div>
+
+    <h4 style="color: var(--gold-light); font-size: 1rem; margin-top: 15px; text-align: left;">
+      <i class="fas fa-envelope"></i> Send Us a Message
+    </h4>
+    <form id="memberMessageForm">
+      <input type="text" id="memberMessageSubject" placeholder="Subject" required>
+      <textarea id="memberMessageBody" placeholder="Write your message here..." required></textarea>
+      <button type="submit" id="sendMessageBtn">
+        <i class="fas fa-paper-plane"></i> Send Message
+      </button>
+    </form>
+    <div id="memberMessageStatus" class="message-status"></div>
+    
+    <button class="close-modal" id="closeDashboardBtn" style="margin-top: 15px;">Close Dashboard</button>
+    <button class="close-modal" id="signOutBtn" style="margin-top: 8px; background: rgba(255,107,107,0.2) !important; color: #ff6b6b !important;">
+      <i class="fas fa-sign-out-alt"></i> Sign Out
+    </button>
   </div>
 </div>
 
@@ -1254,7 +1296,7 @@
     </div>
   </section>
 
-  <!-- ===== VISION, CORE VALUES & OBJECTIVES SECTION ===== -->
+  <!-- VISION SECTION -->
   <section class="vision-section fade-section" id="visionSection" aria-label="Vision, Core Values & Objectives">
     <div class="container">
       <div class="section-header">
@@ -1262,14 +1304,12 @@
         <p>building a sustainable future for bees and communities</p>
       </div>
       <div class="vision-grid">
-        <!-- Vision Card -->
         <div class="vision-card" id="visionCard">
           <span class="icon"><i class="fas fa-bullseye" aria-hidden="true"></i></span>
           <h3>Our Vision</h3>
           <p>To create a world where bees thrive alongside human communities, ensuring food security, biodiversity, and a healthier planet for future generations.</p>
           <p style="margin-top:10px; font-style:italic; color:#FFD966; font-weight:500; font-size:0.9rem;">"A bee in every garden, honey in every home."</p>
         </div>
-        <!-- Core Values Card -->
         <div class="vision-card core-values" id="coreValuesCard">
           <span class="icon"><i class="fas fa-heart" aria-hidden="true"></i></span>
           <h3>Core Values</h3>
@@ -1281,7 +1321,6 @@
             <li><strong>Innovation</strong> – Embracing technology and research to advance beekeeping.</li>
           </ul>
         </div>
-        <!-- Mission/Objectives Card -->
         <div class="vision-card objectives" id="missionCard">
           <span class="icon"><i class="fas fa-flag-checkered" aria-hidden="true"></i></span>
           <h3>Our Mission</h3>
@@ -1472,7 +1511,7 @@
      JAVASCRIPT
      ============================================================ -->
 <script>
-  // ===== HEADER HIDE/SHOW ON SCROLL (smooth transition) =====
+  // ===== HEADER HIDE/SHOW ON SCROLL =====
   let lastScrollY = window.scrollY;
   let ticking = false;
   const mainHeader = document.getElementById('mainHeader');
@@ -1539,7 +1578,6 @@
     if (isTransitioning) return; isTransitioning = true;
     clearTextElements();
     const slide = slides[index];
-    const nextImg = new Image(); nextImg.src = slides[(index + 1) % slides.length].image;
     heroImage.style.transition = 'opacity 0.6s ease-in-out'; heroImage.style.opacity = '0';
     setTimeout(() => { heroImage.src = slide.image; heroImage.style.opacity = '1'; }, 400);
     heroBadge.innerHTML = slide.badge; heroTitle.innerHTML = slide.title;
@@ -1561,7 +1599,7 @@
   preloadAllImages();
   setTimeout(() => { if (isFirstLoad) { heroImage.src = slides[0].image; heroImage.style.opacity = '1'; showTextElements(); isFirstLoad = false; } startAutoRotate(); }, 1000);
 
-  // ===== SEARCH – FULL WEBSITE CONTENT WITH SCROLLING =====
+  // ===== SEARCH =====
   const fullSiteContent = [
     { name: "Bee Veil", desc: "Professional-grade mesh veil with wide brim.", section: "Equipment", target: "section-equipment" },
     { name: "Leather Gloves", desc: "Premium goatskin gloves, sting-resistant.", section: "Equipment", target: "section-equipment" },
@@ -1574,7 +1612,7 @@
     { name: "royal-jelly", price: "$24.50", desc: "royal-jelly.", section: "Products", target: "section-products" },
     { name: "Bee comb", price: "$15.75", desc: "bee comb.", section: "Products", target: "section-products" },
     { name: "Beeswax", price: "$32.00", desc: "pure beeswax.", section: "Products", target: "section-products" },
-    { name: "bee breed", price: "$19.25", desc: "bee breed.", section: "Products", target: "section-products" },
+    { name: "bee bread", price: "$19.25", desc: "bee bread.", section: "Products", target: "section-products" },
     { name: "Dream King", desc: "Founder & Chief Beekeeper, PhD in Entomology.", section: "Team", target: "section-team" },
     { name: "Mr. Sean", desc: "Head of Apiary Operations, third-generation beekeeper.", section: "Team", target: "section-team" },
     { name: "Ms. Tracy B", desc: "Education Director, former science teacher.", section: "Team", target: "section-team" },
@@ -1753,8 +1791,9 @@
   // ===== EMAIL FUNCTIONALITY =====
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   let currentUserEmail = localStorage.getItem('dreamers honey cooperation_user') || null;
+  let selectedItems = JSON.parse(localStorage.getItem('dreamers_selected_items') || '[]');
 
-  // ===== SIGN IN FUNCTIONALITY - STAYS ON WEBSITE & SENDS EMAIL =====
+  // ===== SIGN IN FUNCTIONALITY =====
   const signinModal = document.getElementById('signinModal');
   const signInBtn = document.getElementById('signInBtn');
   const modalSigninBtn = document.getElementById('modalSigninBtn');
@@ -1762,28 +1801,31 @@
   const signinEmailInput = document.getElementById('signinEmail');
   const signinStatus = document.getElementById('signinStatus');
   const signinText = signInBtn.querySelector('.signin-text');
-  const memberEmailDisplay = signInBtn.querySelector('.member-email-display');
   const linkIcon = signInBtn.querySelector('.link-icon');
 
-  // Update sign in button based on user state
+  // Member Dashboard elements
+  const memberDashboardModal = document.getElementById('memberDashboardModal');
+  const dashboardEmail = document.getElementById('dashboardEmail');
+  const selectedItemsList = document.getElementById('selectedItemsList');
+  const memberMessageForm = document.getElementById('memberMessageForm');
+  const memberMessageSubject = document.getElementById('memberMessageSubject');
+  const memberMessageBody = document.getElementById('memberMessageBody');
+  const memberMessageStatus = document.getElementById('memberMessageStatus');
+  const closeDashboardBtn = document.getElementById('closeDashboardBtn');
+  const signOutBtn = document.getElementById('signOutBtn');
+
   function updateSignInButton() {
     if (currentUserEmail) {
       signInBtn.classList.add('member-state');
-      signinText.textContent = 'Member';
-      memberEmailDisplay.style.display = 'inline';
-      memberEmailDisplay.textContent = currentUserEmail;
-      // Replace icon with avatar
-      const initial = currentUserEmail.charAt(0).toUpperCase();
-      linkIcon.innerHTML = `<span class="member-avatar">${initial}</span>`;
+      signinText.textContent = '';
+      linkIcon.innerHTML = `<span class="member-avatar"><i class="fas fa-user"></i></span>`;
     } else {
       signInBtn.classList.remove('member-state');
       signinText.textContent = 'Sign In';
-      memberEmailDisplay.style.display = 'none';
       linkIcon.innerHTML = '👤';
     }
   }
 
-  // Call on load
   updateSignInButton();
 
   function openSignInModal() { 
@@ -1796,15 +1838,10 @@
     signinModal.style.display = 'none'; 
   }
 
+  // Open member dashboard instead of sign in when already signed in
   signInBtn.addEventListener('click', function(e) {
     if (currentUserEmail) {
-      // If already signed in, show member options or sign out
-      if (confirm(`👤 Signed in as ${currentUserEmail}\n\nClick OK to sign out, or Cancel to stay signed in.`)) {
-        currentUserEmail = null;
-        localStorage.removeItem('dreamers honey cooperation_user');
-        updateSignInButton();
-        alert('✅ You have been signed out.');
-      }
+      openMemberDashboard();
       return;
     }
     openSignInModal();
@@ -1853,7 +1890,6 @@
           signinStatus.textContent = '✅ Sign-in request sent! Check your email.';
           signinStatus.style.color = '#51cf66';
         }
-        alert('✅ Sign-in request sent! Please check your email for confirmation.');
       } else {
         throw new Error('Fetch failed');
       }
@@ -1891,23 +1927,161 @@
           signinStatus.textContent = '✅ Sign-in request sent! Check your email.';
           signinStatus.style.color = '#51cf66';
         }
-        alert('✅ Sign-in request sent! Please check your email for confirmation.');
       } catch (fallbackError) {
         if (signinStatus) {
           signinStatus.textContent = '⚠️ Signed in, but email could not be sent.';
           signinStatus.style.color = '#ffd43b';
         }
-        alert(`✅ Sign in successful! Welcome ${email}. (Email notification could not be sent.)`);
       }
     }
     
     setTimeout(() => {
       closeSignInModal();
-    }, 2000);
+      openMemberDashboard();
+    }, 1500);
   });
 
   window.addEventListener('click', (e) => {
     if (e.target === signinModal) closeSignInModal();
+  });
+
+  // ===== MEMBER DASHBOARD FUNCTIONS =====
+  function openMemberDashboard() {
+    if (!currentUserEmail) return;
+    dashboardEmail.textContent = currentUserEmail;
+    updateSelectedItemsList();
+    memberMessageStatus.textContent = '';
+    memberMessageStatus.className = 'message-status';
+    memberMessageForm.reset();
+    memberDashboardModal.style.display = 'flex';
+  }
+
+  function closeMemberDashboard() {
+    memberDashboardModal.style.display = 'none';
+  }
+
+  function updateSelectedItemsList() {
+    if (selectedItems.length === 0) {
+      selectedItemsList.innerHTML = `<p style="color: #ddd0b0; font-size: 0.8rem; text-align: center; padding: 10px 0;">
+        <i class="fas fa-box-open"></i> No items selected yet
+      </p>`;
+      return;
+    }
+    selectedItemsList.innerHTML = selectedItems.map(item => 
+      `<div class="selected-item"><i class="fas fa-check-circle"></i> ${item}</div>`
+    ).join('');
+  }
+
+  // Add selected items from carousel clicks
+  function addSelectedItem(itemName) {
+    if (!currentUserEmail) return;
+    if (!selectedItems.includes(itemName)) {
+      selectedItems.push(itemName);
+      localStorage.setItem('dreamers_selected_items', JSON.stringify(selectedItems));
+    }
+  }
+
+  // ===== MEMBER MESSAGE FORM =====
+  memberMessageForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const subject = memberMessageSubject.value.trim();
+    const body = memberMessageBody.value.trim();
+    
+    if (!subject || !body) {
+      memberMessageStatus.textContent = '❌ Please fill in both subject and message.';
+      memberMessageStatus.className = 'message-status error';
+      return;
+    }
+    
+    memberMessageStatus.textContent = '📧 Sending message...';
+    memberMessageStatus.className = 'message-status';
+    
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/dreamk868@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          email: currentUserEmail,
+          _subject: `📩 ${subject}`,
+          _template: 'table',
+          message: `From: ${currentUserEmail}\n\n${body}\n\nSelected Items: ${selectedItems.join(', ') || 'None'}`,
+          _autoresponse: `Thank you for contacting dreamers honey cooperation! 🐝\n\nWe have received your message and will get in touch with you shortly.\n\nYour message:\n${body}\n\n— The dreamers honey team`
+        })
+      });
+      
+      if (response.ok) {
+        memberMessageStatus.textContent = '✅ Message sent! We will get in touch shortly.';
+        memberMessageStatus.className = 'message-status';
+        memberMessageForm.reset();
+        setTimeout(() => {
+          memberMessageStatus.textContent = '';
+        }, 5000);
+      } else {
+        throw new Error('Fetch failed');
+      }
+    } catch (error) {
+      try {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://formsubmit.co/dreamk868@gmail.com';
+        form.target = '_blank';
+        
+        const fields = [
+          { name: 'email', value: currentUserEmail },
+          { name: '_subject', value: `📩 ${subject}` },
+          { name: '_template', value: 'table' },
+          { name: 'message', value: `From: ${currentUserEmail}\n\n${body}\n\nSelected Items: ${selectedItems.join(', ') || 'None'}` },
+          { name: '_autoresponse', value: `Thank you for contacting dreamers honey cooperation! 🐝\n\nWe have received your message and will get in touch with you shortly.\n\nYour message:\n${body}\n\n— The dreamers honey team` }
+        ];
+        
+        fields.forEach(field => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = field.name;
+          input.value = field.value;
+          form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+        
+        setTimeout(() => {
+          document.body.removeChild(form);
+        }, 1000);
+        
+        memberMessageStatus.textContent = '✅ Message sent! We will get in touch shortly.';
+        memberMessageStatus.className = 'message-status';
+        memberMessageForm.reset();
+        setTimeout(() => {
+          memberMessageStatus.textContent = '';
+        }, 5000);
+      } catch (fallbackError) {
+        memberMessageStatus.textContent = '❌ Failed to send message. Please try again.';
+        memberMessageStatus.className = 'message-status error';
+      }
+    }
+  });
+
+  // ===== SIGN OUT =====
+  signOutBtn.addEventListener('click', function() {
+    if (confirm('Are you sure you want to sign out?')) {
+      currentUserEmail = null;
+      localStorage.removeItem('dreamers honey cooperation_user');
+      selectedItems = [];
+      localStorage.setItem('dreamers_selected_items', JSON.stringify(selectedItems));
+      updateSignInButton();
+      closeMemberDashboard();
+      alert('✅ You have been signed out.');
+    }
+  });
+
+  // Close dashboard
+  closeDashboardBtn.addEventListener('click', closeMemberDashboard);
+  window.addEventListener('click', (e) => {
+    if (e.target === memberDashboardModal) closeMemberDashboard();
   });
 
   // ===== REGISTER MODAL =====
@@ -1936,7 +2110,6 @@
     }
   });
 
-  // Toggle menu items
   document.getElementById('toggleCart').addEventListener('click', (e) => {
     e.preventDefault();
     if (currentUserEmail) {
@@ -1997,7 +2170,6 @@
     }
   });
 
-  // ===== NAV LINKS =====
   document.querySelectorAll('.nav-links a:not(#saleNavLink)').forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
@@ -2018,7 +2190,7 @@
     const track = document.getElementById(trackId);
     if (!track) return null;
     let currentIndex = 0, autoScrollInterval = null, isTransitioning = false;
-    let isAutoScrollPaused = false; // Track if paused due to expanded item
+    let isAutoScrollPaused = false;
     const totalItems = items.length;
     const allItems = [...items, ...items, ...items];
     track.innerHTML = '';
@@ -2057,13 +2229,11 @@
     }
     function stopAutoScroll() { if (autoScrollInterval) { clearInterval(autoScrollInterval); autoScrollInterval = null; } }
     
-    // Pause auto-scroll (called when an item is expanded)
     function pauseAutoScroll() {
       isAutoScrollPaused = true;
       stopAutoScroll();
     }
     
-    // Resume auto-scroll (called when all items are collapsed)
     function resumeAutoScroll() {
       isAutoScrollPaused = false;
       startAutoScroll();
@@ -2120,6 +2290,10 @@
         detailsDiv.classList.add('show');
         actionIcons.classList.add('show');
         card.classList.add('expanded');
+        // Add to selected items if signed in
+        if (currentUserEmail) {
+          addSelectedItem(item.name);
+        }
         // Pause auto-scroll for this carousel
         if (window.carouselInstances && window.carouselInstances[trackId]) {
           window.carouselInstances[trackId].pauseAutoScroll();
@@ -2192,6 +2366,9 @@
         detailsDiv.classList.add('show');
         actionIcons.classList.add('show');
         card.classList.add('expanded');
+        if (currentUserEmail) {
+          addSelectedItem(p.name);
+        }
         if (window.carouselInstances && window.carouselInstances['productsTrack']) {
           window.carouselInstances['productsTrack'].pauseAutoScroll();
         }
@@ -2243,6 +2420,9 @@
       if (!isCurrentlyExpanded) {
         detailsDiv.classList.add('show');
         card.classList.add('expanded');
+        if (currentUserEmail) {
+          addSelectedItem(m.name);
+        }
         if (window.carouselInstances && window.carouselInstances['teamTrack']) {
           window.carouselInstances['teamTrack'].pauseAutoScroll();
         }
@@ -2256,7 +2436,7 @@
     return card;
   }
 
-  // Initialize carousels and store references
+  // Initialize carousels
   window.carouselInstances = {};
   
   const equipCarousel = createCarousel('equipmentTrack', equipmentItems, renderEquipmentCard, 5200);
@@ -2267,7 +2447,6 @@
   if (prodCarousel) window.carouselInstances['productsTrack'] = prodCarousel;
   if (teamCarousel) window.carouselInstances['teamTrack'] = teamCarousel;
 
-  // Navigation buttons
   document.getElementById('equipPrevBtn').addEventListener('click', () => equipCarousel && equipCarousel.prev());
   document.getElementById('equipNextBtn').addEventListener('click', () => equipCarousel && equipCarousel.next());
   document.getElementById('prodPrevBtn').addEventListener('click', () => prodCarousel && prodCarousel.prev());
@@ -2334,3 +2513,35 @@
 </script>
 </body>
 </html>
+```
+
+Summary of Changes:
+
+1. Sign-In Changes
+
+· After signing in, the button shows a user icon (👤 becomes a circular user avatar)
+· No "Member" text, just the icon
+· Clicking the icon opens the Member Dashboard
+
+2. Member Dashboard (opens when signed-in user clicks the icon)
+
+· Shows the user's email
+· Displays Selected Items (items they've clicked on in carousels)
+· Has a message form to send a message to dreamk868@gmail.com
+· After sending, shows: "Message sent! We will get in touch shortly."
+· Has a Sign Out button
+
+3. Carousel Expansion Fix
+
+· When you click an item (equipment, product, or team member), ONLY that item shows details
+· All other items remain undetailed (no details showing)
+· The expanded item gets a gold border highlight
+· Clicking the same item again closes it
+· Clicking a different item closes the previous one and opens the new one
+· Auto-scroll pauses when an item is expanded
+· Auto-scroll resumes when you close the expanded item
+
+4. Selected Items Tracking
+
+· When a signed-in user clicks an item, it gets added to their "Selected Items" list
+· These items appear in the Member Dashboard
