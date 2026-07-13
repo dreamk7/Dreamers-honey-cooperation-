@@ -1,11 +1,3 @@
-I understand now. Let me fix these issues:
-
-1. Sign-in changes: After signing in, show a contact-style icon, clicking it opens a page with selected items and a message form
-2. Carousel expansion: When you click an item, ONLY that item shows details - others stay undetailed (no details showing at all)
-
-Here's the updated code:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2513,35 +2505,3 @@ Here's the updated code:
 </script>
 </body>
 </html>
-```
-
-Summary of Changes:
-
-1. Sign-In Changes
-
-· After signing in, the button shows a user icon (👤 becomes a circular user avatar)
-· No "Member" text, just the icon
-· Clicking the icon opens the Member Dashboard
-
-2. Member Dashboard (opens when signed-in user clicks the icon)
-
-· Shows the user's email
-· Displays Selected Items (items they've clicked on in carousels)
-· Has a message form to send a message to dreamk868@gmail.com
-· After sending, shows: "Message sent! We will get in touch shortly."
-· Has a Sign Out button
-
-3. Carousel Expansion Fix
-
-· When you click an item (equipment, product, or team member), ONLY that item shows details
-· All other items remain undetailed (no details showing)
-· The expanded item gets a gold border highlight
-· Clicking the same item again closes it
-· Clicking a different item closes the previous one and opens the new one
-· Auto-scroll pauses when an item is expanded
-· Auto-scroll resumes when you close the expanded item
-
-4. Selected Items Tracking
-
-· When a signed-in user clicks an item, it gets added to their "Selected Items" list
-· These items appear in the Member Dashboard
