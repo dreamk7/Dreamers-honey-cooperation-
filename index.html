@@ -1,3 +1,12 @@
+OH! Now I understand! 🤣 You want:
+
+· When you click an image, ONLY that one item expands (shows gold border + details)
+· All other items stay normal (no border, no details)
+· When you click the same item again, it closes
+
+Let me fix this properly:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -917,7 +926,10 @@
       box-shadow: var(--shadow);
       cursor: pointer;
     }
-    .equipment-card:hover, .product-card:hover, .team-card:hover { transform: translateY(-8px); border-color: var(--gold); }
+    .equipment-card:hover, .product-card:hover, .team-card:hover { 
+      transform: translateY(-8px); 
+      border-color: var(--gold); 
+    }
     .clickable-area { cursor: pointer; }
     .equipment-image, .team-image { 
       width: 100%; 
@@ -979,11 +991,11 @@
     .action-icon:hover { transform: scale(1.2); }
     .heart-icon.liked { color: #ff4444 !important; }
 
-    /* Only the clicked card gets the gold border - NO transform */
+    /* ONLY the clicked/expanded card gets the gold border */
     .equipment-card.expanded, .product-card.expanded, .team-card.expanded {
       border-color: var(--gold) !important;
       box-shadow: 0 0 0 3px rgba(233, 162, 59, 0.3), 0 8px 30px rgba(0,0,0,0.2) !important;
-      /* NO transform: scale - only border changes */
+      transform: translateY(-8px) !important;
     }
 
     .nav-buttons { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
@@ -2234,7 +2246,7 @@
   });
   window.addEventListener('click', (e) => { if (e.target === signinModal) closeSignInModal(); if (e.target === registerModal) closeRegisterModalFunc(); });
 
-  // ===== CAROUSELS WITH INDEPENDENT ITEM EXPAND/COLLAPSE =====
+  // ===== CAROUSELS WITH SINGLE ITEM EXPAND =====
   function createCarousel(trackId, items, cardRenderer, autoScrollSpeed = 4000) {
     const track = document.getElementById(trackId);
     if (!track) return null;
@@ -2335,7 +2347,7 @@
         if (actions) actions.classList.remove('show');
       });
       
-      // If it wasn't expanded, expand this one
+      // If it wasn't expanded, expand THIS ONE only
       if (!isCurrentlyExpanded) {
         detailsDiv.classList.add('show');
         actionIcons.classList.add('show');
@@ -2344,6 +2356,7 @@
           window.carouselInstances['equipmentTrack'].pauseAutoScroll();
         }
       } else {
+        // Resume auto-scroll if no expanded items
         const anyExpanded = card.parentElement.querySelector('.equipment-card.expanded, .product-card.expanded, .team-card.expanded');
         if (!anyExpanded && window.carouselInstances && window.carouselInstances['equipmentTrack']) {
           window.carouselInstances['equipmentTrack'].resumeAutoScroll();
@@ -2447,7 +2460,7 @@
     return card;
   }
 
-  // ===== TEAM MEMBERS - 8 members =====
+  // ===== TEAM MEMBERS =====
   const teamMembers = [
     {name:"Dream King", position:"CEO DHC", bio:"PhD in Entomology. Founder & Chief Beekeeper.", image:"dreamers/assets/team 3.jpg"},
     {name:"Mr. Sean", position:"THE ACCOUNTANT", bio:"Incharge of all expenses and financial calls of the project.", image:"dreamers/assets/team 5.jpg"},
