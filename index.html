@@ -979,11 +979,11 @@
     .action-icon:hover { transform: scale(1.2); }
     .heart-icon.liked { color: #ff4444 !important; }
 
-    /* Only the expanded card gets this style - REMOVED transform to prevent all cards from expanding */
+    /* Only the clicked card gets the gold border - NO transform */
     .equipment-card.expanded, .product-card.expanded, .team-card.expanded {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(233, 162, 59, 0.3), 0 8px 30px rgba(0,0,0,0.2);
-      /* Removed transform: scale(1.02) - only border changes */
+      border-color: var(--gold) !important;
+      box-shadow: 0 0 0 3px rgba(233, 162, 59, 0.3), 0 8px 30px rgba(0,0,0,0.2) !important;
+      /* NO transform: scale - only border changes */
     }
 
     .nav-buttons { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
@@ -1632,6 +1632,8 @@
     { name: "Mr. Layton", desc: "Research Lead, biologist specializing in native bees.", section: "Team", target: "section-team" },
     { name: "Ms. Patience", desc: "Community Partnerships, works with farmers across West Africa.", section: "Team", target: "section-team" },
     { name: "Mr. Henry", desc: "Sustainability Coordinator, manages carbon-neutral shipping.", section: "Team", target: "section-team" },
+    { name: "Dr. Sarah", desc: "Lead Veterinarian, specializes in bee health and disease prevention.", section: "Team", target: "section-team" },
+    { name: "Prof. James", desc: "Research Director, focuses on pollinator behavior and conservation.", section: "Team", target: "section-team" },
     { name: "Our Vision", desc: "Creating a world where bees thrive alongside human communities.", section: "Vision", target: "visionSection" },
     { name: "Core Values", desc: "Sustainability, Education, Quality, Community, Innovation.", section: "Core Values", target: "visionSection" },
     { name: "Our Mission", desc: "Protect habitats, train 5,000 beekeepers, develop eco-friendly tech, partner with 100+ apiaries, inspire youth.", section: "Mission", target: "visionSection" },
@@ -2298,10 +2300,10 @@
 
   // ===== EQUIPMENT ITEMS =====
   const equipmentItems = [
-    { name: "Bee wax", desc: "Professional-grade mesh veil with wide brim.", image: "dreamers/assets/bee wax.jpeg" },
+    { name: "Bee Veil", desc: "Professional-grade mesh veil with wide brim.", image: "dreamers/assets/bee wax.jpeg" },
     { name: "Leather Gloves", desc: "Premium goatskin gloves, sting-resistant.", image: "dreamers/assets/leather gloves.jpg" },
     { name: "Bee Smoker", desc: "Stainless steel smoker with heat shield.", image: "dreamers/assets/image 1.jpg" },
-    { name: "KTB hive", desc: "Heavy-duty stainless steel tool.", image: "dreamers/assets/background 4.jpeg" },
+    { name: "KTB Hive", desc: "Heavy-duty stainless steel tool.", image: "dreamers/assets/background 4.jpeg" },
     { name: "Langstroth Hive", desc: "Complete modular beehive system.", image: "dreamers/assets/lamgstroth.jpg" },
     { name: "Honey Extractor", desc: "2-frame manual centrifugal extractor.", image: "dreamers/assets/images 4.jpeg" }
   ];
@@ -2323,14 +2325,14 @@
       e.stopPropagation(); 
       const isCurrentlyExpanded = detailsDiv.classList.contains('show');
       
-      // Collapse all items in this carousel first
+      // Remove expanded class from ALL cards in this carousel
       const allCards = card.parentElement.querySelectorAll('.equipment-card, .product-card, .team-card');
       allCards.forEach(c => {
+        c.classList.remove('expanded');
         const details = c.querySelector('.equipment-details, .product-details, .team-details');
         const actions = c.querySelector('.action-icons');
         if (details) details.classList.remove('show');
         if (actions) actions.classList.remove('show');
-        c.classList.remove('expanded');
       });
       
       // If it wasn't expanded, expand this one
@@ -2408,11 +2410,11 @@
       
       const allCards = card.parentElement.querySelectorAll('.equipment-card, .product-card, .team-card');
       allCards.forEach(c => {
+        c.classList.remove('expanded');
         const details = c.querySelector('.equipment-details, .product-details, .team-details');
         const actions = c.querySelector('.action-icons');
         if (details) details.classList.remove('show');
         if (actions) actions.classList.remove('show');
-        c.classList.remove('expanded');
       });
       
       if (!isCurrentlyExpanded) {
@@ -2445,14 +2447,16 @@
     return card;
   }
 
-  // ===== TEAM MEMBERS =====
+  // ===== TEAM MEMBERS - 8 members =====
   const teamMembers = [
-    {name:"dream king",position:"CEO DHC",bio:"PhD in Entomology.",image:"dreamers/assets/team 3.jpg"},
-    {name:"Mr.sean",position:"THE ACCOUNTANT",bio:"Incharge of all expenses and financial calls of the project.",image:"dreamers/assets/team 5.jpg"},
-    {name:"Ms Tracy B",position:"SECRETARY",bio:"having a masters degree in record management and systemanalysis.",image:"dreamers/assets/team 2.jpg"},
-    {name:"Mr. Layton",position:"APIARY MANAGER",bio:"Biologist specializing in native bees, ensuring well being of bees.",image:"dreamers/assets/team 4.jpg"},
-    {name:"Ms. patience",position:"PERSONAL SECRETARY",bio:"professional analyst and also holds a masters degree in marketing.",image:"dreamers/assets/team 5.jpg"},
-    {name:"Mr. Henry",position:"FINANCIAL ADVISOR",bio:"well versed with digits and calculations ensuring all expenses are void .",image:"dreamers/assets/team 4.jpg"}
+    {name:"Dream King", position:"CEO DHC", bio:"PhD in Entomology. Founder & Chief Beekeeper.", image:"dreamers/assets/team 3.jpg"},
+    {name:"Mr. Sean", position:"THE ACCOUNTANT", bio:"Incharge of all expenses and financial calls of the project.", image:"dreamers/assets/team 5.jpg"},
+    {name:"Ms. Tracy B", position:"SECRETARY", bio:"Master's degree in record management and system analysis.", image:"dreamers/assets/team 2.jpg"},
+    {name:"Mr. Layton", position:"APIARY MANAGER", bio:"Biologist specializing in native bees, ensuring well being of bees.", image:"dreamers/assets/team 4.jpg"},
+    {name:"Ms. Patience", position:"PERSONAL SECRETARY", bio:"Professional analyst with a master's degree in marketing.", image:"dreamers/assets/team 5.jpg"},
+    {name:"Mr. Henry", position:"FINANCIAL ADVISOR", bio:"Well versed with digits and calculations ensuring all expenses are void.", image:"dreamers/assets/team 4.jpg"},
+    {name:"Dr. Sarah", position:"LEAD VETERINARIAN", bio:"Specializes in bee health, disease prevention, and colony wellness.", image:"dreamers/assets/team 3.jpg"},
+    {name:"Prof. James", position:"RESEARCH DIRECTOR", bio:"Focuses on pollinator behavior and conservation science.", image:"dreamers/assets/team 2.jpg"}
   ];
 
   function renderTeamCard(m, idx) {
@@ -2473,11 +2477,11 @@
       
       const allCards = card.parentElement.querySelectorAll('.equipment-card, .product-card, .team-card');
       allCards.forEach(c => {
+        c.classList.remove('expanded');
         const details = c.querySelector('.equipment-details, .product-details, .team-details');
         const actions = c.querySelector('.action-icons');
         if (details) details.classList.remove('show');
         if (actions) actions.classList.remove('show');
-        c.classList.remove('expanded');
       });
       
       if (!isCurrentlyExpanded) {
