@@ -285,7 +285,7 @@
       100% { opacity: 1; transform: translateY(0); filter: blur(0); }
     }
 
-    /* RIGHT: Sign In button */
+    /* RIGHT: Sign In button - updated for member state */
     .right-links {
       flex: 0 0 auto;
       display: flex;
@@ -329,6 +329,40 @@
       color: #FFD966;
       transform: scale(1.05);
       background: rgba(255, 217, 102, 0.1);
+    }
+    /* Member state - remove sparkle animation when signed in */
+    .signin-btn.member-state::before {
+      animation: none !important;
+      display: none !important;
+    }
+    .signin-btn.member-state {
+      background: rgba(255, 217, 102, 0.15);
+      border: 1px solid rgba(255, 217, 102, 0.3);
+      padding: 4px 12px 4px 8px;
+      border-radius: 30px;
+    }
+    .signin-btn.member-state:hover {
+      background: rgba(255, 217, 102, 0.25);
+    }
+    .member-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #1a3a2a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .member-email-display {
+      font-size: 0.7rem;
+      opacity: 0.8;
+      max-width: 80px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     @keyframes sparklingSweep {
@@ -458,6 +492,7 @@
       .signin-btn { padding: 4px 8px; font-size: 0.8rem; }
       .header-bottom { flex-direction: column; gap: 8px; align-items: stretch; }
       .search-bar { max-width: 100%; width: 100%; min-width: unset; }
+      .member-email-display { max-width: 50px; }
     }
 
     @media (max-width: 480px) {
@@ -469,6 +504,7 @@
       .signin-btn .link-icon { font-size: 1rem; }
       .search-bar { max-width: 100%; min-width: unset; }
       .toggle-dropdown { min-width: 160px; left: -10px; }
+      .member-email-display { max-width: 30px; font-size: 0.6rem; }
     }
 
     @media (max-width: 360px) {
@@ -860,21 +896,25 @@
       border: 1px solid rgba(233, 162, 59, 0.4);
       overflow: hidden;
       box-shadow: var(--shadow);
+      cursor: pointer;
     }
     .equipment-card:hover, .product-card:hover, .team-card:hover { transform: translateY(-8px); border-color: var(--gold); }
     .clickable-area { cursor: pointer; }
-    .equipment-image, .team-image { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .equipment-image, .team-image { 
+      width: 100%; 
+      height: 200px; 
+      object-fit: cover; 
+      display: block; 
+    }
     .product-img {
-      background: linear-gradient(135deg, #FDF3E6, #FFF8F0);
-      padding: 30px;
-      font-size: 3.2rem;
-      text-align: center;
-      cursor: pointer;
+      width: 100%;
       height: 200px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #FDF3E6, #FFF8F0);
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      cursor: pointer;
     }
     .product-img img {
       width: 100%;
@@ -882,17 +922,50 @@
       object-fit: cover;
       display: block;
     }
-    .equipment-card h3, .product-card h3, .team-card h3 { font-size: 1.25rem; font-weight: 700; margin: 16px 0 6px; color: #2a3a1f; }
-    .team-position { font-size: 0.85rem; color: var(--gold); font-weight: 600; margin-bottom: 10px; }
-    .equipment-details, .product-details, .team-details { display: none; padding: 0 16px 20px; color: #4a3a2a; font-size: 0.85rem; line-height: 1.5; }
-    .equipment-details.show, .product-details.show, .team-details.show { display: block; animation: fadeSlideUp 0.3s ease; }
+    .equipment-card h3, .product-card h3, .team-card h3 { 
+      font-size: 1.25rem; 
+      font-weight: 700; 
+      margin: 16px 0 6px; 
+      color: #2a3a1f; 
+    }
+    .team-position { 
+      font-size: 0.85rem; 
+      color: var(--gold); 
+      font-weight: 600; 
+      margin-bottom: 10px; 
+    }
+    .equipment-details, .product-details, .team-details { 
+      display: none; 
+      padding: 0 16px 20px; 
+      color: #4a3a2a; 
+      font-size: 0.85rem; 
+      line-height: 1.5; 
+    }
+    .equipment-details.show, .product-details.show, .team-details.show { 
+      display: block; 
+      animation: fadeSlideUp 0.3s ease; 
+    }
     @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .product-price { font-size: 1.2rem; font-weight: 800; color: var(--gold); margin-bottom: 8px; }
-    .action-icons { display: none; justify-content: center; gap: 28px; padding: 12px 0 20px; border-top: 1px solid #FCE0BC; margin-top: 6px; }
+    .action-icons { 
+      display: none; 
+      justify-content: center; 
+      gap: 28px; 
+      padding: 12px 0 20px; 
+      border-top: 1px solid #FCE0BC; 
+      margin-top: 6px; 
+    }
     .action-icons.show { display: flex; }
     .action-icon { font-size: 1.2rem; cursor: pointer; transition: all 0.2s; color: #5a4a2e; }
     .action-icon:hover { transform: scale(1.2); }
     .heart-icon.liked { color: #ff4444 !important; }
+
+    /* Carousel item expanded state - highlight the active item */
+    .equipment-card.expanded, .product-card.expanded, .team-card.expanded {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(233, 162, 59, 0.3), 0 8px 30px rgba(0,0,0,0.2);
+      transform: scale(1.02);
+    }
 
     .nav-buttons { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
     .nav-btn {
@@ -1020,6 +1093,8 @@
       .footer-sponsor span { font-size: 0.5rem; }
       .vision-grid { grid-template-columns: 1fr; }
       .stats-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+      .product-img { height: 160px; }
+      .product-img img { object-fit: cover; }
     }
     @media (max-width: 480px) {
       .footer-sponsors { gap: 14px; }
@@ -1027,6 +1102,8 @@
       .footer-sponsor span { font-size: 0.45rem; }
       .vision-card { padding: 18px 14px; }
       .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .product-img { height: 140px; }
+      .product-img img { object-fit: cover; }
     }
   </style>
 </head>
@@ -1074,9 +1151,13 @@
         </div>
       </div>
 
-      <!-- Right: Sign In button -->
+      <!-- Right: Sign In button / Member display -->
       <div class="right-links">
-        <button class="signin-btn" id="signInBtn" aria-label="Sign In"><span class="link-icon">👤</span><span>Sign In</span></button>
+        <button class="signin-btn" id="signInBtn" aria-label="Sign In">
+          <span class="link-icon">👤</span>
+          <span class="signin-text">Sign In</span>
+          <span class="member-email-display" style="display:none;"></span>
+        </button>
       </div>
     </div>
 
@@ -1342,12 +1423,12 @@
         <p>join our global community of bee advocates</p>
       </div>
       <div class="connect-icons">
-        <a href="#" class="social-icon-link" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
-        <a href="#" class="social-icon-link" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
-        <a href="#" class="social-icon-link" aria-label="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
-        <a href="#" class="social-icon-link" aria-label="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>
-        <a href="#" class="social-icon-link" aria-label="TikTok"><i class="fab fa-tiktok" aria-hidden="true"></i></a>
-        <a href="#" class="social-icon-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+        <a href="https://www.dreamerssocial.com/instagram" target="_blank" class="social-icon-link" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+        <a href="https://www.dreamerssocial.com/facebook" target="_blank" class="social-icon-link" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+        <a href="https://www.dreamerssocial.com/twitter" target="_blank" class="social-icon-link" aria-label="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+        <a href="https://www.dreamerssocial.com/youtube" target="_blank" class="social-icon-link" aria-label="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>
+        <a href="https://www.dreamerssocial.com/tiktok" target="_blank" class="social-icon-link" aria-label="TikTok"><i class="fab fa-tiktok" aria-hidden="true"></i></a>
+        <a href="https://www.dreamerssocial.com/linkedin" target="_blank" class="social-icon-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
       </div>
     </div>
   </section>
@@ -1673,128 +1754,158 @@
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   let currentUserEmail = localStorage.getItem('dreamers honey cooperation_user') || null;
 
-// ===== SIGN IN FUNCTIONALITY - STAYS ON WEBSITE & SENDS EMAIL =====
-const signinModal = document.getElementById('signinModal');
-const signInBtn = document.getElementById('signInBtn');
-const modalSigninBtn = document.getElementById('modalSigninBtn');
-const closeModalBtn = document.getElementById('closeModalBtn');
-const signinEmailInput = document.getElementById('signinEmail');
-const signinStatus = document.getElementById('signinStatus');
+  // ===== SIGN IN FUNCTIONALITY - STAYS ON WEBSITE & SENDS EMAIL =====
+  const signinModal = document.getElementById('signinModal');
+  const signInBtn = document.getElementById('signInBtn');
+  const modalSigninBtn = document.getElementById('modalSigninBtn');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const signinEmailInput = document.getElementById('signinEmail');
+  const signinStatus = document.getElementById('signinStatus');
+  const signinText = signInBtn.querySelector('.signin-text');
+  const memberEmailDisplay = signInBtn.querySelector('.member-email-display');
+  const linkIcon = signInBtn.querySelector('.link-icon');
 
-function openSignInModal() { 
-  signinModal.style.display = 'flex'; 
-  signinEmailInput.value = ''; 
-  if (signinStatus) signinStatus.textContent = '';
-}
-
-function closeSignInModal() { 
-  signinModal.style.display = 'none'; 
-}
-
-signInBtn.addEventListener('click', openSignInModal);
-closeModalBtn.addEventListener('click', closeSignInModal);
-
-modalSigninBtn.addEventListener('click', async () => {
-  const email = signinEmailInput.value.trim();
-  
-  if (!email || !emailRegex.test(email)) {
-    if (signinStatus) {
-      signinStatus.textContent = '❌ Please enter a valid email address.';
-      signinStatus.style.color = '#ff6b6b';
-    }
-    return;
-  }
-  
-  currentUserEmail = email;
-  localStorage.setItem('dreamers honey cooperation_user', email);
-  
-  if (signinStatus) {
-    signinStatus.textContent = '📧 Sending sign-in request...';
-    signinStatus.style.color = '#FFD966';
-  }
-  
-  try {
-    // Try fetch first (stays on site)
-    const response = await fetch('https://formsubmit.co/ajax/dreamk868@gmail.com', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        email: email,
-        _subject: '🐝 New User Sign-In - dreamers honey cooperation',
-        _template: 'table',
-        _autoresponse: `Welcome to HiveHarvest, ${email}! 🐝\n\nThank you for signing in. You'll now receive updates about our products, beekeeping tips, and seasonal sales.\n\n— The dreamers honey team`,
-        message: `User ${email} has signed in to dreamers honey cooperation at ${new Date().toLocaleString()}.`
-      })
-    });
-    
-    if (response.ok) {
-      if (signinStatus) {
-        signinStatus.textContent = '✅ Sign-in request sent! Check your email.';
-        signinStatus.style.color = '#51cf66';
-      }
-      alert('✅ Sign-in request sent! Please check your email for confirmation.');
+  // Update sign in button based on user state
+  function updateSignInButton() {
+    if (currentUserEmail) {
+      signInBtn.classList.add('member-state');
+      signinText.textContent = 'Member';
+      memberEmailDisplay.style.display = 'inline';
+      memberEmailDisplay.textContent = currentUserEmail;
+      // Replace icon with avatar
+      const initial = currentUserEmail.charAt(0).toUpperCase();
+      linkIcon.innerHTML = `<span class="member-avatar">${initial}</span>`;
     } else {
-      throw new Error('Fetch failed');
-    }
-  } catch (error) {
-    // Fallback: open in new tab
-    try {
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = 'https://formsubmit.co/dreamk868@gmail.com';
-      form.target = '_blank';
-      
-      const fields = [
-        { name: 'email', value: email },
-        { name: '_subject', value: '🐝 New User Sign-In - dreamers honey cooperation' },
-        { name: '_template', value: 'table' },
-        { name: '_autoresponse', value: `Welcome to dreamers honey cooperation, ${email}! 🐝\n\nThank you for signing in. You'll now receive updates about our products, beekeeping tips, and seasonal sales.\n\n— The dreamers honey team` },
-        { name: 'message', value: `User ${email} has signed in to dreamers honey cooperation at ${new Date().toLocaleString()}.` }
-      ];
-      
-      fields.forEach(field => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = field.name;
-        input.value = field.value;
-        form.appendChild(input);
-      });
-      
-      document.body.appendChild(form);
-      form.submit();
-      
-      setTimeout(() => {
-        document.body.removeChild(form);
-      }, 1000);
-      
-      if (signinStatus) {
-        signinStatus.textContent = '✅ Sign-in request sent! Check your email.';
-        signinStatus.style.color = '#51cf66';
-      }
-      alert('✅ Sign-in request sent! Please check your email for confirmation.');
-    } catch (fallbackError) {
-      if (signinStatus) {
-        signinStatus.textContent = '⚠️ Signed in, but email could not be sent.';
-        signinStatus.style.color = '#ffd43b';
-      }
-      alert(`✅ Sign in successful! Welcome ${email}. (Email notification could not be sent, but ywait for feed back.)`);
+      signInBtn.classList.remove('member-state');
+      signinText.textContent = 'Sign In';
+      memberEmailDisplay.style.display = 'none';
+      linkIcon.innerHTML = '👤';
     }
   }
-  
-  setTimeout(() => {
-    closeSignInModal();
+
+  // Call on load
+  updateSignInButton();
+
+  function openSignInModal() { 
+    signinModal.style.display = 'flex'; 
+    signinEmailInput.value = ''; 
+    if (signinStatus) signinStatus.textContent = '';
+  }
+
+  function closeSignInModal() { 
+    signinModal.style.display = 'none'; 
+  }
+
+  signInBtn.addEventListener('click', function(e) {
+    if (currentUserEmail) {
+      // If already signed in, show member options or sign out
+      if (confirm(`👤 Signed in as ${currentUserEmail}\n\nClick OK to sign out, or Cancel to stay signed in.`)) {
+        currentUserEmail = null;
+        localStorage.removeItem('dreamers honey cooperation_user');
+        updateSignInButton();
+        alert('✅ You have been signed out.');
+      }
+      return;
+    }
+    openSignInModal();
   });
 
-window.addEventListener('click', (e) => {
-  if (e.target === signinModal)
-    closeSignInModal();
+  closeModalBtn.addEventListener('click', closeSignInModal);
+
+  modalSigninBtn.addEventListener('click', async () => {
+    const email = signinEmailInput.value.trim();
+    
+    if (!email || !emailRegex.test(email)) {
+      if (signinStatus) {
+        signinStatus.textContent = '❌ Please enter a valid email address.';
+        signinStatus.style.color = '#ff6b6b';
+      }
+      return;
+    }
+    
+    currentUserEmail = email;
+    localStorage.setItem('dreamers honey cooperation_user', email);
+    updateSignInButton();
+    
+    if (signinStatus) {
+      signinStatus.textContent = '📧 Sending sign-in request...';
+      signinStatus.style.color = '#FFD966';
+    }
+    
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/dreamk868@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email,
+          _subject: '🐝 New User Sign-In - dreamers honey cooperation',
+          _template: 'table',
+          _autoresponse: `Welcome to dreamers honey cooperation, ${email}! 🐝\n\nThank you for signing in. You'll now receive updates about our products, beekeeping tips, and seasonal sales.\n\n— The dreamers honey team`,
+          message: `User ${email} has signed in to dreamers honey cooperation at ${new Date().toLocaleString()}.`
+        })
+      });
+      
+      if (response.ok) {
+        if (signinStatus) {
+          signinStatus.textContent = '✅ Sign-in request sent! Check your email.';
+          signinStatus.style.color = '#51cf66';
+        }
+        alert('✅ Sign-in request sent! Please check your email for confirmation.');
+      } else {
+        throw new Error('Fetch failed');
+      }
+    } catch (error) {
+      try {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://formsubmit.co/dreamk868@gmail.com';
+        form.target = '_blank';
+        
+        const fields = [
+          { name: 'email', value: email },
+          { name: '_subject', value: '🐝 New User Sign-In - dreamers honey cooperation' },
+          { name: '_template', value: 'table' },
+          { name: '_autoresponse', value: `Welcome to dreamers honey cooperation, ${email}! 🐝\n\nThank you for signing in. You'll now receive updates about our products, beekeeping tips, and seasonal sales.\n\n— The dreamers honey team` },
+          { name: 'message', value: `User ${email} has signed in to dreamers honey cooperation at ${new Date().toLocaleString()}.` }
+        ];
+        
+        fields.forEach(field => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = field.name;
+          input.value = field.value;
+          form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+        
+        setTimeout(() => {
+          document.body.removeChild(form);
+        }, 1000);
+        
+        if (signinStatus) {
+          signinStatus.textContent = '✅ Sign-in request sent! Check your email.';
+          signinStatus.style.color = '#51cf66';
+        }
+        alert('✅ Sign-in request sent! Please check your email for confirmation.');
+      } catch (fallbackError) {
+        if (signinStatus) {
+          signinStatus.textContent = '⚠️ Signed in, but email could not be sent.';
+          signinStatus.style.color = '#ffd43b';
+        }
+        alert(`✅ Sign in successful! Welcome ${email}. (Email notification could not be sent.)`);
+      }
+    }
+    
+    setTimeout(() => {
+      closeSignInModal();
     }, 2000);
   });
 
-  // Close modal when clicking outside
   window.addEventListener('click', (e) => {
     if (e.target === signinModal) closeSignInModal();
   });
@@ -1902,11 +2013,12 @@ window.addEventListener('click', (e) => {
   });
   window.addEventListener('click', (e) => { if (e.target === signinModal) closeSignInModal(); if (e.target === registerModal) closeRegisterModalFunc(); });
 
-  // ===== CAROUSELS =====
+  // ===== CAROUSELS WITH INDEPENDENT ITEM EXPAND/COLLAPSE =====
   function createCarousel(trackId, items, cardRenderer, autoScrollSpeed = 4000) {
     const track = document.getElementById(trackId);
     if (!track) return null;
     let currentIndex = 0, autoScrollInterval = null, isTransitioning = false;
+    let isAutoScrollPaused = false; // Track if paused due to expanded item
     const totalItems = items.length;
     const allItems = [...items, ...items, ...items];
     track.innerHTML = '';
@@ -1915,7 +2027,9 @@ window.addEventListener('click', (e) => {
     track.style.transform = `translateX(-${totalItems * 308}px)`;
     track.offsetHeight;
     track.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    
     function getCardWidth() { const firstCard = track.querySelector('.equipment-card, .product-card, .team-card'); return firstCard ? firstCard.offsetWidth + 28 : 308; }
+    
     function goTo(index, smooth = true) {
       if (isTransitioning && smooth) return;
       isTransitioning = true;
@@ -1931,19 +2045,41 @@ window.addEventListener('click', (e) => {
         else { currentIndex = index; }
       }, 650);
     }
-    function next() { if (!isTransitioning) goTo(currentIndex + 1); }
-    function prev() { if (!isTransitioning) goTo(currentIndex - 1); }
-    function startAutoScroll() { if (autoScrollInterval) clearInterval(autoScrollInterval); autoScrollInterval = setInterval(next, autoScrollSpeed); }
+    
+    function next() { if (!isTransitioning && !isAutoScrollPaused) goTo(currentIndex + 1); }
+    function prev() { if (!isTransitioning && !isAutoScrollPaused) goTo(currentIndex - 1); }
+    
+    function startAutoScroll() { 
+      if (autoScrollInterval) clearInterval(autoScrollInterval); 
+      if (!isAutoScrollPaused) {
+        autoScrollInterval = setInterval(next, autoScrollSpeed); 
+      }
+    }
     function stopAutoScroll() { if (autoScrollInterval) { clearInterval(autoScrollInterval); autoScrollInterval = null; } }
+    
+    // Pause auto-scroll (called when an item is expanded)
+    function pauseAutoScroll() {
+      isAutoScrollPaused = true;
+      stopAutoScroll();
+    }
+    
+    // Resume auto-scroll (called when all items are collapsed)
+    function resumeAutoScroll() {
+      isAutoScrollPaused = false;
+      startAutoScroll();
+    }
+
     setTimeout(() => { const cardWidth = getCardWidth(); track.style.transition = 'none'; track.style.transform = `translateX(-${totalItems * cardWidth}px)`; currentIndex = totalItems; track.offsetHeight; track.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)'; }, 100);
     track.addEventListener('mouseenter', stopAutoScroll);
-    track.addEventListener('mouseleave', startAutoScroll);
+    track.addEventListener('mouseleave', () => { if (!isAutoScrollPaused) startAutoScroll(); });
     track.addEventListener('touchstart', stopAutoScroll);
-    track.addEventListener('touchend', () => { setTimeout(startAutoScroll, 2000); });
+    track.addEventListener('touchend', () => { if (!isAutoScrollPaused) setTimeout(startAutoScroll, 2000); });
     startAutoScroll();
-    return { next, prev, startAutoScroll, stopAutoScroll };
+    
+    return { next, prev, startAutoScroll, stopAutoScroll, pauseAutoScroll, resumeAutoScroll };
   }
 
+  // ===== EQUIPMENT ITEMS =====
   const equipmentItems = [
     { name: "Bee wax", desc: "Professional-grade mesh veil with wide brim.", image: "dreamers/assets/bee wax.jpeg" },
     { name: "Leather Gloves", desc: "Premium goatskin gloves, sting-resistant.", image: "dreamers/assets/leather gloves.jpg" },
@@ -1952,37 +2088,71 @@ window.addEventListener('click', (e) => {
     { name: "Langstroth Hive", desc: "Complete modular beehive system.", image: "dreamers/assets/lamgstroth.jpg" },
     { name: "Honey Extractor", desc: "2-frame manual centrifugal extractor.", image: "dreamers/assets/images 4.jpeg" }
   ];
+
   function renderEquipmentCard(item, idx) {
     const card = document.createElement('div');
     card.className = 'equipment-card';
     card.setAttribute('role', 'listitem');
+    card.dataset.itemId = idx;
     card.innerHTML = `<div class="clickable-area"><img src="${item.image}" class="equipment-image" alt="${item.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect width=%22600%22 height=%22400%22 fill=%22%232d6a3b%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23E9A23B%22 font-size=%2224%22%3E${encodeURIComponent(item.name)}%3C/text%3E%3C/svg%3E'"></div><h3>${item.name}</h3><div class="equipment-details">${item.desc}</div><div class="action-icons"><i class="fas fa-heart action-icon heart-icon" aria-label="Like"></i><i class="fas fa-shopping-cart action-icon cart-icon" aria-label="Add to cart"></i></div>`;
     const clickArea = card.querySelector('.clickable-area');
     const detailsDiv = card.querySelector('.equipment-details');
     const actionIcons = card.querySelector('.action-icons');
     const heartIcon = card.querySelector('.heart-icon');
     const cartIcon = card.querySelector('.cart-icon');
-    clickArea.addEventListener('click', (e) => { e.stopPropagation(); detailsDiv.classList.toggle('show'); if (detailsDiv.classList.contains('show')) actionIcons.classList.add('show'); else actionIcons.classList.remove('show'); });
+    
+    clickArea.addEventListener('click', (e) => { 
+      e.stopPropagation(); 
+      const isCurrentlyExpanded = detailsDiv.classList.contains('show');
+      
+      // Collapse all items in this carousel first
+      const allCards = card.parentElement.querySelectorAll('.equipment-card, .product-card, .team-card');
+      allCards.forEach(c => {
+        const details = c.querySelector('.equipment-details, .product-details, .team-details');
+        const actions = c.querySelector('.action-icons');
+        if (details) details.classList.remove('show');
+        if (actions) actions.classList.remove('show');
+        c.classList.remove('expanded');
+      });
+      
+      // If it wasn't expanded, expand this one
+      if (!isCurrentlyExpanded) {
+        detailsDiv.classList.add('show');
+        actionIcons.classList.add('show');
+        card.classList.add('expanded');
+        // Pause auto-scroll for this carousel
+        if (window.carouselInstances && window.carouselInstances[trackId]) {
+          window.carouselInstances[trackId].pauseAutoScroll();
+        }
+      } else {
+        // Resume auto-scroll if no other items are expanded
+        const anyExpanded = card.parentElement.querySelector('.equipment-card.expanded, .product-card.expanded, .team-card.expanded');
+        if (!anyExpanded && window.carouselInstances && window.carouselInstances[trackId]) {
+          window.carouselInstances[trackId].resumeAutoScroll();
+        }
+      }
+    });
+    
     heartIcon.addEventListener('click', (e) => { e.stopPropagation(); heartIcon.classList.toggle('liked'); });
     cartIcon.addEventListener('click', (e) => { e.stopPropagation(); alert(`✨ "${item.name}" added to your cart!`); });
     return card;
   }
 
-  // ===== FIXED PRODUCTS ARRAY WITH CORRECT IMAGE PATHS =====
+  // ===== PRODUCTS =====
   const products = [
     { name: "Pollen", price: "$18.90", desc: "Nutrient-rich bee pollen granules.", image: "dreamers/assets/pollen.jpeg" },
     { name: "Propolis", price: "$42.00", desc: "Pure propolis tincture.", image: "dreamers/assets/propolis.jpeg" },
     { name: "Bee Venom", price: "$24.50", desc: "High-quality bee venom extract.", image: "dreamers/assets/venom.jpeg" },
     { name: "Royal Jelly", price: "$15.75", desc: "Fresh royal jelly from our hives.", image: "dreamers/assets/royal-jelly.jpg" },
     { name: "Honey Comb", price: "$32.00", desc: "Pure raw honeycomb, naturally harvested.", image: "dreamers/assets/comb.jpeg" },
-    { name: "Bee Breed", price: "$19.25", desc: "Fermented bee bread superfood.", image: "dreamers/assets/bee bleed.jpeg" }
+    { name: "Bee Bread", price: "$19.25", desc: "Fermented bee bread superfood.", image: "dreamers/assets/bee bleed.jpeg" }
   ];
 
   function renderProductCard(p, idx) {
     const card = document.createElement('div');
     card.className = 'product-card';
     card.setAttribute('role', 'listitem');
-    // Use an img tag inside product-img for consistent display
+    card.dataset.itemId = idx;
     card.innerHTML = `
       <div class="clickable-area">
         <div class="product-img">
@@ -2004,35 +2174,100 @@ window.addEventListener('click', (e) => {
     const actionIcons = card.querySelector('.action-icons');
     const heartIcon = card.querySelector('.heart-icon');
     const cartIcon = card.querySelector('.cart-icon');
-    clickArea.addEventListener('click', (e) => { e.stopPropagation(); detailsDiv.classList.toggle('show'); if (detailsDiv.classList.contains('show')) actionIcons.classList.add('show'); else actionIcons.classList.remove('show'); });
+    
+    clickArea.addEventListener('click', (e) => { 
+      e.stopPropagation(); 
+      const isCurrentlyExpanded = detailsDiv.classList.contains('show');
+      
+      const allCards = card.parentElement.querySelectorAll('.equipment-card, .product-card, .team-card');
+      allCards.forEach(c => {
+        const details = c.querySelector('.equipment-details, .product-details, .team-details');
+        const actions = c.querySelector('.action-icons');
+        if (details) details.classList.remove('show');
+        if (actions) actions.classList.remove('show');
+        c.classList.remove('expanded');
+      });
+      
+      if (!isCurrentlyExpanded) {
+        detailsDiv.classList.add('show');
+        actionIcons.classList.add('show');
+        card.classList.add('expanded');
+        if (window.carouselInstances && window.carouselInstances['productsTrack']) {
+          window.carouselInstances['productsTrack'].pauseAutoScroll();
+        }
+      } else {
+        const anyExpanded = card.parentElement.querySelector('.equipment-card.expanded, .product-card.expanded, .team-card.expanded');
+        if (!anyExpanded && window.carouselInstances && window.carouselInstances['productsTrack']) {
+          window.carouselInstances['productsTrack'].resumeAutoScroll();
+        }
+      }
+    });
+    
     heartIcon.addEventListener('click', (e) => { e.stopPropagation(); heartIcon.classList.toggle('liked'); });
     cartIcon.addEventListener('click', (e) => { e.stopPropagation(); alert(`✨ "${p.name}" added to cart! ${p.price}`); });
     return card;
   }
 
+  // ===== TEAM MEMBERS =====
   const teamMembers = [
     {name:"dream king",position:"CEO DHC",bio:"PhD in Entomology.",image:"dreamers/assets/team 3.jpg"},
-    {name:"Mr.sean",position:" THE ACCOUNTANT",bio:"Incharge of all expenses and financial calls of the project.",image:"dreamers/assets/team 5.jpg"},
+    {name:"Mr.sean",position:"THE ACCOUNTANT",bio:"Incharge of all expenses and financial calls of the project.",image:"dreamers/assets/team 5.jpg"},
     {name:"Ms Tracy B",position:"SECRETARY",bio:"having a masters degree in record management and systemanalysis.",image:"dreamers/assets/team 2.jpg"},
     {name:"Mr. Layton",position:"APIARY MANAGER",bio:"Biologist specializing in native bees, ensuring well being of bees.",image:"dreamers/assets/team 4.jpg"},
-    {name:"Ms. patience",position:"PERSONAL SECRETARY",bio:"profssional analyst and also holds amasters degree in marketing.",image:"dreamers/assets/team 5.jpg"},
+    {name:"Ms. patience",position:"PERSONAL SECRETARY",bio:"professional analyst and also holds a masters degree in marketing.",image:"dreamers/assets/team 5.jpg"},
     {name:"Mr. Henry",position:"FINANCIAL ADVISOR",bio:"well versed with digits and calculations ensuring all expenses are void .",image:"dreamers/assets/team 4.jpg"}
   ];
+
   function renderTeamCard(m, idx) {
     const card = document.createElement('div');
     card.className = 'team-card';
     card.setAttribute('role', 'listitem');
+    card.dataset.itemId = idx;
     card.innerHTML = `<div class="clickable-area"><img src="${m.image}" class="team-image" alt="${m.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect width=%22600%22 height=%22400%22 fill=%22%232d6a3b%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%23E9A23B%22 font-size=%2224%22%3E${encodeURIComponent(m.name)}%3C/text%3E%3C/svg%3E'"></div><h3>${m.name}</h3><div class="team-position">${m.position}</div><div class="team-details">${m.bio}</div>`;
     const clickArea = card.querySelector('.clickable-area');
     const detailsDiv = card.querySelector('.team-details');
-    clickArea.addEventListener('click', () => { detailsDiv.classList.toggle('show'); });
+    
+    clickArea.addEventListener('click', (e) => { 
+      e.stopPropagation(); 
+      const isCurrentlyExpanded = detailsDiv.classList.contains('show');
+      
+      const allCards = card.parentElement.querySelectorAll('.equipment-card, .product-card, .team-card');
+      allCards.forEach(c => {
+        const details = c.querySelector('.equipment-details, .product-details, .team-details');
+        const actions = c.querySelector('.action-icons');
+        if (details) details.classList.remove('show');
+        if (actions) actions.classList.remove('show');
+        c.classList.remove('expanded');
+      });
+      
+      if (!isCurrentlyExpanded) {
+        detailsDiv.classList.add('show');
+        card.classList.add('expanded');
+        if (window.carouselInstances && window.carouselInstances['teamTrack']) {
+          window.carouselInstances['teamTrack'].pauseAutoScroll();
+        }
+      } else {
+        const anyExpanded = card.parentElement.querySelector('.equipment-card.expanded, .product-card.expanded, .team-card.expanded');
+        if (!anyExpanded && window.carouselInstances && window.carouselInstances['teamTrack']) {
+          window.carouselInstances['teamTrack'].resumeAutoScroll();
+        }
+      }
+    });
     return card;
   }
 
+  // Initialize carousels and store references
+  window.carouselInstances = {};
+  
   const equipCarousel = createCarousel('equipmentTrack', equipmentItems, renderEquipmentCard, 5200);
   const prodCarousel = createCarousel('productsTrack', products, renderProductCard, 5600);
   const teamCarousel = createCarousel('teamTrack', teamMembers, renderTeamCard, 5100);
+  
+  if (equipCarousel) window.carouselInstances['equipmentTrack'] = equipCarousel;
+  if (prodCarousel) window.carouselInstances['productsTrack'] = prodCarousel;
+  if (teamCarousel) window.carouselInstances['teamTrack'] = teamCarousel;
 
+  // Navigation buttons
   document.getElementById('equipPrevBtn').addEventListener('click', () => equipCarousel && equipCarousel.prev());
   document.getElementById('equipNextBtn').addEventListener('click', () => equipCarousel && equipCarousel.next());
   document.getElementById('prodPrevBtn').addEventListener('click', () => prodCarousel && prodCarousel.prev());
@@ -2099,4 +2334,3 @@ window.addEventListener('click', (e) => {
 </script>
 </body>
 </html>
-```
