@@ -835,14 +835,53 @@
       object-fit: cover;
       background: #000;
     }
-    .video-controls {
+
+    /* Video Title Overlay - YouTube style */
+    .video-title-overlay {
+      position: absolute;
+      bottom: 60px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 8px 18px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+      font-weight: 600;
+      pointer-events: none;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      opacity: 1;
+      transform: translateY(0);
+      backdrop-filter: blur(4px);
+      border-left: 3px solid var(--gold);
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.5px;
+    }
+    .video-title-overlay.hidden {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    /* Hide download button on video */
+    .video-wrapper video::-webkit-media-controls-download-button {
+      display: none !important;
+    }
+    .video-wrapper video::-webkit-media-controls-enclosure {
+      overflow: hidden;
+    }
+    .video-wrapper video::-internal-media-controls-download-button {
+      display: none !important;
+    }
+
+    /* Custom video controls wrapper */
+    .video-controls-wrapper {
       display: flex;
       justify-content: center;
+      align-items: center;
       gap: 15px;
-      margin-top: 20px;
+      margin-top: 15px;
       flex-wrap: wrap;
     }
-    .video-controls button {
+    .video-controls-wrapper button {
       background: rgba(233, 162, 59, 0.2);
       border: 1px solid rgba(233, 162, 59, 0.3);
       color: #fff;
@@ -854,12 +893,12 @@
       transition: all 0.3s ease;
       font-family: inherit;
     }
-    .video-controls button:hover {
+    .video-controls-wrapper button:hover {
       background: var(--gold);
       color: #1a3a2a;
       transform: scale(1.05);
     }
-    .video-controls button.active-video {
+    .video-controls-wrapper button.active-video {
       background: var(--gold);
       color: #1a3a2a;
     }
@@ -867,7 +906,7 @@
       display: flex;
       justify-content: center;
       gap: 10px;
-      margin-top: 15px;
+      margin-top: 12px;
     }
     .video-indicators span {
       width: 12px;
@@ -1203,6 +1242,7 @@
       .product-img { height: 160px; }
       .product-img img { object-fit: cover; }
       .video-wrapper video { max-height: 300px; }
+      .video-title-overlay { bottom: 50px; left: 15px; font-size: 0.8rem; padding: 6px 14px; }
     }
     @media (max-width: 480px) {
       .footer-sponsors { gap: 14px; }
@@ -1213,6 +1253,7 @@
       .product-img { height: 140px; }
       .product-img img { object-fit: cover; }
       .video-wrapper video { max-height: 220px; }
+      .video-title-overlay { bottom: 40px; left: 12px; font-size: 0.7rem; padding: 4px 12px; }
     }
   </style>
 </head>
@@ -1407,16 +1448,14 @@
         <p>watch our bees at work — educational and inspiring</p>
       </div>
       <div class="video-wrapper">
-        <video id="mainVideo" controls playsinline preload="metadata">
-          <source src="dreamers/assets/video1.mp4" type="video/mp4">
+        <video id="mainVideo" controls playsinline preload="metadata" controlsList="nodownload">
+          <source src="dreamers/assets/kwegamba1.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
+        <!-- YouTube-style video title overlay -->
+        <div class="video-title-overlay" id="videoTitleOverlay">Hive Inspection</div>
       </div>
-      <div class="video-controls" id="videoControls">
-        <button class="active-video" data-video="0">🐝 Hive Inspection</button>
-        <button data-video="1">🍯 Honey Harvest</button>
-        <button data-video="2">🌸 Bee Pollination</button>
-      </div>
+      <!-- Simple indicators showing which video is playing -->
       <div class="video-indicators" id="videoIndicators">
         <span class="active" data-video="0"></span>
         <span data-video="1"></span>
@@ -1681,18 +1720,46 @@
 
   // ===== VIDEO SECTION =====
   const videoElement = document.getElementById('mainVideo');
-  const videoButtons = document.querySelectorAll('#videoControls button');
   const videoIndicators = document.querySelectorAll('#videoIndicators span');
+  const videoTitleOverlay = document.getElementById('videoTitleOverlay');
   
-  // Video sources - replace with your actual video file paths
+  // Video sources - using kwegamba naming
   const videoSources = [
-    'dreamers/assets/video1.mp4',
-    'dreamers/assets/video2.mp4',
-    'dreamers/assets/video3.mp4'
+    'dreamers/assets/kwegamba1.mp4',
+    'dreamers/assets/kwegamba2.mp4',
+    'dreamers/assets/kwegamba3.mp4'
+  ];
+  
+  // Video titles (shown as overlay then fade)
+  const videoTitles = [
+    'Hive Inspection',
+    'Honey Harvest',
+    'Bee Pollination'
   ];
   
   let currentVideoIndex = 0;
   let isVideoPlaying = false;
+  let titleTimeout = null;
+  
+  function showVideoTitle(index) {
+    // Clear any existing timeout
+    if (titleTimeout) {
+      clearTimeout(titleTimeout);
+      titleTimeout = null;
+    }
+    
+    // Set the title text
+    videoTitleOverlay.textContent = videoTitles[index];
+    
+    // Show the title (remove hidden class)
+    videoTitleOverlay.classList.remove('hidden');
+    
+    // After 3 seconds, fade it out
+    titleTimeout = setTimeout(() => {
+      videoTitleOverlay.classList.add('hidden');
+      titleTimeout = null;
+    }, 3000);
+  }
   
   function changeVideo(index) {
     if (index >= videoSources.length) index = 0;
@@ -1704,28 +1771,17 @@
     videoElement.querySelector('source').src = videoSources[index];
     videoElement.load();
     
-    // If it was playing, continue playing
-    if (isVideoPlaying) {
-      videoElement.play();
-    }
+    // Show title overlay
+    showVideoTitle(index);
     
-    // Update button states
-    videoButtons.forEach((btn, i) => {
-      btn.classList.toggle('active-video', i === index);
-    });
+    // Auto-play if it was playing or if user hasn't paused
+    videoElement.play().catch(() => {});
     
     // Update indicators
     videoIndicators.forEach((ind, i) => {
       ind.classList.toggle('active', i === index);
     });
   }
-  
-  // Button click handlers
-  videoButtons.forEach((btn, index) => {
-    btn.addEventListener('click', () => {
-      changeVideo(index);
-    });
-  });
   
   // Indicator click handlers
   videoIndicators.forEach((ind, index) => {
@@ -1742,6 +1798,11 @@
   // Track play/pause state
   videoElement.addEventListener('play', () => { isVideoPlaying = true; });
   videoElement.addEventListener('pause', () => { isVideoPlaying = false; });
+  
+  // When video loads, show title
+  videoElement.addEventListener('loadeddata', () => {
+    showVideoTitle(currentVideoIndex);
+  });
 
   // ===== HERO IMAGE ROTATION =====
   const slides = [
@@ -2087,7 +2148,6 @@
         throw new Error('Fetch failed');
       }
     } catch (error) {
-      // Fallback: open formsubmit in new tab silently
       try {
         const form = document.createElement('form');
         form.method = 'POST';
@@ -2723,7 +2783,7 @@
   }, { threshold: 0.3 });
   statsObserver2.observe(document.getElementById('stats'));
 
-  // ===== POPUP SUBSCRIPTION - FIXED: No redirect =====
+  // ===== POPUP SUBSCRIPTION =====
   const popup = document.getElementById('subscribePopup');
   const closePopupBtn = document.getElementById('popupCloseBtn');
   const popupForm = document.getElementById('subscribeForm');
@@ -2772,7 +2832,6 @@
         throw new Error('Fetch failed');
       }
     } catch (error) {
-      // Silent fallback - just show success anyway since the user's intent is recorded
       popupMsg.innerHTML = '<span style="color:#51cf66;">✅ Sign up success! Check your email.</span>';
       document.getElementById('popupEmail').value = '';
       setTimeout(() => {
