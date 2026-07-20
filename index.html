@@ -827,7 +827,14 @@
       position: relative;
       background: #000;
     }
-    .video-wrapper video {
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      background: #000;
+    }
+
+    .video-container video {
       width: 100%;
       height: auto;
       display: block;
@@ -839,9 +846,9 @@
     /* Video Title Overlay - YouTube style */
     .video-title-overlay {
       position: absolute;
-      bottom: 60px;
+      bottom: 70px;
       left: 20px;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.7);
       padding: 8px 18px;
       border-radius: 8px;
       color: #fff;
@@ -855,70 +862,139 @@
       border-left: 3px solid var(--gold);
       font-family: 'Inter', sans-serif;
       letter-spacing: 0.5px;
+      z-index: 10;
     }
     .video-title-overlay.hidden {
       opacity: 0;
       transform: translateY(10px);
     }
 
-    /* Hide download button on video */
-    .video-wrapper video::-webkit-media-controls-download-button {
-      display: none !important;
+    /* Custom Play/Pause Button (centered overlay) */
+    .video-play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(233, 162, 59, 0.85);
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 40px rgba(233, 162, 59, 0.3);
     }
-    .video-wrapper video::-webkit-media-controls-enclosure {
-      overflow: hidden;
+    .video-play-btn:hover {
+      background: var(--gold);
+      transform: translate(-50%, -50%) scale(1.1);
+      box-shadow: 0 0 60px rgba(233, 162, 59, 0.5);
     }
-    .video-wrapper video::-internal-media-controls-download-button {
-      display: none !important;
+    .video-play-btn.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0.8);
     }
 
-    /* Custom video controls wrapper */
-    .video-controls-wrapper {
+    /* Custom Controls Bar */
+    .video-controls-bar {
       display: flex;
-      justify-content: center;
       align-items: center;
-      gap: 15px;
-      margin-top: 15px;
+      gap: 12px;
+      padding: 10px 16px;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
       flex-wrap: wrap;
     }
-    .video-controls-wrapper button {
-      background: rgba(233, 162, 59, 0.2);
-      border: 1px solid rgba(233, 162, 59, 0.3);
+
+    .video-control-btn {
+      background: transparent;
+      border: none;
       color: #fff;
-      padding: 10px 24px;
-      border-radius: 40px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-size: 1.1rem;
       cursor: pointer;
+      padding: 6px 8px;
       transition: all 0.3s ease;
-      font-family: inherit;
-    }
-    .video-controls-wrapper button:hover {
-      background: var(--gold);
-      color: #1a3a2a;
-      transform: scale(1.05);
-    }
-    .video-controls-wrapper button.active-video {
-      background: var(--gold);
-      color: #1a3a2a;
-    }
-    .video-indicators {
+      border-radius: 6px;
       display: flex;
+      align-items: center;
       justify-content: center;
-      gap: 10px;
-      margin-top: 12px;
+      min-width: 36px;
     }
-    .video-indicators span {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.2);
+    .video-control-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--gold);
+    }
+
+    .video-progress-container {
+      flex: 1;
+      min-width: 80px;
+      display: flex;
+      align-items: center;
+    }
+
+    .video-progress {
+      width: 100%;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      outline: none;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: height 0.2s ease;
     }
-    .video-indicators span.active {
+    .video-progress:hover {
+      height: 6px;
+    }
+    .video-progress::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
       background: var(--gold);
-      transform: scale(1.3);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .video-progress::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+    .video-progress::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--gold);
+      cursor: pointer;
+      border: none;
+    }
+
+    .video-time {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.75rem;
+      font-family: 'Inter', sans-serif;
+      min-width: 90px;
+      text-align: center;
+      letter-spacing: 0.3px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Hide download button on video */
+    .video-container video::-webkit-media-controls-download-button {
+      display: none !important;
+    }
+    .video-container video::-webkit-media-controls-enclosure {
+      overflow: hidden;
+    }
+    .video-container video::-internal-media-controls-download-button {
+      display: none !important;
     }
 
     .equipment-section, .carousel-section, .team-section, .learn-section, .about-section, .media-section, .vision-section {
@@ -1242,7 +1318,11 @@
       .product-img { height: 160px; }
       .product-img img { object-fit: cover; }
       .video-wrapper video { max-height: 300px; }
-      .video-title-overlay { bottom: 50px; left: 15px; font-size: 0.8rem; padding: 6px 14px; }
+      .video-title-overlay { bottom: 65px; left: 15px; font-size: 0.8rem; padding: 6px 14px; }
+      .video-play-btn { width: 55px; height: 55px; font-size: 1.5rem; }
+      .video-controls-bar { padding: 8px 12px; gap: 8px; }
+      .video-control-btn { font-size: 0.9rem; padding: 4px 6px; min-width: 30px; }
+      .video-time { font-size: 0.65rem; min-width: 70px; }
     }
     @media (max-width: 480px) {
       .footer-sponsors { gap: 14px; }
@@ -1253,7 +1333,12 @@
       .product-img { height: 140px; }
       .product-img img { object-fit: cover; }
       .video-wrapper video { max-height: 220px; }
-      .video-title-overlay { bottom: 40px; left: 12px; font-size: 0.7rem; padding: 4px 12px; }
+      .video-title-overlay { bottom: 55px; left: 12px; font-size: 0.7rem; padding: 4px 12px; }
+      .video-play-btn { width: 45px; height: 45px; font-size: 1.2rem; }
+      .video-controls-bar { padding: 6px 10px; gap: 6px; flex-wrap: nowrap; }
+      .video-control-btn { font-size: 0.8rem; padding: 3px 5px; min-width: 26px; }
+      .video-time { font-size: 0.55rem; min-width: 60px; }
+      .video-progress-container { min-width: 50px; }
     }
   </style>
 </head>
@@ -1448,18 +1533,36 @@
         <p>watch our bees at work — educational and inspiring</p>
       </div>
       <div class="video-wrapper">
-        <video id="mainVideo" controls playsinline preload="metadata" controlsList="nodownload">
-          <source src="dreamers/assets/kwegamba1.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <!-- YouTube-style video title overlay -->
-        <div class="video-title-overlay" id="videoTitleOverlay">Hive Inspection</div>
-      </div>
-      <!-- Simple indicators showing which video is playing -->
-      <div class="video-indicators" id="videoIndicators">
-        <span class="active" data-video="0"></span>
-        <span data-video="1"></span>
-        <span data-video="2"></span>
+        <div class="video-container">
+          <video id="mainVideo" playsinline preload="metadata" controlsList="nodownload">
+            <source src="dreamers/assets/kwegamba1.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <!-- YouTube-style video title overlay -->
+          <div class="video-title-overlay" id="videoTitleOverlay">Hive Inspection</div>
+          
+          <!-- Custom Play/Pause Button (centered overlay) -->
+          <button class="video-play-btn" id="videoPlayBtn" aria-label="Play/Pause">
+            <i class="fas fa-play"></i>
+          </button>
+        </div>
+        
+        <!-- Custom Controls -->
+        <div class="video-controls-bar">
+          <button class="video-control-btn" id="videoPlayPauseBtn" aria-label="Play/Pause">
+            <i class="fas fa-play" id="playPauseIcon"></i>
+          </button>
+          <div class="video-progress-container">
+            <input type="range" class="video-progress" id="videoProgress" min="0" max="100" value="0">
+          </div>
+          <span class="video-time" id="videoTimeDisplay">0:00 / 0:00</span>
+          <button class="video-control-btn" id="videoVolumeBtn" aria-label="Mute/Unmute">
+            <i class="fas fa-volume-up" id="volumeIcon"></i>
+          </button>
+          <button class="video-control-btn" id="videoNextBtn" aria-label="Next video">
+            <i class="fas fa-forward"></i>
+          </button>
+        </div>
       </div>
     </div>
   </section>
@@ -1718,49 +1821,54 @@
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
   fadeSections.forEach(section => sectionObserver.observe(section));
 
-  // ===== VIDEO SECTION =====
+  // ===== VIDEO SECTION WITH FULL CONTROLS (NO INDICATORS) =====
   const videoElement = document.getElementById('mainVideo');
-  const videoIndicators = document.querySelectorAll('#videoIndicators span');
   const videoTitleOverlay = document.getElementById('videoTitleOverlay');
-  
+
+  // Control elements
+  const playPauseBtn = document.getElementById('videoPlayPauseBtn');
+  const playPauseIcon = document.getElementById('playPauseIcon');
+  const playBtnOverlay = document.getElementById('videoPlayBtn');
+  const progressBar = document.getElementById('videoProgress');
+  const timeDisplay = document.getElementById('videoTimeDisplay');
+  const volumeBtn = document.getElementById('videoVolumeBtn');
+  const volumeIcon = document.getElementById('volumeIcon');
+  const nextBtn = document.getElementById('videoNextBtn');
+
   // Video sources - using kwegamba naming
   const videoSources = [
     'dreamers/assets/kwegamba1.mp4',
     'dreamers/assets/kwegamba2.mp4',
     'dreamers/assets/kwegamba3.mp4'
   ];
-  
+
   // Video titles (shown as overlay then fade)
   const videoTitles = [
     'Hive Inspection',
     'Honey Harvest',
     'Bee Pollination'
   ];
-  
+
   let currentVideoIndex = 0;
   let isVideoPlaying = false;
   let titleTimeout = null;
-  
+  let isDragging = false;
+
   function showVideoTitle(index) {
-    // Clear any existing timeout
     if (titleTimeout) {
       clearTimeout(titleTimeout);
       titleTimeout = null;
     }
     
-    // Set the title text
     videoTitleOverlay.textContent = videoTitles[index];
-    
-    // Show the title (remove hidden class)
     videoTitleOverlay.classList.remove('hidden');
     
-    // After 3 seconds, fade it out
     titleTimeout = setTimeout(() => {
       videoTitleOverlay.classList.add('hidden');
       titleTimeout = null;
     }, 3000);
   }
-  
+
   function changeVideo(index) {
     if (index >= videoSources.length) index = 0;
     if (index < 0) index = videoSources.length - 1;
@@ -1774,34 +1882,139 @@
     // Show title overlay
     showVideoTitle(index);
     
-    // Auto-play if it was playing or if user hasn't paused
+    // Auto-play
     videoElement.play().catch(() => {});
     
-    // Update indicators
-    videoIndicators.forEach((ind, i) => {
-      ind.classList.toggle('active', i === index);
-    });
+    // Reset play button icon
+    playPauseIcon.className = 'fas fa-pause';
   }
-  
-  // Indicator click handlers
-  videoIndicators.forEach((ind, index) => {
-    ind.addEventListener('click', () => {
-      changeVideo(index);
-    });
+
+  // Play/Pause toggle
+  function togglePlayPause() {
+    if (videoElement.paused) {
+      videoElement.play();
+      playPauseIcon.className = 'fas fa-pause';
+      playBtnOverlay.classList.add('hidden');
+    } else {
+      videoElement.pause();
+      playPauseIcon.className = 'fas fa-play';
+      playBtnOverlay.classList.remove('hidden');
+    }
+  }
+
+  // Update progress bar
+  function updateProgress() {
+    if (!isDragging) {
+      const percent = (videoElement.currentTime / videoElement.duration) * 100;
+      progressBar.value = percent || 0;
+    }
+  }
+
+  // Update time display
+  function updateTimeDisplay() {
+    const current = formatTime(videoElement.currentTime);
+    const duration = formatTime(videoElement.duration);
+    timeDisplay.textContent = `${current} / ${duration}`;
+  }
+
+  function formatTime(time) {
+    if (isNaN(time) || !isFinite(time)) return '0:00';
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  // Event Listeners
+  playPauseBtn.addEventListener('click', togglePlayPause);
+  playBtnOverlay.addEventListener('click', togglePlayPause);
+
+  // Click on video to toggle play/pause
+  videoElement.addEventListener('click', togglePlayPause);
+
+  // Progress bar
+  progressBar.addEventListener('input', function() {
+    isDragging = true;
+    const time = (this.value / 100) * videoElement.duration;
+    videoElement.currentTime = time;
   });
-  
-  // Auto-play next video when current ends
-  videoElement.addEventListener('ended', () => {
+
+  progressBar.addEventListener('change', function() {
+    isDragging = false;
+  });
+
+  // Volume toggle
+  volumeBtn.addEventListener('click', function() {
+    if (videoElement.muted) {
+      videoElement.muted = false;
+      volumeIcon.className = 'fas fa-volume-up';
+    } else {
+      videoElement.muted = true;
+      volumeIcon.className = 'fas fa-volume-mute';
+    }
+  });
+
+  // Next video button
+  nextBtn.addEventListener('click', function() {
     changeVideo(currentVideoIndex + 1);
   });
-  
-  // Track play/pause state
-  videoElement.addEventListener('play', () => { isVideoPlaying = true; });
-  videoElement.addEventListener('pause', () => { isVideoPlaying = false; });
-  
-  // When video loads, show title
-  videoElement.addEventListener('loadeddata', () => {
+
+  // Video events
+  videoElement.addEventListener('timeupdate', function() {
+    updateProgress();
+    updateTimeDisplay();
+  });
+
+  videoElement.addEventListener('play', function() {
+    isVideoPlaying = true;
+    playPauseIcon.className = 'fas fa-pause';
+    playBtnOverlay.classList.add('hidden');
+  });
+
+  videoElement.addEventListener('pause', function() {
+    isVideoPlaying = false;
+    playPauseIcon.className = 'fas fa-play';
+    if (!videoElement.ended) {
+      playBtnOverlay.classList.remove('hidden');
+    }
+  });
+
+  videoElement.addEventListener('ended', function() {
+    playPauseIcon.className = 'fas fa-play';
+    playBtnOverlay.classList.remove('hidden');
+    // Auto-advance to next video
+    setTimeout(() => {
+      changeVideo(currentVideoIndex + 1);
+    }, 1500);
+  });
+
+  videoElement.addEventListener('loadeddata', function() {
     showVideoTitle(currentVideoIndex);
+    updateTimeDisplay();
+    // Auto-play
+    videoElement.play().catch(() => {});
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    
+    if (e.key === ' ' || e.key === 'Space') {
+      e.preventDefault();
+      togglePlayPause();
+    }
+    if (e.key === 'ArrowRight') {
+      videoElement.currentTime = Math.min(videoElement.currentTime + 10, videoElement.duration);
+    }
+    if (e.key === 'ArrowLeft') {
+      videoElement.currentTime = Math.max(videoElement.currentTime - 10, 0);
+    }
+    if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        videoElement.requestFullscreen().catch(() => {});
+      }
+    }
   });
 
   // ===== HERO IMAGE ROTATION =====
