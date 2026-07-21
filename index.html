@@ -847,7 +847,6 @@
       background: #000;
     }
 
-    /* Video Title Overlay - YouTube style */
     .video-title-overlay {
       position: absolute;
       bottom: 70px;
@@ -873,7 +872,6 @@
       transform: translateY(10px);
     }
 
-    /* Custom Play/Pause Button (centered overlay) */
     .video-play-btn {
       position: absolute;
       top: 50%;
@@ -906,7 +904,6 @@
       transform: translate(-50%, -50%) scale(0.8);
     }
 
-    /* Custom Controls Bar */
     .video-controls-bar {
       display: flex;
       align-items: center;
@@ -990,7 +987,6 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* Hide download button on video */
     .video-container video::-webkit-media-controls-download-button {
       display: none !important;
     }
@@ -1780,7 +1776,7 @@
 </div>
 
 <!-- ============================================================
-     JAVASCRIPT
+     JAVASCRIPT - COMPLETE FIXED VERSION
      ============================================================ -->
 <script>
   // ===== HEADER HIDE/SHOW ON SCROLL =====
@@ -1826,7 +1822,9 @@
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
   fadeSections.forEach(section => sectionObserver.observe(section));
 
-  // ===== VIDEO SECTION - COVER MODE =====
+  // ============================================================
+  // VIDEO SECTION - FIXED: No sound bleeding, proper mute control
+  // ============================================================
   const videoElement = document.getElementById('mainVideo');
   const videoTitleOverlay = document.getElementById('videoTitleOverlay');
 
@@ -1842,11 +1840,13 @@
   const youtubeContainer = document.getElementById('youtubeEmbedContainer');
   const youtubeIframe = document.getElementById('youtubeIframe');
 
-  let usingYouTube = false;
+  let usingYouTube = true;
   let currentVideoIndex = 0;
   let isVideoPlaying = false;
   let titleTimeout = null;
   let isDragging = false;
+  let isYouTubeMuted = true;
+  let isLocalMuted = true;
 
   const videoTitles = ['Hive Inspection', 'Bee Pollination'];
 
@@ -1867,33 +1867,64 @@
 
   function switchToYouTube() {
     if (usingYouTube) return;
+    
+    // PAUSE LOCAL VIDEO FIRST - prevents sound bleeding
+    videoElement.pause();
+    videoElement.currentTime = 0;
+    
     usingYouTube = true;
     currentVideoIndex = 0;
+    
     videoElement.style.display = 'none';
     youtubeContainer.style.display = 'block';
+    
     showVideoTitle(0);
     progressBar.value = 0;
     timeDisplay.textContent = '0:00 / 0:00';
     playPauseIcon.className = 'fas fa-pause';
     playBtnOverlay.classList.add('hidden');
-    volumeIcon.className = 'fas fa-volume-mute';
+    
+    // Restore YouTube mute state
+    const iframe = document.getElementById('youtubeIframe');
+    if (iframe && iframe.contentWindow) {
+      if (isYouTubeMuted) {
+        iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+        volumeIcon.className = 'fas fa-volume-mute';
+      } else {
+        iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+        volumeIcon.className = 'fas fa-volume-up';
+      }
+    }
   }
 
   function switchToLocal() {
     if (!usingYouTube) return;
+    
+    // PAUSE YOUTUBE VIDEO FIRST - prevents sound bleeding
+    const iframe = document.getElementById('youtubeIframe');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+    }
+    
     usingYouTube = false;
     currentVideoIndex = 1;
+    
     youtubeContainer.style.display = 'none';
     videoElement.style.display = 'block';
+    
     videoElement.load();
     videoElement.play().catch(() => {});
+    
     showVideoTitle(1);
     playPauseIcon.className = 'fas fa-pause';
     playBtnOverlay.classList.add('hidden');
-    videoElement.muted = true;
-    volumeIcon.className = 'fas fa-volume-mute';
+    
+    // Restore local video mute state
+    videoElement.muted = isLocalMuted;
+    volumeIcon.className = isLocalMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
   }
 
+  // Initialize: start with YouTube
   setTimeout(() => {
     switchToYouTube();
   }, 500);
@@ -1933,9 +1964,7 @@
   }
 
   function updateTimeDisplay() {
-    if (usingYouTube) {
-      return;
-    }
+    if (usingYouTube) return;
     const current = formatTime(videoElement.currentTime);
     const duration = formatTime(videoElement.duration);
     timeDisplay.textContent = `${current} / ${duration}`;
@@ -1963,29 +1992,35 @@
     isDragging = false;
   });
 
+  // Volume toggle - Fixed: tracks mute state per video type
   volumeBtn.addEventListener('click', function() {
     if (usingYouTube) {
       const iframe = document.getElementById('youtubeIframe');
       if (iframe && iframe.contentWindow) {
-        if (volumeIcon.className === 'fas fa-volume-mute') {
+        if (isYouTubeMuted) {
           iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+          isYouTubeMuted = false;
           volumeIcon.className = 'fas fa-volume-up';
         } else {
           iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+          isYouTubeMuted = true;
           volumeIcon.className = 'fas fa-volume-mute';
         }
       }
     } else {
-      if (videoElement.muted) {
+      if (isLocalMuted) {
         videoElement.muted = false;
+        isLocalMuted = false;
         volumeIcon.className = 'fas fa-volume-up';
       } else {
         videoElement.muted = true;
+        isLocalMuted = true;
         volumeIcon.className = 'fas fa-volume-mute';
       }
     }
   });
 
+  // Next video button - switches between YouTube and Local
   nextBtn.addEventListener('click', function() {
     if (usingYouTube) {
       switchToLocal();
@@ -2032,11 +2067,29 @@
       showVideoTitle(1);
       updateTimeDisplay();
       videoElement.play().catch(() => {});
-      videoElement.muted = true;
-      volumeIcon.className = 'fas fa-volume-mute';
+      videoElement.muted = isLocalMuted;
+      volumeIcon.className = isLocalMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
     }
   });
 
+  // Listen for YouTube state changes
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.event === 'onStateChange') {
+      if (event.data.info === 1) {
+        if (usingYouTube) {
+          playPauseIcon.className = 'fas fa-pause';
+          playBtnOverlay.classList.add('hidden');
+        }
+      } else if (event.data.info === 2) {
+        if (usingYouTube) {
+          playPauseIcon.className = 'fas fa-play';
+          playBtnOverlay.classList.remove('hidden');
+        }
+      }
+    }
+  });
+
+  // Keyboard shortcuts
   document.addEventListener('keydown', function(e) {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     
@@ -2117,7 +2170,7 @@
   // DYNAMIC SEARCH SYSTEM - Auto-detects and adds new content
   // ============================================================
   
-  // Static fallback content (kept for compatibility)
+  // Static fallback content
   const staticSiteContent = [
     { name: "Bee Veil", desc: "Professional-grade mesh veil with wide brim.", section: "Equipment", target: "section-equipment" },
     { name: "Leather Gloves", desc: "Premium goatskin gloves, sting-resistant.", section: "Equipment", target: "section-equipment" },
@@ -2169,11 +2222,9 @@
     { name: "Harvest", desc: "Honey extraction, extractor, harvesting tools.", section: "Equipment", target: "section-equipment" },
   ];
 
-  // ===== DYNAMIC SEARCH INDEX BUILDER =====
   function buildSearchIndex() {
     const searchItems = [];
     
-    // 1. Scan equipment items
     document.querySelectorAll('.equipment-card').forEach(card => {
       const name = card.querySelector('h3')?.textContent || '';
       const desc = card.querySelector('.equipment-details')?.textContent || '';
@@ -2188,7 +2239,6 @@
       }
     });
     
-    // 2. Scan product items
     document.querySelectorAll('.product-card').forEach(card => {
       const name = card.querySelector('h3')?.textContent || '';
       const price = card.querySelector('.product-price')?.textContent || '';
@@ -2205,7 +2255,6 @@
       }
     });
     
-    // 3. Scan team members
     document.querySelectorAll('.team-card').forEach(card => {
       const name = card.querySelector('h3')?.textContent || '';
       const position = card.querySelector('.team-position')?.textContent || '';
@@ -2221,7 +2270,6 @@
       }
     });
     
-    // 4. Scan vision cards
     document.querySelectorAll('.vision-card').forEach(card => {
       const title = card.querySelector('h3')?.textContent || '';
       const content = card.querySelector('p')?.textContent || '';
@@ -2241,7 +2289,6 @@
       }
     });
     
-    // 5. Scan navigation items
     document.querySelectorAll('.nav-links a').forEach(link => {
       const text = link.textContent.trim();
       if (text && !text.includes('SALE')) {
@@ -2258,12 +2305,10 @@
     return searchItems;
   }
 
-  // ===== UPDATE SEARCH INDEX =====
   let dynamicSearchIndex = [];
 
   function updateSearchIndex() {
     const dynamicItems = buildSearchIndex();
-    // Merge static and dynamic content, prioritizing dynamic for deduplication
     const allItems = [...dynamicItems, ...staticSiteContent];
     const uniqueItems = [];
     const seenNames = new Set();
@@ -2280,7 +2325,6 @@
     console.log(`🔍 Search index updated: ${dynamicSearchIndex.length} items`);
   }
 
-  // ===== OBSERVER FOR DOM CHANGES =====
   function watchForContentChanges() {
     const observer = new MutationObserver((mutations) => {
       let shouldUpdate = false;
@@ -2322,7 +2366,6 @@
     return observer;
   }
 
-  // ===== MODIFIED SEARCH FUNCTION =====
   const searchInput = document.getElementById('searchInput');
   const searchSuggestions = document.getElementById('searchSuggestions');
   const searchForm = document.getElementById('searchForm');
@@ -2356,14 +2399,12 @@
     
     const lowerQuery = query.toLowerCase();
     
-    // Use dynamic search index
     const matches = dynamicSearchIndex.filter(item => 
       item.name.toLowerCase().includes(lowerQuery) || 
       (item.desc && item.desc.toLowerCase().includes(lowerQuery)) ||
       (item.section && item.section.toLowerCase().includes(lowerQuery))
     );
     
-    // Limit to 15 results max
     const limitedMatches = matches.slice(0, 15);
     
     if (limitedMatches.length === 0) {
@@ -2404,11 +2445,8 @@
     searchSuggestions.classList.add('show');
   }
 
-  // Override the original showSuggestions with dynamic version
-  const originalShowSuggestions = window.showSuggestions;
   window.showSuggestions = showDynamicSuggestions;
 
-  // Search input events
   searchInput.addEventListener('input', function() { showDynamicSuggestions(this.value); });
   searchInput.addEventListener('blur', function() { setTimeout(() => searchSuggestions.classList.remove('show'), 200); });
 
@@ -2462,22 +2500,11 @@
     searchSuggestions.classList.remove('show');
   });
 
-  // ===== INITIALIZE DYNAMIC SEARCH =====
-  // Build initial search index
+  // Initialize dynamic search
   updateSearchIndex();
-
-  // Watch for content changes
   watchForContentChanges();
 
-  // Also update when carousels change (new items loaded)
-  const originalCreateCarousel = createCarousel;
-  createCarousel = function(trackId, items, cardRenderer, autoScrollSpeed) {
-    const result = originalCreateCarousel(trackId, items, cardRenderer, autoScrollSpeed);
-    setTimeout(updateSearchIndex, 300);
-    return result;
-  };
-
-  // Periodic refresh every 60 seconds to catch any missed updates
+  // Periodic refresh every 60 seconds
   setInterval(() => {
     updateSearchIndex();
   }, 60000);
@@ -2489,7 +2516,6 @@
   let likedItems = JSON.parse(localStorage.getItem('dreamers_liked_items') || '[]');
   let cartItems = JSON.parse(localStorage.getItem('dreamers_cart_items') || '[]');
 
-  // ===== SIGN IN FUNCTIONALITY =====
   const signinModal = document.getElementById('signinModal');
   const signInBtn = document.getElementById('signInBtn');
   const modalSigninBtn = document.getElementById('modalSigninBtn');
