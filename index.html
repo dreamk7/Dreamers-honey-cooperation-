@@ -832,13 +832,17 @@
       position: relative;
       width: 100%;
       background: #000;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .video-container video {
       width: 100%;
-      height: auto;
+      height: 100%;
       display: block;
-      object-fit: cover;
+      object-fit: contain;
       background: #000;
     }
 
@@ -1533,7 +1537,7 @@
       </div>
       <div class="video-wrapper">
         <div class="video-container">
-          <video id="mainVideo" playsinline preload="metadata" controlsList="nodownload">
+          <video id="mainVideo" playsinline preload="metadata" controlsList="nodownload" muted>
             <source src="dreamers/assets/harvest.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
@@ -1556,7 +1560,7 @@
           </div>
           <span class="video-time" id="videoTimeDisplay">0:00 / 0:00</span>
           <button class="video-control-btn" id="videoVolumeBtn" aria-label="Mute/Unmute">
-            <i class="fas fa-volume-up" id="volumeIcon"></i>
+            <i class="fas fa-volume-mute" id="volumeIcon"></i>
           </button>
           <button class="video-control-btn" id="videoNextBtn" aria-label="Next video">
             <i class="fas fa-forward"></i>
@@ -1820,7 +1824,7 @@
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
   fadeSections.forEach(section => sectionObserver.observe(section));
 
-  // ===== VIDEO SECTION WITH FULL CONTROLS (NO INDICATORS) =====
+  // ===== VIDEO SECTION WITH AUTO-MUTE ON SCROLL =====
   const videoElement = document.getElementById('mainVideo');
   const videoTitleOverlay = document.getElementById('videoTitleOverlay');
 
@@ -1852,6 +1856,8 @@
   let isVideoPlaying = false;
   let titleTimeout = null;
   let isDragging = false;
+  let userUnmuted = false; // track if user manually unmuted
+  let wasUserUnmuted = false; // preserve across video changes
 
   function showVideoTitle(index) {
     if (titleTimeout) {
@@ -1886,6 +1892,17 @@
     
     // Reset play button icon
     playPauseIcon.className = 'fas fa-pause';
+    
+    // Restore mute state based on user preference
+    if (!wasUserUnmuted) {
+      videoElement.muted = true;
+      volumeIcon.className = 'fas fa-volume-mute';
+      userUnmuted = false;
+    } else {
+      videoElement.muted = false;
+      volumeIcon.className = 'fas fa-volume-up';
+      userUnmuted = true;
+    }
   }
 
   // Play/Pause toggle
@@ -1941,14 +1958,18 @@
     isDragging = false;
   });
 
-  // Volume toggle
+  // Volume toggle: user manually toggles mute/unmute
   volumeBtn.addEventListener('click', function() {
     if (videoElement.muted) {
       videoElement.muted = false;
       volumeIcon.className = 'fas fa-volume-up';
+      userUnmuted = true;
+      wasUserUnmuted = true;
     } else {
       videoElement.muted = true;
       volumeIcon.className = 'fas fa-volume-mute';
+      userUnmuted = false;
+      wasUserUnmuted = false;
     }
   });
 
@@ -1991,6 +2012,45 @@
     updateTimeDisplay();
     // Auto-play
     videoElement.play().catch(() => {});
+    // Apply mute state
+    if (!wasUserUnmuted) {
+      videoElement.muted = true;
+      volumeIcon.className = 'fas fa-volume-mute';
+      userUnmuted = false;
+    } else {
+      videoElement.muted = false;
+      volumeIcon.className = 'fas fa-volume-up';
+      userUnmuted = true;
+    }
+  });
+
+  // ===== AUTO-MUTE ON SCROLL (Video stays muted unless user unmuted) =====
+  let lastScrollYVideo = window.scrollY;
+  let videoScrollTicking = false;
+
+  window.addEventListener('scroll', () => {
+    if (!videoScrollTicking) {
+      window.requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        const scrollDiff = currentScrollY - lastScrollYVideo;
+        
+        // If user hasn't manually unmuted, keep it muted
+        if (!wasUserUnmuted) {
+          videoElement.muted = true;
+          volumeIcon.className = 'fas fa-volume-mute';
+          userUnmuted = false;
+        } else {
+          // User unmuted: keep unmuted
+          videoElement.muted = false;
+          volumeIcon.className = 'fas fa-volume-up';
+          userUnmuted = true;
+        }
+        
+        lastScrollYVideo = currentScrollY;
+        videoScrollTicking = false;
+      });
+      videoScrollTicking = true;
+    }
   });
 
   // Keyboard shortcuts
