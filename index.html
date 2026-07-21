@@ -836,13 +836,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
 
     .video-container video {
       width: 100%;
       height: 100%;
       display: block;
-      object-fit: contain;
+      object-fit: cover;
       background: #000;
     }
 
@@ -1824,7 +1825,7 @@
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
   fadeSections.forEach(section => sectionObserver.observe(section));
 
-  // ===== VIDEO SECTION WITH AUTO-MUTE ON SCROLL =====
+  // ===== VIDEO SECTION - COVER MODE + AUTO MUTE ON SCROLL =====
   const videoElement = document.getElementById('mainVideo');
   const videoTitleOverlay = document.getElementById('videoTitleOverlay');
 
@@ -1838,14 +1839,13 @@
   const volumeIcon = document.getElementById('volumeIcon');
   const nextBtn = document.getElementById('videoNextBtn');
 
-  // Video sources - using kwegamba naming
+  // Video sources
   const videoSources = [
     'dreamers/assets/harvest.mp4',
     'dreamers/assets/smoking.mp4',
     'dreamers/assets/preparing.mp4'
   ];
 
-  // Video titles (shown as overlay then fade)
   const videoTitles = [
     'Hive Inspection',
     'Honey Harvest',
@@ -1856,8 +1856,6 @@
   let isVideoPlaying = false;
   let titleTimeout = null;
   let isDragging = false;
-  let userUnmuted = false; // track if user manually unmuted
-  let wasUserUnmuted = false; // preserve across video changes
 
   function showVideoTitle(index) {
     if (titleTimeout) {
@@ -1893,16 +1891,9 @@
     // Reset play button icon
     playPauseIcon.className = 'fas fa-pause';
     
-    // Restore mute state based on user preference
-    if (!wasUserUnmuted) {
-      videoElement.muted = true;
-      volumeIcon.className = 'fas fa-volume-mute';
-      userUnmuted = false;
-    } else {
-      videoElement.muted = false;
-      volumeIcon.className = 'fas fa-volume-up';
-      userUnmuted = true;
-    }
+    // Always start muted
+    videoElement.muted = true;
+    volumeIcon.className = 'fas fa-volume-mute';
   }
 
   // Play/Pause toggle
@@ -1958,18 +1949,14 @@
     isDragging = false;
   });
 
-  // Volume toggle: user manually toggles mute/unmute
+  // Volume toggle - user can unmute, but scroll will mute again
   volumeBtn.addEventListener('click', function() {
     if (videoElement.muted) {
       videoElement.muted = false;
       volumeIcon.className = 'fas fa-volume-up';
-      userUnmuted = true;
-      wasUserUnmuted = true;
     } else {
       videoElement.muted = true;
       volumeIcon.className = 'fas fa-volume-mute';
-      userUnmuted = false;
-      wasUserUnmuted = false;
     }
   });
 
@@ -2001,7 +1988,6 @@
   videoElement.addEventListener('ended', function() {
     playPauseIcon.className = 'fas fa-play';
     playBtnOverlay.classList.remove('hidden');
-    // Auto-advance to next video
     setTimeout(() => {
       changeVideo(currentVideoIndex + 1);
     }, 1500);
@@ -2010,21 +1996,13 @@
   videoElement.addEventListener('loadeddata', function() {
     showVideoTitle(currentVideoIndex);
     updateTimeDisplay();
-    // Auto-play
     videoElement.play().catch(() => {});
-    // Apply mute state
-    if (!wasUserUnmuted) {
-      videoElement.muted = true;
-      volumeIcon.className = 'fas fa-volume-mute';
-      userUnmuted = false;
-    } else {
-      videoElement.muted = false;
-      volumeIcon.className = 'fas fa-volume-up';
-      userUnmuted = true;
-    }
+    // Always start muted
+    videoElement.muted = true;
+    volumeIcon.className = 'fas fa-volume-mute';
   });
 
-  // ===== AUTO-MUTE ON SCROLL (Video stays muted unless user unmuted) =====
+  // ===== AUTO-MUTE ON SCROLL - ALWAYS MUTES WHEN SCROLLING =====
   let lastScrollYVideo = window.scrollY;
   let videoScrollTicking = false;
 
@@ -2032,19 +2010,9 @@
     if (!videoScrollTicking) {
       window.requestAnimationFrame(() => {
         const currentScrollY = window.scrollY;
-        const scrollDiff = currentScrollY - lastScrollYVideo;
-        
-        // If user hasn't manually unmuted, keep it muted
-        if (!wasUserUnmuted) {
-          videoElement.muted = true;
-          volumeIcon.className = 'fas fa-volume-mute';
-          userUnmuted = false;
-        } else {
-          // User unmuted: keep unmuted
-          videoElement.muted = false;
-          volumeIcon.className = 'fas fa-volume-up';
-          userUnmuted = true;
-        }
+        // Always mute when scrolling, regardless of user preference
+        videoElement.muted = true;
+        volumeIcon.className = 'fas fa-volume-mute';
         
         lastScrollYVideo = currentScrollY;
         videoScrollTicking = false;
