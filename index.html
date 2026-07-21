@@ -1538,10 +1538,17 @@
       </div>
       <div class="video-wrapper">
         <div class="video-container">
+          <!-- Video element: first source is YouTube embed, second is local file -->
           <video id="mainVideo" playsinline preload="metadata" controlsList="nodownload" muted>
+            <!-- YouTube video via iframe is injected by JS for better control. We'll keep a fallback local video -->
             <source src="dreamers/assets/harvest.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
+          <!-- YouTube embed container (hidden by default, toggled by JS) -->
+          <div id="youtubeEmbedContainer" style="display:none; width:100%; height:100%; position:absolute; top:0; left:0; z-index:5;">
+            <iframe id="youtubeIframe" width="100%" height="100%" src="https://www.youtube.com/embed/Ne_jkKDUuC8?autoplay=1&mute=1&modestbranding=1&rel=0&showinfo=0&controls=0&loop=1&playlist=Ne_jkKDUuC8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"></iframe>
+          </div>
+          
           <!-- YouTube-style video title overlay -->
           <div class="video-title-overlay" id="videoTitleOverlay">Hive Inspection</div>
           
@@ -1839,23 +1846,20 @@
   const volumeIcon = document.getElementById('volumeIcon');
   const nextBtn = document.getElementById('videoNextBtn');
 
-  // Video sources
-  const videoSources = [
-    'dreamers/assets/harvest.mp4',
-    'dreamers/assets/smoking.mp4',
-    'dreamers/assets/preparing.mp4'
-  ];
+  // YouTube embed container
+  const youtubeContainer = document.getElementById('youtubeEmbedContainer');
+  const youtubeIframe = document.getElementById('youtubeIframe');
 
-  const videoTitles = [
-    'Hive Inspection',
-    'Honey Harvest',
-    'Bee Pollination'
-  ];
-
-  let currentVideoIndex = 0;
+  // Video sources: first is YouTube (via iframe), second is local file
+  // We'll use a flag to track which source is active
+  let usingYouTube = false; // start with local video
+  let currentVideoIndex = 0; // 0 = YouTube, 1 = local
   let isVideoPlaying = false;
   let titleTimeout = null;
   let isDragging = false;
+
+  // Video titles
+  const videoTitles = ['Hive Inspection', 'Bee Pollination'];
 
   function showVideoTitle(index) {
     if (titleTimeout) {
@@ -1872,53 +1876,98 @@
     }, 3000);
   }
 
-  function changeVideo(index) {
-    if (index >= videoSources.length) index = 0;
-    if (index < 0) index = videoSources.length - 1;
-    
-    currentVideoIndex = index;
-    
-    // Update video source
-    videoElement.querySelector('source').src = videoSources[index];
-    videoElement.load();
-    
-    // Show title overlay
-    showVideoTitle(index);
-    
-    // Auto-play
-    videoElement.play().catch(() => {});
-    
-    // Reset play button icon
+  function switchToYouTube() {
+    if (usingYouTube) return;
+    usingYouTube = true;
+    currentVideoIndex = 0;
+    // Hide video element, show YouTube iframe
+    videoElement.style.display = 'none';
+    youtubeContainer.style.display = 'block';
+    // The iframe autoplays via src parameter
+    // Update title
+    showVideoTitle(0);
+    // Update progress bar to simulate? We'll just set to 0 for now.
+    progressBar.value = 0;
+    timeDisplay.textContent = '0:00 / 0:00';
+    // Update play button
     playPauseIcon.className = 'fas fa-pause';
-    
-    // Always start muted
+    playBtnOverlay.classList.add('hidden');
+    // Mute
     videoElement.muted = true;
     volumeIcon.className = 'fas fa-volume-mute';
   }
 
+  function switchToLocal() {
+    if (!usingYouTube) return;
+    usingYouTube = false;
+    currentVideoIndex = 1;
+    // Hide YouTube, show video element
+    youtubeContainer.style.display = 'none';
+    videoElement.style.display = 'block';
+    // Load and play local video
+    videoElement.load();
+    videoElement.play().catch(() => {});
+    // Update title
+    showVideoTitle(1);
+    // Update play button
+    playPauseIcon.className = 'fas fa-pause';
+    playBtnOverlay.classList.add('hidden');
+    // Mute
+    videoElement.muted = true;
+    volumeIcon.className = 'fas fa-volume-mute';
+  }
+
+  // Initialize: start with local video (as before)
+  // But we want the first video to be YouTube. So we call switchToYouTube on load.
+  // However, we need to ensure the local video is also available.
+  // Let's start with YouTube.
+  setTimeout(() => {
+    switchToYouTube();
+  }, 500);
+
   // Play/Pause toggle
   function togglePlayPause() {
-    if (videoElement.paused) {
-      videoElement.play();
-      playPauseIcon.className = 'fas fa-pause';
-      playBtnOverlay.classList.add('hidden');
+    if (usingYouTube) {
+      // YouTube: send play/pause via postMessage
+      const iframe = document.getElementById('youtubeIframe');
+      if (iframe && iframe.contentWindow) {
+        if (playPauseIcon.className === 'fas fa-pause') {
+          iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+          playPauseIcon.className = 'fas fa-play';
+          playBtnOverlay.classList.remove('hidden');
+        } else {
+          iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+          playPauseIcon.className = 'fas fa-pause';
+          playBtnOverlay.classList.add('hidden');
+        }
+      }
     } else {
-      videoElement.pause();
-      playPauseIcon.className = 'fas fa-play';
-      playBtnOverlay.classList.remove('hidden');
+      if (videoElement.paused) {
+        videoElement.play();
+        playPauseIcon.className = 'fas fa-pause';
+        playBtnOverlay.classList.add('hidden');
+      } else {
+        videoElement.pause();
+        playPauseIcon.className = 'fas fa-play';
+        playBtnOverlay.classList.remove('hidden');
+      }
     }
   }
 
-  // Update progress bar
+  // Update progress bar (local video only)
   function updateProgress() {
-    if (!isDragging) {
+    if (!usingYouTube && !isDragging) {
       const percent = (videoElement.currentTime / videoElement.duration) * 100;
       progressBar.value = percent || 0;
     }
   }
 
-  // Update time display
+  // Update time display (local video only)
   function updateTimeDisplay() {
+    if (usingYouTube) {
+      // For YouTube, we can't easily get time, so we keep it as is.
+      return;
+    }
     const current = formatTime(videoElement.currentTime);
     const duration = formatTime(videoElement.duration);
     timeDisplay.textContent = `${current} / ${duration}`;
@@ -1940,6 +1989,7 @@
 
   // Progress bar
   progressBar.addEventListener('input', function() {
+    if (usingYouTube) return; // Can't seek YouTube via this method
     isDragging = true;
     const time = (this.value / 100) * videoElement.duration;
     videoElement.currentTime = time;
@@ -1951,55 +2001,81 @@
 
   // Volume toggle - user can unmute, but scroll will mute again
   volumeBtn.addEventListener('click', function() {
-    if (videoElement.muted) {
-      videoElement.muted = false;
-      volumeIcon.className = 'fas fa-volume-up';
+    if (usingYouTube) {
+      // For YouTube, we can mute/unmute via postMessage
+      const iframe = document.getElementById('youtubeIframe');
+      if (iframe && iframe.contentWindow) {
+        if (volumeIcon.className === 'fas fa-volume-mute') {
+          iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+          volumeIcon.className = 'fas fa-volume-up';
+        } else {
+          iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+          volumeIcon.className = 'fas fa-volume-mute';
+        }
+      }
     } else {
-      videoElement.muted = true;
-      volumeIcon.className = 'fas fa-volume-mute';
+      if (videoElement.muted) {
+        videoElement.muted = false;
+        volumeIcon.className = 'fas fa-volume-up';
+      } else {
+        videoElement.muted = true;
+        volumeIcon.className = 'fas fa-volume-mute';
+      }
     }
   });
 
   // Next video button
   nextBtn.addEventListener('click', function() {
-    changeVideo(currentVideoIndex + 1);
+    if (usingYouTube) {
+      switchToLocal();
+    } else {
+      switchToYouTube();
+    }
   });
 
-  // Video events
+  // Video events (local)
   videoElement.addEventListener('timeupdate', function() {
     updateProgress();
     updateTimeDisplay();
   });
 
   videoElement.addEventListener('play', function() {
-    isVideoPlaying = true;
-    playPauseIcon.className = 'fas fa-pause';
-    playBtnOverlay.classList.add('hidden');
+    if (!usingYouTube) {
+      isVideoPlaying = true;
+      playPauseIcon.className = 'fas fa-pause';
+      playBtnOverlay.classList.add('hidden');
+    }
   });
 
   videoElement.addEventListener('pause', function() {
-    isVideoPlaying = false;
-    playPauseIcon.className = 'fas fa-play';
-    if (!videoElement.ended) {
-      playBtnOverlay.classList.remove('hidden');
+    if (!usingYouTube) {
+      isVideoPlaying = false;
+      playPauseIcon.className = 'fas fa-play';
+      if (!videoElement.ended) {
+        playBtnOverlay.classList.remove('hidden');
+      }
     }
   });
 
   videoElement.addEventListener('ended', function() {
-    playPauseIcon.className = 'fas fa-play';
-    playBtnOverlay.classList.remove('hidden');
-    setTimeout(() => {
-      changeVideo(currentVideoIndex + 1);
-    }, 1500);
+    if (!usingYouTube) {
+      playPauseIcon.className = 'fas fa-play';
+      playBtnOverlay.classList.remove('hidden');
+      setTimeout(() => {
+        switchToYouTube();
+      }, 1500);
+    }
   });
 
   videoElement.addEventListener('loadeddata', function() {
-    showVideoTitle(currentVideoIndex);
-    updateTimeDisplay();
-    videoElement.play().catch(() => {});
-    // Always start muted
-    videoElement.muted = true;
-    volumeIcon.className = 'fas fa-volume-mute';
+    if (!usingYouTube) {
+      showVideoTitle(1);
+      updateTimeDisplay();
+      videoElement.play().catch(() => {});
+      // Always start muted
+      videoElement.muted = true;
+      volumeIcon.className = 'fas fa-volume-mute';
+    }
   });
 
   // ===== AUTO-MUTE ON SCROLL - ALWAYS MUTES WHEN SCROLLING =====
@@ -2011,7 +2087,14 @@
       window.requestAnimationFrame(() => {
         const currentScrollY = window.scrollY;
         // Always mute when scrolling, regardless of user preference
-        videoElement.muted = true;
+        if (usingYouTube) {
+          const iframe = document.getElementById('youtubeIframe');
+          if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+          }
+        } else {
+          videoElement.muted = true;
+        }
         volumeIcon.className = 'fas fa-volume-mute';
         
         lastScrollYVideo = currentScrollY;
@@ -2029,17 +2112,26 @@
       e.preventDefault();
       togglePlayPause();
     }
-    if (e.key === 'ArrowRight') {
-      videoElement.currentTime = Math.min(videoElement.currentTime + 10, videoElement.duration);
-    }
-    if (e.key === 'ArrowLeft') {
-      videoElement.currentTime = Math.max(videoElement.currentTime - 10, 0);
+    if (!usingYouTube) {
+      if (e.key === 'ArrowRight') {
+        videoElement.currentTime = Math.min(videoElement.currentTime + 10, videoElement.duration);
+      }
+      if (e.key === 'ArrowLeft') {
+        videoElement.currentTime = Math.max(videoElement.currentTime - 10, 0);
+      }
     }
     if (e.key === 'f' || e.key === 'F') {
       if (document.fullscreenElement) {
         document.exitFullscreen();
       } else {
-        videoElement.requestFullscreen().catch(() => {});
+        if (usingYouTube) {
+          const iframe = document.getElementById('youtubeIframe');
+          if (iframe) {
+            iframe.requestFullscreen().catch(() => {});
+          }
+        } else {
+          videoElement.requestFullscreen().catch(() => {});
+        }
       }
     }
   });
