@@ -1538,27 +1538,21 @@
       </div>
       <div class="video-wrapper">
         <div class="video-container">
-          <!-- Video element: first source is YouTube embed, second is local file -->
           <video id="mainVideo" playsinline preload="metadata" controlsList="nodownload" muted>
-            <!-- YouTube video via iframe is injected by JS for better control. We'll keep a fallback local video -->
             <source src="dreamers/assets/harvest.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
-          <!-- YouTube embed container (hidden by default, toggled by JS) -->
           <div id="youtubeEmbedContainer" style="display:none; width:100%; height:100%; position:absolute; top:0; left:0; z-index:5;">
             <iframe id="youtubeIframe" width="100%" height="100%" src="https://www.youtube.com/embed/Ne_jkKDUuC8?autoplay=1&mute=1&modestbranding=1&rel=0&showinfo=0&controls=0&loop=1&playlist=Ne_jkKDUuC8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"></iframe>
           </div>
           
-          <!-- YouTube-style video title overlay -->
           <div class="video-title-overlay" id="videoTitleOverlay">Hive Inspection</div>
           
-          <!-- Custom Play/Pause Button (centered overlay) -->
           <button class="video-play-btn" id="videoPlayBtn" aria-label="Play/Pause">
             <i class="fas fa-play"></i>
           </button>
         </div>
         
-        <!-- Custom Controls -->
         <div class="video-controls-bar">
           <button class="video-control-btn" id="videoPlayPauseBtn" aria-label="Play/Pause">
             <i class="fas fa-play" id="playPauseIcon"></i>
@@ -1832,11 +1826,10 @@
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
   fadeSections.forEach(section => sectionObserver.observe(section));
 
-  // ===== VIDEO SECTION - COVER MODE + AUTO MUTE ON SCROLL =====
+  // ===== VIDEO SECTION - COVER MODE =====
   const videoElement = document.getElementById('mainVideo');
   const videoTitleOverlay = document.getElementById('videoTitleOverlay');
 
-  // Control elements
   const playPauseBtn = document.getElementById('videoPlayPauseBtn');
   const playPauseIcon = document.getElementById('playPauseIcon');
   const playBtnOverlay = document.getElementById('videoPlayBtn');
@@ -1846,19 +1839,15 @@
   const volumeIcon = document.getElementById('volumeIcon');
   const nextBtn = document.getElementById('videoNextBtn');
 
-  // YouTube embed container
   const youtubeContainer = document.getElementById('youtubeEmbedContainer');
   const youtubeIframe = document.getElementById('youtubeIframe');
 
-  // Video sources: first is YouTube (via iframe), second is local file
-  // We'll use a flag to track which source is active
-  let usingYouTube = false; // start with local video
-  let currentVideoIndex = 0; // 0 = YouTube, 1 = local
+  let usingYouTube = false;
+  let currentVideoIndex = 0;
   let isVideoPlaying = false;
   let titleTimeout = null;
   let isDragging = false;
 
-  // Video titles
   const videoTitles = ['Hive Inspection', 'Bee Pollination'];
 
   function showVideoTitle(index) {
@@ -1880,20 +1869,13 @@
     if (usingYouTube) return;
     usingYouTube = true;
     currentVideoIndex = 0;
-    // Hide video element, show YouTube iframe
     videoElement.style.display = 'none';
     youtubeContainer.style.display = 'block';
-    // The iframe autoplays via src parameter
-    // Update title
     showVideoTitle(0);
-    // Update progress bar to simulate? We'll just set to 0 for now.
     progressBar.value = 0;
     timeDisplay.textContent = '0:00 / 0:00';
-    // Update play button
     playPauseIcon.className = 'fas fa-pause';
     playBtnOverlay.classList.add('hidden');
-    // Mute
-    videoElement.muted = true;
     volumeIcon.className = 'fas fa-volume-mute';
   }
 
@@ -1901,34 +1883,23 @@
     if (!usingYouTube) return;
     usingYouTube = false;
     currentVideoIndex = 1;
-    // Hide YouTube, show video element
     youtubeContainer.style.display = 'none';
     videoElement.style.display = 'block';
-    // Load and play local video
     videoElement.load();
     videoElement.play().catch(() => {});
-    // Update title
     showVideoTitle(1);
-    // Update play button
     playPauseIcon.className = 'fas fa-pause';
     playBtnOverlay.classList.add('hidden');
-    // Mute
     videoElement.muted = true;
     volumeIcon.className = 'fas fa-volume-mute';
   }
 
-  // Initialize: start with local video (as before)
-  // But we want the first video to be YouTube. So we call switchToYouTube on load.
-  // However, we need to ensure the local video is also available.
-  // Let's start with YouTube.
   setTimeout(() => {
     switchToYouTube();
   }, 500);
 
-  // Play/Pause toggle
   function togglePlayPause() {
     if (usingYouTube) {
-      // YouTube: send play/pause via postMessage
       const iframe = document.getElementById('youtubeIframe');
       if (iframe && iframe.contentWindow) {
         if (playPauseIcon.className === 'fas fa-pause') {
@@ -1954,7 +1925,6 @@
     }
   }
 
-  // Update progress bar (local video only)
   function updateProgress() {
     if (!usingYouTube && !isDragging) {
       const percent = (videoElement.currentTime / videoElement.duration) * 100;
@@ -1962,10 +1932,8 @@
     }
   }
 
-  // Update time display (local video only)
   function updateTimeDisplay() {
     if (usingYouTube) {
-      // For YouTube, we can't easily get time, so we keep it as is.
       return;
     }
     const current = formatTime(videoElement.currentTime);
@@ -1980,16 +1948,12 @@
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
-  // Event Listeners
   playPauseBtn.addEventListener('click', togglePlayPause);
   playBtnOverlay.addEventListener('click', togglePlayPause);
-
-  // Click on video to toggle play/pause
   videoElement.addEventListener('click', togglePlayPause);
 
-  // Progress bar
   progressBar.addEventListener('input', function() {
-    if (usingYouTube) return; // Can't seek YouTube via this method
+    if (usingYouTube) return;
     isDragging = true;
     const time = (this.value / 100) * videoElement.duration;
     videoElement.currentTime = time;
@@ -1999,10 +1963,8 @@
     isDragging = false;
   });
 
-  // Volume toggle - user can unmute, but scroll will mute again
   volumeBtn.addEventListener('click', function() {
     if (usingYouTube) {
-      // For YouTube, we can mute/unmute via postMessage
       const iframe = document.getElementById('youtubeIframe');
       if (iframe && iframe.contentWindow) {
         if (volumeIcon.className === 'fas fa-volume-mute') {
@@ -2024,7 +1986,6 @@
     }
   });
 
-  // Next video button
   nextBtn.addEventListener('click', function() {
     if (usingYouTube) {
       switchToLocal();
@@ -2033,7 +1994,6 @@
     }
   });
 
-  // Video events (local)
   videoElement.addEventListener('timeupdate', function() {
     updateProgress();
     updateTimeDisplay();
@@ -2072,39 +2032,11 @@
       showVideoTitle(1);
       updateTimeDisplay();
       videoElement.play().catch(() => {});
-      // Always start muted
       videoElement.muted = true;
       volumeIcon.className = 'fas fa-volume-mute';
     }
   });
 
-  // ===== AUTO-MUTE ON SCROLL - ALWAYS MUTES WHEN SCROLLING =====
-  let lastScrollYVideo = window.scrollY;
-  let videoScrollTicking = false;
-
-  window.addEventListener('scroll', () => {
-    if (!videoScrollTicking) {
-      window.requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY;
-        // Always mute when scrolling, regardless of user preference
-        if (usingYouTube) {
-          const iframe = document.getElementById('youtubeIframe');
-          if (iframe && iframe.contentWindow) {
-            iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
-          }
-        } else {
-          videoElement.muted = true;
-        }
-        volumeIcon.className = 'fas fa-volume-mute';
-        
-        lastScrollYVideo = currentScrollY;
-        videoScrollTicking = false;
-      });
-      videoScrollTicking = true;
-    }
-  });
-
-  // Keyboard shortcuts
   document.addEventListener('keydown', function(e) {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     
@@ -2181,20 +2113,24 @@
   preloadAllImages();
   setTimeout(() => { if (isFirstLoad) { heroImage.src = slides[0].image; heroImage.style.opacity = '1'; showTextElements(); isFirstLoad = false; } startAutoRotate(); }, 1000);
 
-  // ===== SEARCH =====
-  const fullSiteContent = [
+  // ============================================================
+  // DYNAMIC SEARCH SYSTEM - Auto-detects and adds new content
+  // ============================================================
+  
+  // Static fallback content (kept for compatibility)
+  const staticSiteContent = [
     { name: "Bee Veil", desc: "Professional-grade mesh veil with wide brim.", section: "Equipment", target: "section-equipment" },
     { name: "Leather Gloves", desc: "Premium goatskin gloves, sting-resistant.", section: "Equipment", target: "section-equipment" },
     { name: "Bee Smoker", desc: "Stainless steel smoker with heat shield.", section: "Equipment", target: "section-equipment" },
     { name: "Hive Tool", desc: "Heavy-duty stainless steel tool.", section: "Equipment", target: "section-equipment" },
     { name: "Langstroth Hive", desc: "Complete modular beehive system.", section: "Equipment", target: "section-equipment" },
     { name: "Honey Extractor", desc: "2-frame manual centrifugal extractor.", section: "Equipment", target: "section-equipment" },
-    { name: "KTB hive", price: "$18.90", desc: "RKTB hive.", section: "Products", target: "section-products" },
-    { name: "propolis", price: "$42.00", desc: "Propolis.", section: "Products", target: "section-products" },
-    { name: "royal-jelly", price: "$24.50", desc: "royal-jelly.", section: "Products", target: "section-products" },
-    { name: "Bee comb", price: "$15.75", desc: "bee comb.", section: "Products", target: "section-products" },
-    { name: "Beeswax", price: "$32.00", desc: "pure beeswax.", section: "Products", target: "section-products" },
-    { name: "bee bread", price: "$19.25", desc: "bee bread.", section: "Products", target: "section-products" },
+    { name: "Pollen", price: "$18.90", desc: "Nutrient-rich bee pollen granules.", section: "Products", target: "section-products" },
+    { name: "Propolis", price: "$42.00", desc: "Pure propolis tincture.", section: "Products", target: "section-products" },
+    { name: "Bee Venom", price: "$24.50", desc: "High-quality bee venom extract.", section: "Products", target: "section-products" },
+    { name: "Royal Jelly", price: "$15.75", desc: "Fresh royal jelly from our hives.", section: "Products", target: "section-products" },
+    { name: "Honey Comb", price: "$32.00", desc: "Pure raw honeycomb, naturally harvested.", section: "Products", target: "section-products" },
+    { name: "Bee Bread", price: "$19.25", desc: "Fermented bee bread superfood.", section: "Products", target: "section-products" },
     { name: "Dream King", desc: "Founder & Chief Beekeeper, PhD in Entomology.", section: "Team", target: "section-team" },
     { name: "Mr. Sean", desc: "Head of Apiary Operations, third-generation beekeeper.", section: "Team", target: "section-team" },
     { name: "Ms. Tracy B", desc: "Education Director, former science teacher.", section: "Team", target: "section-team" },
@@ -2233,6 +2169,160 @@
     { name: "Harvest", desc: "Honey extraction, extractor, harvesting tools.", section: "Equipment", target: "section-equipment" },
   ];
 
+  // ===== DYNAMIC SEARCH INDEX BUILDER =====
+  function buildSearchIndex() {
+    const searchItems = [];
+    
+    // 1. Scan equipment items
+    document.querySelectorAll('.equipment-card').forEach(card => {
+      const name = card.querySelector('h3')?.textContent || '';
+      const desc = card.querySelector('.equipment-details')?.textContent || '';
+      if (name) {
+        searchItems.push({
+          name: name.trim(),
+          desc: desc.trim() || 'Beekeeping equipment',
+          section: 'Equipment',
+          target: 'section-equipment',
+          type: 'equipment'
+        });
+      }
+    });
+    
+    // 2. Scan product items
+    document.querySelectorAll('.product-card').forEach(card => {
+      const name = card.querySelector('h3')?.textContent || '';
+      const price = card.querySelector('.product-price')?.textContent || '';
+      const desc = card.querySelector('.product-details')?.textContent || '';
+      if (name) {
+        searchItems.push({
+          name: name.trim(),
+          desc: desc.trim() || 'Artisan honey product',
+          price: price,
+          section: 'Products',
+          target: 'section-products',
+          type: 'product'
+        });
+      }
+    });
+    
+    // 3. Scan team members
+    document.querySelectorAll('.team-card').forEach(card => {
+      const name = card.querySelector('h3')?.textContent || '';
+      const position = card.querySelector('.team-position')?.textContent || '';
+      const bio = card.querySelector('.team-details')?.textContent || '';
+      if (name) {
+        searchItems.push({
+          name: name.trim(),
+          desc: `${position} - ${bio}`.trim(),
+          section: 'Team',
+          target: 'section-team',
+          type: 'team'
+        });
+      }
+    });
+    
+    // 4. Scan vision cards
+    document.querySelectorAll('.vision-card').forEach(card => {
+      const title = card.querySelector('h3')?.textContent || '';
+      const content = card.querySelector('p')?.textContent || '';
+      const listItems = [];
+      card.querySelectorAll('ul li').forEach(li => {
+        listItems.push(li.textContent.trim());
+      });
+      const fullDesc = content + ' ' + listItems.join(' ');
+      if (title) {
+        searchItems.push({
+          name: title.trim(),
+          desc: fullDesc.trim(),
+          section: 'Vision',
+          target: 'visionSection',
+          type: 'vision'
+        });
+      }
+    });
+    
+    // 5. Scan navigation items
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      const text = link.textContent.trim();
+      if (text && !text.includes('SALE')) {
+        searchItems.push({
+          name: text,
+          desc: `Navigate to ${text}`,
+          section: 'Navigation',
+          target: 'section-equipment',
+          type: 'nav'
+        });
+      }
+    });
+    
+    return searchItems;
+  }
+
+  // ===== UPDATE SEARCH INDEX =====
+  let dynamicSearchIndex = [];
+
+  function updateSearchIndex() {
+    const dynamicItems = buildSearchIndex();
+    // Merge static and dynamic content, prioritizing dynamic for deduplication
+    const allItems = [...dynamicItems, ...staticSiteContent];
+    const uniqueItems = [];
+    const seenNames = new Set();
+    
+    for (const item of allItems) {
+      const key = item.name.toLowerCase();
+      if (!seenNames.has(key)) {
+        seenNames.add(key);
+        uniqueItems.push(item);
+      }
+    }
+    
+    dynamicSearchIndex = uniqueItems;
+    console.log(`🔍 Search index updated: ${dynamicSearchIndex.length} items`);
+  }
+
+  // ===== OBSERVER FOR DOM CHANGES =====
+  function watchForContentChanges() {
+    const observer = new MutationObserver((mutations) => {
+      let shouldUpdate = false;
+      
+      mutations.forEach(mutation => {
+        if (mutation.addedNodes.length > 0) {
+          mutation.addedNodes.forEach(node => {
+            if (node.nodeType === 1) {
+              if (node.matches?.('.equipment-card, .product-card, .team-card, .vision-card') ||
+                  node.querySelector?.('.equipment-card, .product-card, .team-card, .vision-card')) {
+                shouldUpdate = true;
+              }
+            }
+          });
+        }
+        
+        if (mutation.type === 'attributes' && 
+            (mutation.target.matches?.('.equipment-details, .product-details, .team-details') ||
+             mutation.target.classList?.contains('show'))) {
+          shouldUpdate = true;
+        }
+      });
+      
+      if (shouldUpdate) {
+        clearTimeout(window._searchUpdateTimeout);
+        window._searchUpdateTimeout = setTimeout(() => {
+          updateSearchIndex();
+        }, 500);
+      }
+    });
+    
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class']
+    });
+    
+    return observer;
+  }
+
+  // ===== MODIFIED SEARCH FUNCTION =====
   const searchInput = document.getElementById('searchInput');
   const searchSuggestions = document.getElementById('searchSuggestions');
   const searchForm = document.getElementById('searchForm');
@@ -2258,20 +2348,25 @@
     }
   }
 
-  function showSuggestions(query) {
+  function showDynamicSuggestions(query) {
     if (!query.trim()) {
       searchSuggestions.classList.remove('show');
       return;
     }
     
     const lowerQuery = query.toLowerCase();
-    const matches = fullSiteContent.filter(item => 
+    
+    // Use dynamic search index
+    const matches = dynamicSearchIndex.filter(item => 
       item.name.toLowerCase().includes(lowerQuery) || 
       (item.desc && item.desc.toLowerCase().includes(lowerQuery)) ||
       (item.section && item.section.toLowerCase().includes(lowerQuery))
     );
     
-    if (matches.length === 0) {
+    // Limit to 15 results max
+    const limitedMatches = matches.slice(0, 15);
+    
+    if (limitedMatches.length === 0) {
       searchSuggestions.innerHTML = `
         <div class="search-suggestion-item">
           No results found for "${query}". 
@@ -2281,18 +2376,8 @@
       searchSuggestions.classList.add('show');
       return;
     }
-
-    const uniqueMatches = [];
-    const seen = new Set();
-    for (const item of matches) {
-      const key = item.name.toLowerCase();
-      if (!seen.has(key)) {
-        seen.add(key);
-        uniqueMatches.push(item);
-      }
-    }
-
-    searchSuggestions.innerHTML = uniqueMatches.map(item => {
+    
+    searchSuggestions.innerHTML = limitedMatches.map(item => {
       let label = item.name;
       if (item.price) label += ` - ${item.price}`;
       if (item.section) label += ` (${item.section})`;
@@ -2301,7 +2386,7 @@
         <br><small style="color:#666;">${item.desc || ''}</small>
       </div>`;
     }).join('');
-
+    
     document.querySelectorAll('.search-suggestion-item').forEach(el => {
       el.addEventListener('click', function() {
         const target = this.dataset.target;
@@ -2319,7 +2404,12 @@
     searchSuggestions.classList.add('show');
   }
 
-  searchInput.addEventListener('input', function() { showSuggestions(this.value); });
+  // Override the original showSuggestions with dynamic version
+  const originalShowSuggestions = window.showSuggestions;
+  window.showSuggestions = showDynamicSuggestions;
+
+  // Search input events
+  searchInput.addEventListener('input', function() { showDynamicSuggestions(this.value); });
   searchInput.addEventListener('blur', function() { setTimeout(() => searchSuggestions.classList.remove('show'), 200); });
 
   searchForm.addEventListener('submit', function(e) {
@@ -2328,7 +2418,7 @@
     if (!query) { alert("Please enter a search term."); return; }
     
     const lowerQuery = query.toLowerCase();
-    const matches = fullSiteContent.filter(item => 
+    const matches = dynamicSearchIndex.filter(item => 
       item.name.toLowerCase().includes(lowerQuery) || 
       (item.desc && item.desc.toLowerCase().includes(lowerQuery)) ||
       (item.section && item.section.toLowerCase().includes(lowerQuery))
@@ -2359,7 +2449,7 @@
               unique.push(item);
             }
           }
-          unique.forEach((item, i) => {
+          unique.slice(0, 10).forEach((item, i) => {
             msg += `${i+1}. ${item.name}`;
             if (item.price) msg += ` - ${item.price}`;
             if (item.section) msg += ` [${item.section}]`;
@@ -2371,6 +2461,26 @@
     }
     searchSuggestions.classList.remove('show');
   });
+
+  // ===== INITIALIZE DYNAMIC SEARCH =====
+  // Build initial search index
+  updateSearchIndex();
+
+  // Watch for content changes
+  watchForContentChanges();
+
+  // Also update when carousels change (new items loaded)
+  const originalCreateCarousel = createCarousel;
+  createCarousel = function(trackId, items, cardRenderer, autoScrollSpeed) {
+    const result = originalCreateCarousel(trackId, items, cardRenderer, autoScrollSpeed);
+    setTimeout(updateSearchIndex, 300);
+    return result;
+  };
+
+  // Periodic refresh every 60 seconds to catch any missed updates
+  setInterval(() => {
+    updateSearchIndex();
+  }, 60000);
 
   // ===== EMAIL FUNCTIONALITY =====
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -2389,7 +2499,6 @@
   const signinText = signInBtn.querySelector('.signin-text');
   const linkIcon = signInBtn.querySelector('.link-icon');
 
-  // Member Dashboard elements
   const memberDashboardModal = document.getElementById('memberDashboardModal');
   const dashboardEmail = document.getElementById('dashboardEmail');
   const likedItemsList = document.getElementById('likedItemsList');
@@ -2531,7 +2640,6 @@
     if (e.target === signinModal) closeSignInModal();
   });
 
-  // ===== MEMBER DASHBOARD FUNCTIONS =====
   function openMemberDashboard() {
     if (!currentUserEmail) return;
     dashboardEmail.textContent = currentUserEmail;
@@ -2564,7 +2672,6 @@
     }
   }
 
-  // ===== LIKED ITEMS FUNCTIONS =====
   function toggleLike(itemName) {
     if (!currentUserEmail) return;
     const index = likedItems.indexOf(itemName);
@@ -2583,7 +2690,6 @@
     return likedItems.includes(itemName);
   }
 
-  // ===== CART ITEMS FUNCTIONS =====
   function addToCart(itemName) {
     if (!currentUserEmail) {
       alert('🛒 Please sign in to add items to your cart.');
@@ -2600,7 +2706,6 @@
     return true;
   }
 
-  // ===== MEMBER MESSAGE FORM =====
   memberMessageForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     const subject = memberMessageSubject.value.trim();
@@ -2684,7 +2789,6 @@
     }
   });
 
-  // ===== SIGN OUT =====
   signOutBtn.addEventListener('click', function() {
     if (confirm('Are you sure you want to sign out?')) {
       currentUserEmail = null;
@@ -2702,7 +2806,6 @@
     if (e.target === memberDashboardModal) closeMemberDashboard();
   });
 
-  // ===== REGISTER MODAL =====
   const registerModal = document.getElementById('registerModal');
   const closeRegisterModal = document.getElementById('closeRegisterModal');
   const registerRedirectBtn = document.getElementById('registerRedirectBtn');
@@ -2711,11 +2814,9 @@
   closeRegisterModal.addEventListener('click', closeRegisterModalFunc);
   registerRedirectBtn.addEventListener('click', () => { closeRegisterModalFunc(); openSignInModal(); });
 
-  // ===== SALE LINK =====
   const saleLink = document.getElementById('saleNavLink');
   if(saleLink) saleLink.addEventListener('click', (e) => { e.preventDefault(); if (!currentUserEmail) openRegisterModal(); else alert(`🔥 Welcome to the SALE section, ${currentUserEmail}! Exclusive discounts await.`); });
 
-  // ===== TOGGLE MENU =====
   const toggleBtn = document.getElementById('toggleMenuBtn');
   const toggleDropdown = document.getElementById('toggleDropdown');
   toggleBtn.addEventListener('click', (e) => {
@@ -2769,7 +2870,6 @@
     toggleDropdown.classList.remove('open');
   });
 
-  // ===== NAV MENU =====
   const navMenu = document.getElementById('navMenu');
   document.addEventListener('click', (e) => {
     const isNavLink = e.target.closest('.nav-links a');
@@ -2803,7 +2903,7 @@
   });
   window.addEventListener('click', (e) => { if (e.target === signinModal) closeSignInModal(); if (e.target === registerModal) closeRegisterModalFunc(); });
 
-  // ===== CAROUSELS WITH SINGLE ITEM EXPAND =====
+  // ===== CAROUSELS =====
   function createCarousel(trackId, items, cardRenderer, autoScrollSpeed = 4000) {
     const track = document.getElementById(trackId);
     if (!track) return null;
@@ -2867,7 +2967,6 @@
     return { next, prev, startAutoScroll, stopAutoScroll, pauseAutoScroll, resumeAutoScroll };
   }
 
-  // ===== EQUIPMENT ITEMS =====
   const equipmentItems = [
     { name: "Bee Veil", desc: "Professional-grade mesh veil with wide brim.", image: "dreamers/assets/bee wax.jpeg" },
     { name: "Leather Gloves", desc: "Premium goatskin gloves, sting-resistant.", image: "dreamers/assets/leather gloves.jpg" },
@@ -2933,7 +3032,6 @@
     return card;
   }
 
-  // ===== PRODUCTS =====
   const products = [
     { name: "Pollen", price: "$18.90", desc: "Nutrient-rich bee pollen granules.", image: "dreamers/assets/pollen.jpeg" },
     { name: "Propolis", price: "$42.00", desc: "Pure propolis tincture.", image: "dreamers/assets/propolis.jpeg" },
@@ -3014,7 +3112,6 @@
     return card;
   }
 
-  // ===== TEAM MEMBERS =====
   const teamMembers = [
     {name:"Dream King", position:"CEO DHC", bio:"PhD in Entomology. Founder & Chief Beekeeper.", image:"dreamers/assets/team 3.jpg"},
     {name:"Mr. Sean", position:"THE ACCOUNTANT", bio:"Incharge of all expenses and financial calls of the project.", image:"dreamers/assets/team 5.jpg"},
@@ -3074,7 +3171,6 @@
     return card;
   }
 
-  // Initialize carousels
   window.carouselInstances = {};
   
   const equipCarousel = createCarousel('equipmentTrack', equipmentItems, renderEquipmentCard, 5200);
@@ -3175,7 +3271,6 @@
   
   window.addEventListener('scroll', () => { if(!popupShown) { const scrollPercent = window.scrollY / (document.body.scrollHeight - window.innerHeight); if(scrollPercent > 0.4) showPopup(); } });
 
-  // ===== LEARN TOGGLE =====
   const learnHeaderDiv = document.getElementById('learnHeader');
   const learnBodyDiv = document.getElementById('learnBody');
   function toggleLearn() { learnHeaderDiv.classList.toggle('open'); learnBodyDiv.classList.toggle('open'); const isOpen = learnHeaderDiv.classList.contains('open'); learnHeaderDiv.setAttribute('aria-expanded', isOpen); }
