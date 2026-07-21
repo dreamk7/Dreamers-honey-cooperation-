@@ -1538,8 +1538,9 @@
             <source src="dreamers/assets/harvest.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
+          <!-- YouTube Embed - using enablejsapi=1 for better control -->
           <div id="youtubeEmbedContainer" style="display:none; width:100%; height:100%; position:absolute; top:0; left:0; z-index:5;">
-            <iframe id="youtubeIframe" width="100%" height="100%" src="https://www.youtube.com/embed/Ne_jkKDUuC8?autoplay=1&mute=1&modestbranding=1&rel=0&showinfo=0&controls=0&loop=1&playlist=Ne_jkKDUuC8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"></iframe>
+            <iframe id="youtubeIframe" width="100%" height="100%" src="https://www.youtube.com/embed/Ne_jkKDUuC8?autoplay=1&mute=1&modestbranding=1&rel=0&showinfo=0&controls=0&loop=1&playlist=Ne_jkKDUuC8&enablejsapi=1&origin=<?php echo $_SERVER['HTTP_HOST']; ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"></iframe>
           </div>
           
           <div class="video-title-overlay" id="videoTitleOverlay">Hive Inspection</div>
@@ -1823,7 +1824,7 @@
   fadeSections.forEach(section => sectionObserver.observe(section));
 
   // ============================================================
-  // VIDEO SECTION - FIXED: No sound bleeding, proper mute control
+  // VIDEO SECTION - FIXED: Proper YouTube audio control
   // ============================================================
   const videoElement = document.getElementById('mainVideo');
   const videoTitleOverlay = document.getElementById('videoTitleOverlay');
@@ -1865,10 +1866,22 @@
     }, 3000);
   }
 
+  // Send command to YouTube iframe
+  function sendYouTubeCommand(command) {
+    const iframe = document.getElementById('youtubeIframe');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage(JSON.stringify({
+        event: 'command',
+        func: command,
+        args: []
+      }), '*');
+    }
+  }
+
   function switchToYouTube() {
     if (usingYouTube) return;
     
-    // PAUSE LOCAL VIDEO FIRST - prevents sound bleeding
+    // PAUSE LOCAL VIDEO FIRST
     videoElement.pause();
     videoElement.currentTime = 0;
     
@@ -1885,26 +1898,20 @@
     playBtnOverlay.classList.add('hidden');
     
     // Restore YouTube mute state
-    const iframe = document.getElementById('youtubeIframe');
-    if (iframe && iframe.contentWindow) {
-      if (isYouTubeMuted) {
-        iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
-        volumeIcon.className = 'fas fa-volume-mute';
-      } else {
-        iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-        volumeIcon.className = 'fas fa-volume-up';
-      }
+    if (isYouTubeMuted) {
+      sendYouTubeCommand('mute');
+      volumeIcon.className = 'fas fa-volume-mute';
+    } else {
+      sendYouTubeCommand('unMute');
+      volumeIcon.className = 'fas fa-volume-up';
     }
   }
 
   function switchToLocal() {
     if (!usingYouTube) return;
     
-    // PAUSE YOUTUBE VIDEO FIRST - prevents sound bleeding
-    const iframe = document.getElementById('youtubeIframe');
-    if (iframe && iframe.contentWindow) {
-      iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-    }
+    // PAUSE YOUTUBE VIDEO FIRST
+    sendYouTubeCommand('pauseVideo');
     
     usingYouTube = false;
     currentVideoIndex = 1;
@@ -1931,17 +1938,14 @@
 
   function togglePlayPause() {
     if (usingYouTube) {
-      const iframe = document.getElementById('youtubeIframe');
-      if (iframe && iframe.contentWindow) {
-        if (playPauseIcon.className === 'fas fa-pause') {
-          iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-          playPauseIcon.className = 'fas fa-play';
-          playBtnOverlay.classList.remove('hidden');
-        } else {
-          iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-          playPauseIcon.className = 'fas fa-pause';
-          playBtnOverlay.classList.add('hidden');
-        }
+      if (playPauseIcon.className === 'fas fa-pause') {
+        sendYouTubeCommand('pauseVideo');
+        playPauseIcon.className = 'fas fa-play';
+        playBtnOverlay.classList.remove('hidden');
+      } else {
+        sendYouTubeCommand('playVideo');
+        playPauseIcon.className = 'fas fa-pause';
+        playBtnOverlay.classList.add('hidden');
       }
     } else {
       if (videoElement.paused) {
@@ -1992,20 +1996,17 @@
     isDragging = false;
   });
 
-  // Volume toggle - Fixed: tracks mute state per video type
+  // Volume toggle - FIXED: Proper YouTube volume control
   volumeBtn.addEventListener('click', function() {
     if (usingYouTube) {
-      const iframe = document.getElementById('youtubeIframe');
-      if (iframe && iframe.contentWindow) {
-        if (isYouTubeMuted) {
-          iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-          isYouTubeMuted = false;
-          volumeIcon.className = 'fas fa-volume-up';
-        } else {
-          iframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
-          isYouTubeMuted = true;
-          volumeIcon.className = 'fas fa-volume-mute';
-        }
+      if (isYouTubeMuted) {
+        sendYouTubeCommand('unMute');
+        isYouTubeMuted = false;
+        volumeIcon.className = 'fas fa-volume-up';
+      } else {
+        sendYouTubeCommand('mute');
+        isYouTubeMuted = true;
+        volumeIcon.className = 'fas fa-volume-mute';
       }
     } else {
       if (isLocalMuted) {
@@ -2020,7 +2021,7 @@
     }
   });
 
-  // Next video button - switches between YouTube and Local
+  // Next video button
   nextBtn.addEventListener('click', function() {
     if (usingYouTube) {
       switchToLocal();
@@ -2072,20 +2073,21 @@
     }
   });
 
-  // Listen for YouTube state changes
+  // Listen for YouTube state changes to sync play/pause button
   window.addEventListener('message', function(event) {
-    if (event.data && event.data.event === 'onStateChange') {
-      if (event.data.info === 1) {
-        if (usingYouTube) {
+    try {
+      const data = JSON.parse(event.data);
+      if (data.event === 'onStateChange' && usingYouTube) {
+        if (data.info === 1) { // Playing
           playPauseIcon.className = 'fas fa-pause';
           playBtnOverlay.classList.add('hidden');
-        }
-      } else if (event.data.info === 2) {
-        if (usingYouTube) {
+        } else if (data.info === 2) { // Paused
           playPauseIcon.className = 'fas fa-play';
           playBtnOverlay.classList.remove('hidden');
         }
       }
+    } catch (e) {
+      // Ignore non-JSON messages
     }
   });
 
