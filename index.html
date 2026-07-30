@@ -807,7 +807,7 @@
     }
     .fade-section.visible { opacity: 1; transform: translateY(0); }
 
-    /* ===== VIDEO SECTION ===== */
+    /* ===== UPDATED VIDEO SECTION ===== */
     .video-section {
       background: transparent;
       padding: 60px 0;
@@ -817,6 +817,7 @@
     .video-section .section-header h2 {
       color: #F5C542;
     }
+
     .video-wrapper {
       max-width: 900px;
       margin: 0 auto;
@@ -840,38 +841,128 @@
     }
 
     .video-container video {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+      object-fit: contain;
+      background: #000;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+      border: 0 !important;
+    }
+
+    #youtubeEmbedContainer {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      display: block;
-      object-fit: cover;
       background: #000;
+      z-index: 5;
     }
 
+    #youtubeEmbedContainer iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* Video Source Badge */
+    .video-source-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 20;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+      animation: slideInBadge 0.5s ease forwards;
+    }
+
+    @keyframes slideInBadge {
+      from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .video-source-badge .source-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .video-source-badge .source-dot.youtube {
+      background: #FF0000;
+      box-shadow: 0 0 12px rgba(255, 0, 0, 0.3);
+    }
+
+    .video-source-badge .source-dot.local {
+      background: var(--gold);
+      box-shadow: 0 0 12px rgba(233, 162, 59, 0.3);
+    }
+
+    .video-source-badge .source-label {
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    /* Video Title Overlay */
     .video-title-overlay {
       position: absolute;
-      bottom: 70px;
-      left: 20px;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 8px 18px;
-      border-radius: 8px;
-      color: #fff;
-      font-size: clamp(0.9rem, 1.5vw, 1.2rem);
-      font-weight: 600;
-      pointer-events: none;
-      transition: opacity 0.8s ease, transform 0.8s ease;
-      opacity: 1;
-      transform: translateY(0);
-      backdrop-filter: blur(4px);
-      border-left: 3px solid var(--gold);
-      font-family: 'Inter', sans-serif;
-      letter-spacing: 0.5px;
+      bottom: 80px;
+      left: 30px;
+      right: 30px;
       z-index: 10;
-    }
-    .video-title-overlay.hidden {
-      opacity: 0;
-      transform: translateY(10px);
+      pointer-events: none;
+      transition: all 0.8s ease;
     }
 
+    .video-title-overlay.hidden {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .video-title-overlay h3 {
+      color: #fff;
+      font-size: clamp(1.2rem, 2vw, 1.8rem);
+      font-weight: 700;
+      margin: 0 0 4px 0;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+      font-family: 'Playfair Display', serif;
+    }
+
+    .video-title-overlay p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: clamp(0.8rem, 1vw, 1rem);
+      margin: 0;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    }
+
+    /* Play Button Overlay */
     .video-play-btn {
       position: absolute;
       top: 50%;
@@ -893,17 +984,45 @@
       backdrop-filter: blur(4px);
       box-shadow: 0 0 40px rgba(233, 162, 59, 0.3);
     }
+
     .video-play-btn:hover {
       background: var(--gold);
       transform: translate(-50%, -50%) scale(1.1);
       box-shadow: 0 0 60px rgba(233, 162, 59, 0.5);
     }
+
     .video-play-btn.hidden {
       opacity: 0;
       pointer-events: none;
       transform: translate(-50%, -50%) scale(0.8);
     }
 
+    /* Loading Spinner */
+    .video-loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 6;
+      display: none;
+    }
+
+    .video-loading.show {
+      display: block;
+    }
+
+    .video-loading i {
+      font-size: 3rem;
+      color: var(--gold);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Video Controls */
     .video-controls-bar {
       display: flex;
       align-items: center;
@@ -912,26 +1031,38 @@
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(4px);
       border-top: 1px solid rgba(255, 255, 255, 0.05);
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
     }
 
     .video-control-btn {
       background: transparent;
       border: none;
       color: #fff;
-      font-size: 1.1rem;
+      font-size: 1rem;
       cursor: pointer;
       padding: 6px 8px;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
       min-width: 36px;
+      height: 36px;
     }
+
     .video-control-btn:hover {
       background: rgba(255, 255, 255, 0.1);
       color: var(--gold);
+    }
+
+    .video-control-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .video-control-btn:disabled:hover {
+      background: transparent;
+      color: #fff;
     }
 
     .video-progress-container {
@@ -939,10 +1070,21 @@
       min-width: 80px;
       display: flex;
       align-items: center;
+      gap: 10px;
+    }
+
+    .video-time-current,
+    .video-time-total {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.7rem;
+      font-family: 'Inter', monospace;
+      min-width: 40px;
+      text-align: center;
+      letter-spacing: 0.3px;
     }
 
     .video-progress {
-      width: 100%;
+      flex: 1;
       height: 4px;
       -webkit-appearance: none;
       appearance: none;
@@ -952,9 +1094,11 @@
       cursor: pointer;
       transition: height 0.2s ease;
     }
+
     .video-progress:hover {
       height: 6px;
     }
+
     .video-progress::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
@@ -964,10 +1108,13 @@
       background: var(--gold);
       cursor: pointer;
       transition: all 0.2s ease;
+      box-shadow: 0 0 20px rgba(233, 162, 59, 0.3);
     }
+
     .video-progress::-webkit-slider-thumb:hover {
       transform: scale(1.2);
     }
+
     .video-progress::-moz-range-thumb {
       width: 14px;
       height: 14px;
@@ -977,24 +1124,193 @@
       border: none;
     }
 
-    .video-time {
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 0.75rem;
-      font-family: 'Inter', sans-serif;
-      min-width: 90px;
-      text-align: center;
-      letter-spacing: 0.3px;
-      font-variant-numeric: tabular-nums;
+    .video-controls-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .video-container video::-webkit-media-controls-download-button {
-      display: none !important;
+    /* Volume */
+    .volume-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-    .video-container video::-webkit-media-controls-enclosure {
-      overflow: hidden;
+
+    .volume-slider {
+      width: 60px;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+      transition: width 0.3s ease;
     }
-    .video-container video::-internal-media-controls-download-button {
-      display: none !important;
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--gold);
+      cursor: pointer;
+    }
+
+    .volume-slider::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--gold);
+      cursor: pointer;
+      border: none;
+    }
+
+    /* Playlist Counter */
+    .playlist-counter {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.7rem;
+      font-weight: 600;
+      font-family: 'Inter', monospace;
+      padding: 0 4px;
+      min-width: 50px;
+      text-align: center;
+    }
+
+    .playlist-counter #currentVideoNum {
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    /* Next Video Countdown */
+    .video-next-countdown {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 15;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      padding: 8px 20px;
+      border-radius: 30px;
+      color: #fff;
+      font-size: 0.85rem;
+      display: none;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .video-next-countdown.show {
+      display: block;
+      animation: fadeUp 0.3s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .video-next-countdown .countdown-timer {
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .video-next-countdown i {
+      margin-right: 8px;
+      color: var(--gold);
+    }
+
+    @media (max-width: 768px) {
+      .video-wrapper {
+        border-radius: 20px;
+      }
+      .video-title-overlay {
+        bottom: 70px;
+        left: 20px;
+        right: 20px;
+      }
+      .video-controls-bar {
+        padding: 8px 12px;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .video-control-btn {
+        font-size: 0.9rem;
+        padding: 4px 6px;
+        min-width: 32px;
+        height: 32px;
+      }
+      .volume-slider {
+        width: 40px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .video-wrapper {
+        border-radius: 12px;
+      }
+      .video-container {
+        aspect-ratio: 4 / 3;
+      }
+      .video-title-overlay {
+        bottom: 65px;
+        left: 16px;
+        right: 16px;
+      }
+      .video-title-overlay h3 {
+        font-size: 1rem;
+      }
+      .video-title-overlay p {
+        font-size: 0.7rem;
+      }
+      .video-play-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+      }
+      .video-controls-bar {
+        padding: 6px 10px;
+        gap: 4px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+      }
+      .video-control-btn {
+        font-size: 0.8rem;
+        padding: 3px 5px;
+        min-width: 28px;
+        height: 28px;
+      }
+      .video-time-current,
+      .video-time-total {
+        font-size: 0.55rem;
+        min-width: 30px;
+      }
+      .volume-slider {
+        width: 30px;
+      }
+      .video-source-badge {
+        top: 10px;
+        right: 10px;
+        padding: 4px 10px;
+        gap: 6px;
+      }
+      .video-source-badge .source-label {
+        font-size: 0.6rem;
+      }
+      .video-source-badge .source-dot {
+        width: 6px;
+        height: 6px;
+      }
+      .playlist-counter {
+        font-size: 0.6rem;
+        min-width: 40px;
+      }
+      .video-next-countdown {
+        bottom: 80px;
+        font-size: 0.7rem;
+        padding: 6px 14px;
+      }
     }
 
     .equipment-section, .carousel-section, .team-section, .learn-section, .about-section, .media-section, .vision-section {
@@ -1317,12 +1633,6 @@
       .stats-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
       .product-img { height: 160px; }
       .product-img img { object-fit: cover; }
-      .video-wrapper video { max-height: 300px; }
-      .video-title-overlay { bottom: 65px; left: 15px; font-size: 0.8rem; padding: 6px 14px; }
-      .video-play-btn { width: 55px; height: 55px; font-size: 1.5rem; }
-      .video-controls-bar { padding: 8px 12px; gap: 8px; }
-      .video-control-btn { font-size: 0.9rem; padding: 4px 6px; min-width: 30px; }
-      .video-time { font-size: 0.65rem; min-width: 70px; }
     }
     @media (max-width: 480px) {
       .footer-sponsors { gap: 14px; }
@@ -1332,13 +1642,6 @@
       .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
       .product-img { height: 140px; }
       .product-img img { object-fit: cover; }
-      .video-wrapper video { max-height: 220px; }
-      .video-title-overlay { bottom: 55px; left: 12px; font-size: 0.7rem; padding: 4px 12px; }
-      .video-play-btn { width: 45px; height: 45px; font-size: 1.2rem; }
-      .video-controls-bar { padding: 6px 10px; gap: 6px; flex-wrap: nowrap; }
-      .video-control-btn { font-size: 0.8rem; padding: 3px 5px; min-width: 26px; }
-      .video-time { font-size: 0.55rem; min-width: 60px; }
-      .video-progress-container { min-width: 50px; }
     }
   </style>
 </head>
@@ -1525,45 +1828,106 @@
     </div>
   </section>
 
-  <!-- ===== VIDEO SECTION ===== -->
+  <!-- ===== UPDATED VIDEO SECTION ===== -->
   <section class="video-section fade-section" id="videoSection" aria-label="Beekeeping video gallery">
     <div class="container">
       <div class="section-header">
         <h2><i class="fas fa-video" aria-hidden="true"></i> Beekeeping in Action</h2>
         <p>watch our bees at work — educational and inspiring</p>
       </div>
-      <div class="video-wrapper">
-        <div class="video-container">
-          <video id="mainVideo" playsinline preload="metadata" controlsList="nodownload" muted>
+      <div class="video-wrapper" id="videoWrapper">
+        <div class="video-container" id="videoContainer">
+          <!-- Local Video -->
+          <video id="mainVideo" playsinline preload="metadata" controlsList="nodownload" style="display:none;">
             <source src="dreamers/assets/harvest.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
-          <!-- YouTube Embed - using enablejsapi=1 for better control -->
-          <div id="youtubeEmbedContainer" style="display:none; width:100%; height:100%; position:absolute; top:0; left:0; z-index:5;">
-            <iframe id="youtubeIframe" width="100%" height="100%" src="https://www.youtube.com/embed/Ne_jkKDUuC8?autoplay=1&mute=1&modestbranding=1&rel=0&showinfo=0&controls=0&loop=1&playlist=Ne_jkKDUuC8&enablejsapi=1&origin=<?php echo $_SERVER['HTTP_HOST']; ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"></iframe>
+          
+          <!-- YouTube Embed -->
+          <div id="youtubeEmbedContainer">
+            <iframe id="youtubeIframe" 
+              width="100%" 
+              height="100%" 
+              src="https://www.youtube.com/embed/Ne_jkKDUuC8?autoplay=1&mute=1&modestbranding=1&rel=0&showinfo=0&controls=0&loop=1&playlist=Ne_jkKDUuC8&enablejsapi=1" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              allowfullscreen>
+            </iframe>
           </div>
           
-          <div class="video-title-overlay" id="videoTitleOverlay">Hive Inspection</div>
+          <!-- Source Badge -->
+          <div class="video-source-badge" id="videoSourceBadge">
+            <span class="source-dot youtube" id="sourceDot"></span>
+            <span class="source-label" id="sourceLabel">YouTube</span>
+          </div>
           
+          <!-- Title Overlay -->
+          <div class="video-title-overlay" id="videoTitleOverlay">
+            <h3 id="videoTitle">Hive Inspection</h3>
+            <p id="videoDescription">Learn how to safely inspect your beehive</p>
+          </div>
+          
+          <!-- Play Button Overlay -->
           <button class="video-play-btn" id="videoPlayBtn" aria-label="Play/Pause">
             <i class="fas fa-play"></i>
           </button>
+          
+          <!-- Loading Spinner -->
+          <div class="video-loading" id="videoLoading">
+            <i class="fas fa-spinner fa-spin"></i>
+          </div>
+          
+          <!-- Next Video Countdown -->
+          <div class="video-next-countdown" id="videoNextCountdown">
+            <i class="fas fa-forward"></i>
+            Next video in <span class="countdown-timer" id="countdownTimer">2</span>s
+          </div>
         </div>
         
-        <div class="video-controls-bar">
+        <!-- Video Controls -->
+        <div class="video-controls-bar" id="videoControls">
+          <!-- Previous Button -->
+          <button class="video-control-btn" id="videoPrevBtn" title="Previous video" disabled>
+            <i class="fas fa-backward"></i>
+          </button>
+          
+          <!-- Play/Pause -->
           <button class="video-control-btn" id="videoPlayPauseBtn" aria-label="Play/Pause">
             <i class="fas fa-play" id="playPauseIcon"></i>
           </button>
-          <div class="video-progress-container">
-            <input type="range" class="video-progress" id="videoProgress" min="0" max="100" value="0">
-          </div>
-          <span class="video-time" id="videoTimeDisplay">0:00 / 0:00</span>
-          <button class="video-control-btn" id="videoVolumeBtn" aria-label="Mute/Unmute">
-            <i class="fas fa-volume-mute" id="volumeIcon"></i>
-          </button>
-          <button class="video-control-btn" id="videoNextBtn" aria-label="Next video">
+          
+          <!-- Next Button -->
+          <button class="video-control-btn" id="videoNextBtn" title="Next video">
             <i class="fas fa-forward"></i>
           </button>
+          
+          <!-- Progress -->
+          <div class="video-progress-container">
+            <span class="video-time-current" id="videoCurrentTime">0:00</span>
+            <input type="range" class="video-progress" id="videoProgress" min="0" max="100" value="0">
+            <span class="video-time-total" id="videoTotalTime">0:00</span>
+          </div>
+          
+          <!-- Right Controls -->
+          <div class="video-controls-right">
+            <!-- Volume -->
+            <div class="volume-container">
+              <button class="video-control-btn" id="videoVolumeBtn" aria-label="Mute/Unmute">
+                <i class="fas fa-volume-up" id="volumeIcon"></i>
+              </button>
+              <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80">
+            </div>
+            
+            <!-- Playlist Counter -->
+            <span class="playlist-counter" id="playlistCounter">
+              <span id="currentVideoNum">1</span> / <span id="totalVideosNum">3</span>
+            </span>
+            
+            <!-- Fullscreen -->
+            <button class="video-control-btn" id="fullscreenBtn" aria-label="Fullscreen" title="Fullscreen">
+              <i class="fas fa-expand" id="fullscreenIcon"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1777,7 +2141,7 @@
 </div>
 
 <!-- ============================================================
-     JAVASCRIPT - COMPLETE FIXED VERSION
+     JAVASCRIPT - FULL UPDATED VERSION
      ============================================================ -->
 <script>
   // ===== HEADER HIDE/SHOW ON SCROLL =====
@@ -1824,303 +2188,452 @@
   fadeSections.forEach(section => sectionObserver.observe(section));
 
   // ============================================================
-  // VIDEO SECTION - FIXED: Proper YouTube audio control
+  // UPDATED VIDEO PLAYLIST CONTROLLER - FULLY FIXED
   // ============================================================
-  const videoElement = document.getElementById('mainVideo');
-  const videoTitleOverlay = document.getElementById('videoTitleOverlay');
 
-  const playPauseBtn = document.getElementById('videoPlayPauseBtn');
-  const playPauseIcon = document.getElementById('playPauseIcon');
-  const playBtnOverlay = document.getElementById('videoPlayBtn');
-  const progressBar = document.getElementById('videoProgress');
-  const timeDisplay = document.getElementById('videoTimeDisplay');
-  const volumeBtn = document.getElementById('videoVolumeBtn');
-  const volumeIcon = document.getElementById('volumeIcon');
-  const nextBtn = document.getElementById('videoNextBtn');
-
-  const youtubeContainer = document.getElementById('youtubeEmbedContainer');
-  const youtubeIframe = document.getElementById('youtubeIframe');
-
-  let usingYouTube = true;
-  let currentVideoIndex = 0;
-  let isVideoPlaying = false;
-  let titleTimeout = null;
-  let isDragging = false;
-  let isYouTubeMuted = true;
-  let isLocalMuted = true;
-
-  const videoTitles = ['Hive preparation', 'Bee feeds'];
-
-  function showVideoTitle(index) {
-    if (titleTimeout) {
-      clearTimeout(titleTimeout);
-      titleTimeout = null;
+  // ===== VIDEO PLAYLIST =====
+  const videoPlaylist = [
+    {
+      id: 0,
+      title: 'Hive Inspection',
+      description: 'Learn how to safely inspect your beehive',
+      source: 'youtube',
+      youtubeId: 'Ne_jkKDUuC8',
+      duration: '3:42'
+    },
+    {
+      id: 1,
+      title: 'Honey Harvest',
+      description: 'Step-by-step guide to harvesting honey',
+      source: 'local',
+      localFile: 'dreamers/assets/harvest.mp4',
+      duration: '5:18'
+    },
+    {
+      id: 2,
+      title: 'Queen Rearing',
+      description: 'How to raise and introduce new queens',
+      source: 'youtube',
+      youtubeId: 'Ne_jkKDUuC8',
+      duration: '6:05'
     }
-    
-    videoTitleOverlay.textContent = videoTitles[index];
-    videoTitleOverlay.classList.remove('hidden');
-    
-    titleTimeout = setTimeout(() => {
-      videoTitleOverlay.classList.add('hidden');
-      titleTimeout = null;
-    }, 3000);
-  }
+  ];
 
-  // Send command to YouTube iframe
-  function sendYouTubeCommand(command) {
-    const iframe = document.getElementById('youtubeIframe');
-    if (iframe && iframe.contentWindow) {
-      iframe.contentWindow.postMessage(JSON.stringify({
-        event: 'command',
-        func: command,
-        args: []
-      }), '*');
+  // ===== PLAYLIST CONTROLLER =====
+  class PlaylistController {
+    constructor(playlist) {
+      this.playlist = playlist;
+      this.currentIndex = 0;
+      this.isPlaying = false;
+      this.usingYouTube = false;
+      this.isDragging = false;
+      this.volume = 0.8;
+      this.isMuted = false;
+      this.countdownTimer = null;
+      this.countdownValue = 3;
+
+      // DOM Elements
+      this.video = document.getElementById('mainVideo');
+      this.youtubeContainer = document.getElementById('youtubeEmbedContainer');
+      this.youtubeIframe = document.getElementById('youtubeIframe');
+
+      this.playPauseBtn = document.getElementById('videoPlayPauseBtn');
+      this.playPauseIcon = document.getElementById('playPauseIcon');
+      this.playBtnOverlay = document.getElementById('videoPlayBtn');
+      this.prevBtn = document.getElementById('videoPrevBtn');
+      this.nextBtn = document.getElementById('videoNextBtn');
+      this.progressBar = document.getElementById('videoProgress');
+      this.currentTimeDisplay = document.getElementById('videoCurrentTime');
+      this.totalTimeDisplay = document.getElementById('videoTotalTime');
+      this.volumeBtn = document.getElementById('videoVolumeBtn');
+      this.volumeIcon = document.getElementById('volumeIcon');
+      this.volumeSlider = document.getElementById('volumeSlider');
+      this.currentNum = document.getElementById('currentVideoNum');
+      this.totalNum = document.getElementById('totalVideosNum');
+      this.titleOverlay = document.getElementById('videoTitleOverlay');
+      this.videoTitle = document.getElementById('videoTitle');
+      this.videoDescription = document.getElementById('videoDescription');
+      this.sourceDot = document.getElementById('sourceDot');
+      this.sourceLabel = document.getElementById('sourceLabel');
+      this.loading = document.getElementById('videoLoading');
+      this.countdownEl = document.getElementById('videoNextCountdown');
+      this.countdownTimerEl = document.getElementById('countdownTimer');
+      this.fullscreenBtn = document.getElementById('fullscreenBtn');
+      this.fullscreenIcon = document.getElementById('fullscreenIcon');
+
+      this.init();
     }
-  }
 
-  function switchToYouTube() {
-    if (usingYouTube) return;
-    
-    // PAUSE LOCAL VIDEO FIRST
-    videoElement.pause();
-    videoElement.currentTime = 0;
-    
-    usingYouTube = true;
-    currentVideoIndex = 0;
-    
-    videoElement.style.display = 'none';
-    youtubeContainer.style.display = 'block';
-    
-    showVideoTitle(0);
-    progressBar.value = 0;
-    timeDisplay.textContent = '0:00 / 0:00';
-    playPauseIcon.className = 'fas fa-pause';
-    playBtnOverlay.classList.add('hidden');
-    
-    // Restore YouTube mute state
-    if (isYouTubeMuted) {
-      sendYouTubeCommand('mute');
-      volumeIcon.className = 'fas fa-volume-mute';
-    } else {
-      sendYouTubeCommand('unMute');
-      volumeIcon.className = 'fas fa-volume-up';
+    init() {
+      // Set total videos
+      this.totalNum.textContent = this.playlist.length;
+
+      // Load first video
+      this.loadVideo(0);
+
+      // Setup event listeners
+      this.setupEventListeners();
+      this.setupKeyboardShortcuts();
     }
-  }
 
-  function switchToLocal() {
-    if (!usingYouTube) return;
-    
-    // PAUSE YOUTUBE VIDEO FIRST
-    sendYouTubeCommand('pauseVideo');
-    
-    usingYouTube = false;
-    currentVideoIndex = 1;
-    
-    youtubeContainer.style.display = 'none';
-    videoElement.style.display = 'block';
-    
-    videoElement.load();
-    videoElement.play().catch(() => {});
-    
-    showVideoTitle(1);
-    playPauseIcon.className = 'fas fa-pause';
-    playBtnOverlay.classList.add('hidden');
-    
-    // Restore local video mute state
-    videoElement.muted = isLocalMuted;
-    volumeIcon.className = isLocalMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
-  }
+    setupEventListeners() {
+      // Play/Pause
+      this.playPauseBtn.addEventListener('click', () => this.togglePlay());
+      this.playBtnOverlay.addEventListener('click', () => this.togglePlay());
+      this.video.addEventListener('click', () => this.togglePlay());
 
-  // Initialize: start with YouTube
-  setTimeout(() => {
-    switchToYouTube();
-  }, 500);
+      // Previous/Next
+      this.prevBtn.addEventListener('click', () => this.previousVideo());
+      this.nextBtn.addEventListener('click', () => this.nextVideo());
 
-  function togglePlayPause() {
-    if (usingYouTube) {
-      if (playPauseIcon.className === 'fas fa-pause') {
-        sendYouTubeCommand('pauseVideo');
-        playPauseIcon.className = 'fas fa-play';
-        playBtnOverlay.classList.remove('hidden');
+      // Progress
+      this.progressBar.addEventListener('input', () => this.handleProgressSeek());
+      this.progressBar.addEventListener('change', () => this.isDragging = false);
+      this.video.addEventListener('timeupdate', () => this.updateProgress());
+
+      // Volume
+      this.volumeBtn.addEventListener('click', () => this.toggleMute());
+      this.volumeSlider.addEventListener('input', () => this.updateVolume());
+
+      // Video events
+      this.video.addEventListener('loadeddata', () => this.onVideoLoaded());
+      this.video.addEventListener('play', () => this.onPlay());
+      this.video.addEventListener('pause', () => this.onPause());
+      this.video.addEventListener('ended', () => this.onEnded());
+      this.video.addEventListener('waiting', () => this.showLoading());
+      this.video.addEventListener('canplay', () => this.hideLoading());
+
+      // Fullscreen
+      this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
+      document.addEventListener('fullscreenchange', () => {
+        this.fullscreenIcon.className = document.fullscreenElement ? 'fas fa-compress' : 'fas fa-expand';
+      });
+
+      // YouTube messages
+      window.addEventListener('message', (e) => this.handleYouTubeMessage(e));
+    }
+
+    setupKeyboardShortcuts() {
+      document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        // Space = Play/Pause
+        if (e.key === ' ' || e.key === 'Space') {
+          e.preventDefault();
+          this.togglePlay();
+        }
+
+        // Arrow keys for seeking (local only)
+        if (!this.usingYouTube) {
+          if (e.key === 'ArrowRight') {
+            this.video.currentTime = Math.min(this.video.currentTime + 10, this.video.duration);
+          }
+          if (e.key === 'ArrowLeft') {
+            this.video.currentTime = Math.max(this.video.currentTime - 10, 0);
+          }
+        }
+
+        // Ctrl + Arrows for navigation
+        if (e.ctrlKey && e.key === 'ArrowRight') {
+          e.preventDefault();
+          this.nextVideo();
+        }
+        if (e.ctrlKey && e.key === 'ArrowLeft') {
+          e.preventDefault();
+          this.previousVideo();
+        }
+
+        // F = Fullscreen
+        if (e.key === 'f' || e.key === 'F') {
+          this.toggleFullscreen();
+        }
+
+        // M = Mute
+        if (e.key === 'm' || e.key === 'M') {
+          this.toggleMute();
+        }
+      });
+    }
+
+    loadVideo(index) {
+      // Validate index
+      if (index < 0) index = this.playlist.length - 1;
+      if (index >= this.playlist.length) index = 0;
+
+      this.currentIndex = index;
+      const video = this.playlist[index];
+
+      // Update UI
+      this.currentNum.textContent = index + 1;
+      this.videoTitle.textContent = video.title;
+      this.videoDescription.textContent = video.description;
+      this.showTitle();
+
+      // Update buttons
+      this.prevBtn.disabled = this.playlist.length <= 1 || index === 0;
+      this.nextBtn.disabled = this.playlist.length <= 1 || index === this.playlist.length - 1;
+
+      // Hide countdown
+      this.countdownEl.classList.remove('show');
+
+      // Load the video based on source
+      if (video.source === 'youtube') {
+        this.loadYouTubeVideo(video);
       } else {
-        sendYouTubeCommand('playVideo');
-        playPauseIcon.className = 'fas fa-pause';
-        playBtnOverlay.classList.add('hidden');
+        this.loadLocalVideo(video);
       }
-    } else {
-      if (videoElement.paused) {
-        videoElement.play();
-        playPauseIcon.className = 'fas fa-pause';
-        playBtnOverlay.classList.add('hidden');
+    }
+
+    loadYouTubeVideo(video) {
+      this.usingYouTube = true;
+      const params = new URLSearchParams({
+        autoplay: 1,
+        mute: this.isMuted ? 1 : 0,
+        modestbranding: 1,
+        rel: 0,
+        showinfo: 0,
+        controls: 0,
+        loop: 0,
+        enablejsapi: 1
+      });
+
+      this.youtubeIframe.src = `https://www.youtube.com/embed/${video.youtubeId}?${params.toString()}`;
+      this.youtubeContainer.style.display = 'block';
+      this.video.style.display = 'none';
+      this.video.pause();
+
+      // Update source badge
+      this.sourceDot.className = 'source-dot youtube';
+      this.sourceLabel.textContent = 'YouTube';
+
+      this.showLoading();
+      setTimeout(() => this.hideLoading(), 3000);
+    }
+
+    loadLocalVideo(video) {
+      this.usingYouTube = false;
+      this.youtubeContainer.style.display = 'none';
+      this.video.style.display = 'block';
+
+      // Update source
+      const source = this.video.querySelector('source');
+      if (source) {
+        source.src = video.localFile;
+        this.video.load();
+        this.video.play().catch(() => {});
+      }
+
+      // Update source badge
+      this.sourceDot.className = 'source-dot local';
+      this.sourceLabel.textContent = 'Local';
+    }
+
+    togglePlay() {
+      if (this.usingYouTube) {
+        this.sendYouTubeCommand(this.isPlaying ? 'pauseVideo' : 'playVideo');
       } else {
-        videoElement.pause();
-        playPauseIcon.className = 'fas fa-play';
-        playBtnOverlay.classList.remove('hidden');
-      }
-    }
-  }
-
-  function updateProgress() {
-    if (!usingYouTube && !isDragging) {
-      const percent = (videoElement.currentTime / videoElement.duration) * 100;
-      progressBar.value = percent || 0;
-    }
-  }
-
-  function updateTimeDisplay() {
-    if (usingYouTube) return;
-    const current = formatTime(videoElement.currentTime);
-    const duration = formatTime(videoElement.duration);
-    timeDisplay.textContent = `${current} / ${duration}`;
-  }
-
-  function formatTime(time) {
-    if (isNaN(time) || !isFinite(time)) return '0:00';
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  }
-
-  playPauseBtn.addEventListener('click', togglePlayPause);
-  playBtnOverlay.addEventListener('click', togglePlayPause);
-  videoElement.addEventListener('click', togglePlayPause);
-
-  progressBar.addEventListener('input', function() {
-    if (usingYouTube) return;
-    isDragging = true;
-    const time = (this.value / 100) * videoElement.duration;
-    videoElement.currentTime = time;
-  });
-
-  progressBar.addEventListener('change', function() {
-    isDragging = false;
-  });
-
-  // Volume toggle - FIXED: Proper YouTube volume control
-  volumeBtn.addEventListener('click', function() {
-    if (usingYouTube) {
-      if (isYouTubeMuted) {
-        sendYouTubeCommand('unMute');
-        isYouTubeMuted = false;
-        volumeIcon.className = 'fas fa-volume-up';
-      } else {
-        sendYouTubeCommand('mute');
-        isYouTubeMuted = true;
-        volumeIcon.className = 'fas fa-volume-mute';
-      }
-    } else {
-      if (isLocalMuted) {
-        videoElement.muted = false;
-        isLocalMuted = false;
-        volumeIcon.className = 'fas fa-volume-up';
-      } else {
-        videoElement.muted = true;
-        isLocalMuted = true;
-        volumeIcon.className = 'fas fa-volume-mute';
-      }
-    }
-  });
-
-  // Next video button
-  nextBtn.addEventListener('click', function() {
-    if (usingYouTube) {
-      switchToLocal();
-    } else {
-      switchToYouTube();
-    }
-  });
-
-  videoElement.addEventListener('timeupdate', function() {
-    updateProgress();
-    updateTimeDisplay();
-  });
-
-  videoElement.addEventListener('play', function() {
-    if (!usingYouTube) {
-      isVideoPlaying = true;
-      playPauseIcon.className = 'fas fa-pause';
-      playBtnOverlay.classList.add('hidden');
-    }
-  });
-
-  videoElement.addEventListener('pause', function() {
-    if (!usingYouTube) {
-      isVideoPlaying = false;
-      playPauseIcon.className = 'fas fa-play';
-      if (!videoElement.ended) {
-        playBtnOverlay.classList.remove('hidden');
-      }
-    }
-  });
-
-  videoElement.addEventListener('ended', function() {
-    if (!usingYouTube) {
-      playPauseIcon.className = 'fas fa-play';
-      playBtnOverlay.classList.remove('hidden');
-      setTimeout(() => {
-        switchToYouTube();
-      }, 1500);
-    }
-  });
-
-  videoElement.addEventListener('loadeddata', function() {
-    if (!usingYouTube) {
-      showVideoTitle(1);
-      updateTimeDisplay();
-      videoElement.play().catch(() => {});
-      videoElement.muted = isLocalMuted;
-      volumeIcon.className = isLocalMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
-    }
-  });
-
-  // Listen for YouTube state changes to sync play/pause button
-  window.addEventListener('message', function(event) {
-    try {
-      const data = JSON.parse(event.data);
-      if (data.event === 'onStateChange' && usingYouTube) {
-        if (data.info === 1) { // Playing
-          playPauseIcon.className = 'fas fa-pause';
-          playBtnOverlay.classList.add('hidden');
-        } else if (data.info === 2) { // Paused
-          playPauseIcon.className = 'fas fa-play';
-          playBtnOverlay.classList.remove('hidden');
+        if (this.video.paused) {
+          this.video.play();
+        } else {
+          this.video.pause();
         }
       }
-    } catch (e) {
-      // Ignore non-JSON messages
     }
-  });
 
-  // Keyboard shortcuts
-  document.addEventListener('keydown', function(e) {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    
-    if (e.key === ' ' || e.key === 'Space') {
-      e.preventDefault();
-      togglePlayPause();
-    }
-    if (!usingYouTube) {
-      if (e.key === 'ArrowRight') {
-        videoElement.currentTime = Math.min(videoElement.currentTime + 10, videoElement.duration);
-      }
-      if (e.key === 'ArrowLeft') {
-        videoElement.currentTime = Math.max(videoElement.currentTime - 10, 0);
+    nextVideo() {
+      this.stopCountdown();
+      if (this.currentIndex < this.playlist.length - 1) {
+        this.loadVideo(this.currentIndex + 1);
       }
     }
-    if (e.key === 'f' || e.key === 'F') {
+
+    previousVideo() {
+      this.stopCountdown();
+      if (this.currentIndex > 0) {
+        this.loadVideo(this.currentIndex - 1);
+      }
+    }
+
+    toggleMute() {
+      this.isMuted = !this.isMuted;
+      if (this.usingYouTube) {
+        this.sendYouTubeCommand(this.isMuted ? 'mute' : 'unMute');
+      } else {
+        this.video.muted = this.isMuted;
+      }
+      this.updateVolumeIcon();
+    }
+
+    updateVolume() {
+      this.volume = this.volumeSlider.value / 100;
+      if (this.usingYouTube) {
+        this.sendYouTubeCommand('setVolume', this.volume * 100);
+      } else {
+        this.video.volume = this.volume;
+      }
+      this.isMuted = this.volume === 0;
+      this.updateVolumeIcon();
+    }
+
+    updateVolumeIcon() {
+      if (this.isMuted || this.volume === 0) {
+        this.volumeIcon.className = 'fas fa-volume-mute';
+      } else if (this.volume < 0.5) {
+        this.volumeIcon.className = 'fas fa-volume-down';
+      } else {
+        this.volumeIcon.className = 'fas fa-volume-up';
+      }
+    }
+
+    handleProgressSeek() {
+      if (!this.usingYouTube) {
+        this.isDragging = true;
+        const time = (this.progressBar.value / 100) * this.video.duration;
+        this.video.currentTime = time;
+        this.currentTimeDisplay.textContent = this.formatTime(time);
+      }
+    }
+
+    updateProgress() {
+      if (!this.usingYouTube && !this.isDragging) {
+        const percent = (this.video.currentTime / this.video.duration) * 100;
+        this.progressBar.value = percent || 0;
+        this.currentTimeDisplay.textContent = this.formatTime(this.video.currentTime);
+        this.totalTimeDisplay.textContent = this.formatTime(this.video.duration);
+      }
+    }
+
+    sendYouTubeCommand(command, value) {
+      if (this.youtubeIframe && this.youtubeIframe.contentWindow) {
+        const args = value !== undefined ? [value] : [];
+        this.youtubeIframe.contentWindow.postMessage(JSON.stringify({
+          event: 'command',
+          func: command,
+          args: args
+        }), '*');
+      }
+    }
+
+    handleYouTubeMessage(event) {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.event === 'onStateChange' && this.usingYouTube) {
+          if (data.info === 1) { // Playing
+            this.isPlaying = true;
+            this.playPauseIcon.className = 'fas fa-pause';
+            this.playBtnOverlay.classList.add('hidden');
+            this.hideLoading();
+            this.stopCountdown();
+          } else if (data.info === 2) { // Paused
+            this.isPlaying = false;
+            this.playPauseIcon.className = 'fas fa-play';
+            this.playBtnOverlay.classList.remove('hidden');
+          } else if (data.info === 0) { // Ended
+            this.isPlaying = false;
+            this.playPauseIcon.className = 'fas fa-play';
+            this.playBtnOverlay.classList.remove('hidden');
+            this.startCountdown();
+          }
+        }
+      } catch (e) {}
+    }
+
+    startCountdown() {
+      if (this.currentIndex >= this.playlist.length - 1) {
+        // Last video, don't auto-play
+        return;
+      }
+      this.countdownValue = 3;
+      this.countdownTimerEl.textContent = this.countdownValue;
+      this.countdownEl.classList.add('show');
+      
+      this.stopCountdown();
+      this.countdownTimer = setInterval(() => {
+        this.countdownValue--;
+        this.countdownTimerEl.textContent = this.countdownValue;
+        if (this.countdownValue <= 0) {
+          this.stopCountdown();
+          this.countdownEl.classList.remove('show');
+          this.nextVideo();
+        }
+      }, 1000);
+    }
+
+    stopCountdown() {
+      if (this.countdownTimer) {
+        clearInterval(this.countdownTimer);
+        this.countdownTimer = null;
+      }
+      this.countdownEl.classList.remove('show');
+    }
+
+    formatTime(time) {
+      if (isNaN(time) || !isFinite(time)) return '0:00';
+      const minutes = Math.floor(time / 60);
+      const seconds = Math.floor(time % 60);
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    showTitle() {
+      this.titleOverlay.classList.remove('hidden');
+      clearTimeout(this.titleTimeout);
+      this.titleTimeout = setTimeout(() => {
+        this.titleOverlay.classList.add('hidden');
+      }, 4000);
+    }
+
+    showLoading() {
+      this.loading.classList.add('show');
+    }
+
+    hideLoading() {
+      this.loading.classList.remove('show');
+    }
+
+    onPlay() {
+      this.isPlaying = true;
+      this.playPauseIcon.className = 'fas fa-pause';
+      this.playBtnOverlay.classList.add('hidden');
+      this.hideLoading();
+      this.stopCountdown();
+    }
+
+    onPause() {
+      this.isPlaying = false;
+      this.playPauseIcon.className = 'fas fa-play';
+      if (!this.video.ended) {
+        this.playBtnOverlay.classList.remove('hidden');
+      }
+    }
+
+    onEnded() {
+      this.isPlaying = false;
+      this.playPauseIcon.className = 'fas fa-play';
+      this.playBtnOverlay.classList.remove('hidden');
+      this.startCountdown();
+    }
+
+    onVideoLoaded() {
+      this.totalTimeDisplay.textContent = this.formatTime(this.video.duration);
+      this.video.volume = this.volume;
+      this.video.muted = this.isMuted;
+      this.hideLoading();
+    }
+
+    toggleFullscreen() {
+      const wrapper = document.querySelector('.video-wrapper');
       if (document.fullscreenElement) {
         document.exitFullscreen();
-      } else {
-        if (usingYouTube) {
-          const iframe = document.getElementById('youtubeIframe');
-          if (iframe) {
-            iframe.requestFullscreen().catch(() => {});
-          }
-        } else {
-          videoElement.requestFullscreen().catch(() => {});
-        }
+      } else if (wrapper) {
+        wrapper.requestFullscreen().catch(() => {});
       }
     }
+  }
+
+  // ===== INITIALIZE VIDEO PLAYER =====
+  document.addEventListener('DOMContentLoaded', () => {
+    const controller = new PlaylistController(videoPlaylist);
+    window.videoController = controller;
   });
 
   // ===== HERO IMAGE ROTATION =====
@@ -2172,7 +2685,6 @@
   // DYNAMIC SEARCH SYSTEM - Auto-detects and adds new content
   // ============================================================
   
-  // Static fallback content
   const staticSiteContent = [
     { name: "Bee Veil", desc: "Professional-grade mesh veil with wide brim.", section: "Equipment", target: "section-equipment" },
     { name: "Leather Gloves", desc: "Premium goatskin gloves, sting-resistant.", section: "Equipment", target: "section-equipment" },
