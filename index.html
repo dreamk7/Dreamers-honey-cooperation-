@@ -1828,7 +1828,7 @@
     </div>
   </section>
 
-  <!-- ===== UPDATED VIDEO SECTION WITH FIXED YOUTUBE PAUSE ===== -->
+  <!-- ===== VIDEO SECTION WITH FIXED YOUTUBE CONTROLS ===== -->
   <section class="video-section fade-section" id="videoSection" aria-label="Beekeeping video gallery">
     <div class="container">
       <div class="section-header">
@@ -1843,12 +1843,12 @@
             Your browser does not support the video tag.
           </video>
           
-          <!-- YouTube Embed with enablejsapi=1 for proper control -->
+          <!-- YouTube Embed -->
           <div id="youtubeEmbedContainer">
             <iframe id="youtubeIframe" 
               width="100%" 
               height="100%" 
-              src="https://www.youtube.com/embed/Ne_jkKDUuC8?autoplay=1&mute=1&modestbranding=1&rel=0&showinfo=0&controls=0&enablejsapi=1&origin=https://dreamers-honey.netlify.app" 
+              src="https://www.youtube.com/embed/Ne_jkKDUuC8?autoplay=1&mute=1&modestbranding=1&rel=0&showinfo=0&controls=0&enablejsapi=1" 
               frameborder="0" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
               allowfullscreen>
@@ -2141,7 +2141,7 @@
 </div>
 
 <!-- ============================================================
-     JAVASCRIPT - FULL UPDATED VERSION WITH FIXED YOUTUBE PAUSE
+     JAVASCRIPT - SIMPLIFIED AND RELIABLE VIDEO CONTROLLER
      ============================================================ -->
 <script>
   // ===== HEADER HIDE/SHOW ON SCROLL =====
@@ -2188,10 +2188,9 @@
   fadeSections.forEach(section => sectionObserver.observe(section));
 
   // ============================================================
-  // UPDATED VIDEO PLAYLIST CONTROLLER - WITH FIXED YOUTUBE PAUSE
+  // SIMPLIFIED VIDEO CONTROLLER - WORKS RELIABLY
   // ============================================================
 
-  // ===== VIDEO PLAYLIST =====
   const videoPlaylist = [
     {
       id: 0,
@@ -2219,217 +2218,129 @@
     }
   ];
 
-  // ===== PLAYLIST CONTROLLER =====
-  class PlaylistController {
+  class VideoController {
     constructor(playlist) {
       this.playlist = playlist;
       this.currentIndex = 0;
       this.isPlaying = false;
-      this.usingYouTube = false;
-      this.isDragging = false;
+      this.isYouTube = false;
       this.volume = 0.8;
       this.isMuted = false;
-      this.countdownTimer = null;
-      this.countdownValue = 3;
-      this.youtubePlayerReady = false;
-      this.pendingYouTubeCommand = null;
-
-      // DOM Elements
+      
+      // DOM elements
       this.video = document.getElementById('mainVideo');
       this.youtubeContainer = document.getElementById('youtubeEmbedContainer');
       this.youtubeIframe = document.getElementById('youtubeIframe');
-
-      this.playPauseBtn = document.getElementById('videoPlayPauseBtn');
-      this.playPauseIcon = document.getElementById('playPauseIcon');
-      this.playBtnOverlay = document.getElementById('videoPlayBtn');
+      
+      this.playBtn = document.getElementById('videoPlayPauseBtn');
+      this.playIcon = document.getElementById('playPauseIcon');
+      this.overlayPlayBtn = document.getElementById('videoPlayBtn');
       this.prevBtn = document.getElementById('videoPrevBtn');
       this.nextBtn = document.getElementById('videoNextBtn');
-      this.progressBar = document.getElementById('videoProgress');
+      this.progress = document.getElementById('videoProgress');
       this.currentTimeDisplay = document.getElementById('videoCurrentTime');
       this.totalTimeDisplay = document.getElementById('videoTotalTime');
       this.volumeBtn = document.getElementById('videoVolumeBtn');
       this.volumeIcon = document.getElementById('volumeIcon');
       this.volumeSlider = document.getElementById('volumeSlider');
-      this.currentNum = document.getElementById('currentVideoNum');
-      this.totalNum = document.getElementById('totalVideosNum');
+      this.currentNumEl = document.getElementById('currentVideoNum');
+      this.totalNumEl = document.getElementById('totalVideosNum');
+      this.titleEl = document.getElementById('videoTitle');
+      this.descEl = document.getElementById('videoDescription');
       this.titleOverlay = document.getElementById('videoTitleOverlay');
-      this.videoTitle = document.getElementById('videoTitle');
-      this.videoDescription = document.getElementById('videoDescription');
       this.sourceDot = document.getElementById('sourceDot');
       this.sourceLabel = document.getElementById('sourceLabel');
-      this.loading = document.getElementById('videoLoading');
+      this.loadingEl = document.getElementById('videoLoading');
       this.countdownEl = document.getElementById('videoNextCountdown');
       this.countdownTimerEl = document.getElementById('countdownTimer');
       this.fullscreenBtn = document.getElementById('fullscreenBtn');
-      this.fullscreenIcon = document.getElementById('fullscreenIcon');
-
+      
+      this.countdownInterval = null;
+      this.titleTimeout = null;
+      
       this.init();
     }
-
+    
     init() {
-      // Set total videos
-      this.totalNum.textContent = this.playlist.length;
-
-      // Load first video
+      this.totalNumEl.textContent = this.playlist.length;
       this.loadVideo(0);
-
-      // Setup event listeners
-      this.setupEventListeners();
-      this.setupKeyboardShortcuts();
-      
-      // Setup YouTube API ready check
-      this.checkYouTubeAPI();
+      this.setupEvents();
     }
-
-    checkYouTubeAPI() {
-      // Check if YouTube iframe API is ready
-      if (typeof YT !== 'undefined' && YT.Player) {
-        this.youtubePlayerReady = true;
-        if (this.pendingYouTubeCommand) {
-          this.sendYouTubeCommand(this.pendingYouTubeCommand.command, this.pendingYouTubeCommand.value);
-          this.pendingYouTubeCommand = null;
-        }
-      } else {
-        // Listen for YouTube API ready event
-        window.onYouTubeIframeAPIReady = () => {
-          this.youtubePlayerReady = true;
-          if (this.pendingYouTubeCommand) {
-            this.sendYouTubeCommand(this.pendingYouTubeCommand.command, this.pendingYouTubeCommand.value);
-            this.pendingYouTubeCommand = null;
-          }
-        };
-      }
-    }
-
-    setupEventListeners() {
+    
+    setupEvents() {
       // Play/Pause
-      this.playPauseBtn.addEventListener('click', () => this.togglePlay());
-      this.playBtnOverlay.addEventListener('click', () => this.togglePlay());
+      this.playBtn.addEventListener('click', () => this.togglePlay());
+      this.overlayPlayBtn.addEventListener('click', () => this.togglePlay());
       this.video.addEventListener('click', () => this.togglePlay());
-
-      // Previous/Next
-      this.prevBtn.addEventListener('click', () => this.previousVideo());
-      this.nextBtn.addEventListener('click', () => this.nextVideo());
-
+      
+      // Navigation
+      this.prevBtn.addEventListener('click', () => this.prev());
+      this.nextBtn.addEventListener('click', () => this.next());
+      
       // Progress
-      this.progressBar.addEventListener('input', () => this.handleProgressSeek());
-      this.progressBar.addEventListener('change', () => this.isDragging = false);
+      this.progress.addEventListener('input', () => this.seek());
       this.video.addEventListener('timeupdate', () => this.updateProgress());
-
+      
       // Volume
       this.volumeBtn.addEventListener('click', () => this.toggleMute());
-      this.volumeSlider.addEventListener('input', () => this.updateVolume());
-
+      this.volumeSlider.addEventListener('input', () => this.setVolume());
+      
       // Video events
-      this.video.addEventListener('loadeddata', () => this.onVideoLoaded());
       this.video.addEventListener('play', () => this.onPlay());
       this.video.addEventListener('pause', () => this.onPause());
       this.video.addEventListener('ended', () => this.onEnded());
+      this.video.addEventListener('loadeddata', () => this.onLoaded());
       this.video.addEventListener('waiting', () => this.showLoading());
       this.video.addEventListener('canplay', () => this.hideLoading());
-
+      
       // Fullscreen
       this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
-      document.addEventListener('fullscreenchange', () => {
-        this.fullscreenIcon.className = document.fullscreenElement ? 'fas fa-compress' : 'fas fa-expand';
-      });
-
-      // YouTube messages - improved handling
+      
+      // YouTube message listener
       window.addEventListener('message', (e) => this.handleYouTubeMessage(e));
       
-      // Also handle the YouTube player state via polling for reliability
-      this.startYouTubeStatePolling();
-    }
-
-    startYouTubeStatePolling() {
-      // Poll YouTube player state every 500ms for reliability
-      this.pollingInterval = setInterval(() => {
-        if (this.usingYouTube && this.youtubePlayerReady) {
-          this.sendYouTubeCommand('getPlayerState');
-        }
-      }, 500);
-    }
-
-    setupKeyboardShortcuts() {
+      // Keyboard shortcuts
       document.addEventListener('keydown', (e) => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-        // Space = Play/Pause
         if (e.key === ' ' || e.key === 'Space') {
           e.preventDefault();
           this.togglePlay();
         }
-
-        // Arrow keys for seeking (local only)
-        if (!this.usingYouTube) {
-          if (e.key === 'ArrowRight') {
-            this.video.currentTime = Math.min(this.video.currentTime + 10, this.video.duration);
-          }
-          if (e.key === 'ArrowLeft') {
-            this.video.currentTime = Math.max(this.video.currentTime - 10, 0);
-          }
-        }
-
-        // Ctrl + Arrows for navigation
-        if (e.ctrlKey && e.key === 'ArrowRight') {
-          e.preventDefault();
-          this.nextVideo();
-        }
-        if (e.ctrlKey && e.key === 'ArrowLeft') {
-          e.preventDefault();
-          this.previousVideo();
-        }
-
-        // F = Fullscreen
-        if (e.key === 'f' || e.key === 'F') {
-          this.toggleFullscreen();
-        }
-
-        // M = Mute
-        if (e.key === 'm' || e.key === 'M') {
-          this.toggleMute();
-        }
+        if (e.key === 'f' || e.key === 'F') this.toggleFullscreen();
+        if (e.key === 'm' || e.key === 'M') this.toggleMute();
       });
     }
-
+    
     loadVideo(index) {
-      // Validate index
       if (index < 0) index = this.playlist.length - 1;
       if (index >= this.playlist.length) index = 0;
-
+      
       this.currentIndex = index;
       const video = this.playlist[index];
-
+      
       // Update UI
-      this.currentNum.textContent = index + 1;
-      this.videoTitle.textContent = video.title;
-      this.videoDescription.textContent = video.description;
+      this.currentNumEl.textContent = index + 1;
+      this.titleEl.textContent = video.title;
+      this.descEl.textContent = video.description;
       this.showTitle();
-
-      // Update buttons
-      this.prevBtn.disabled = this.playlist.length <= 1 || index === 0;
-      this.nextBtn.disabled = this.playlist.length <= 1 || index === this.playlist.length - 1;
-
-      // Hide countdown
+      
+      this.prevBtn.disabled = index === 0;
+      this.nextBtn.disabled = index === this.playlist.length - 1;
+      
+      this.isPlaying = false;
+      this.playIcon.className = 'fas fa-play';
+      this.overlayPlayBtn.classList.remove('hidden');
       this.countdownEl.classList.remove('show');
       
-      // Reset playing state
-      this.isPlaying = false;
-      this.playPauseIcon.className = 'fas fa-play';
-      this.playBtnOverlay.classList.remove('hidden');
-
-      // Load the video based on source
       if (video.source === 'youtube') {
-        this.loadYouTubeVideo(video);
+        this.loadYouTube(video);
       } else {
-        this.loadLocalVideo(video);
+        this.loadLocal(video);
       }
     }
-
-    loadYouTubeVideo(video) {
-      this.usingYouTube = true;
-      
-      // Build YouTube URL with proper parameters
+    
+    loadYouTube(video) {
+      this.isYouTube = true;
       const params = new URLSearchParams({
         autoplay: 1,
         mute: this.isMuted ? 1 : 0,
@@ -2437,63 +2348,46 @@
         rel: 0,
         showinfo: 0,
         controls: 0,
-        loop: 0,
-        enablejsapi: 1,
-        origin: window.location.origin
+        enablejsapi: 1
       });
-
-      this.youtubeIframe.src = `https://www.youtube.com/embed/${video.youtubeId}?${params.toString()}`;
+      
+      this.youtubeIframe.src = `https://www.youtube.com/embed/${video.youtubeId}?${params}`;
       this.youtubeContainer.style.display = 'block';
       this.video.style.display = 'none';
       this.video.pause();
-
-      // Update source badge
+      
       this.sourceDot.className = 'source-dot youtube';
       this.sourceLabel.textContent = 'YouTube';
-
       this.showLoading();
       
-      // Hide loading after video loads
-      setTimeout(() => {
-        this.hideLoading();
-        // Try to play after load
-        setTimeout(() => {
-          this.sendYouTubeCommand('playVideo');
-        }, 500);
-      }, 2000);
+      setTimeout(() => this.hideLoading(), 3000);
     }
-
-    loadLocalVideo(video) {
-      this.usingYouTube = false;
+    
+    loadLocal(video) {
+      this.isYouTube = false;
       this.youtubeContainer.style.display = 'none';
       this.video.style.display = 'block';
-
-      // Update source
+      
       const source = this.video.querySelector('source');
       if (source) {
         source.src = video.localFile;
         this.video.load();
         this.video.play().catch(() => {});
       }
-
-      // Update source badge
+      
       this.sourceDot.className = 'source-dot local';
       this.sourceLabel.textContent = 'Local';
     }
-
+    
     togglePlay() {
-      if (this.usingYouTube) {
-        // For YouTube, we need to check current state and toggle
+      if (this.isYouTube) {
+        // Send command to YouTube
+        const command = this.isPlaying ? 'pauseVideo' : 'playVideo';
+        this.sendYouTubeCommand(command);
+        // Toggle state immediately for UI responsiveness
+        this.isPlaying = !this.isPlaying;
+        this.updatePlayUI();
         if (this.isPlaying) {
-          this.sendYouTubeCommand('pauseVideo');
-          this.isPlaying = false;
-          this.playPauseIcon.className = 'fas fa-play';
-          this.playBtnOverlay.classList.remove('hidden');
-        } else {
-          this.sendYouTubeCommand('playVideo');
-          this.isPlaying = true;
-          this.playPauseIcon.className = 'fas fa-pause';
-          this.playBtnOverlay.classList.add('hidden');
           this.hideLoading();
           this.stopCountdown();
         }
@@ -2505,34 +2399,74 @@
         }
       }
     }
-
-    nextVideo() {
-      this.stopCountdown();
-      if (this.currentIndex < this.playlist.length - 1) {
-        this.loadVideo(this.currentIndex + 1);
+    
+    sendYouTubeCommand(command) {
+      if (this.youtubeIframe && this.youtubeIframe.contentWindow) {
+        try {
+          this.youtubeIframe.contentWindow.postMessage(JSON.stringify({
+            event: 'command',
+            func: command,
+            args: []
+          }), '*');
+        } catch(e) {}
       }
     }
-
-    previousVideo() {
-      this.stopCountdown();
-      if (this.currentIndex > 0) {
-        this.loadVideo(this.currentIndex - 1);
-      }
-    }
-
-    toggleMute() {
-      this.isMuted = !this.isMuted;
-      if (this.usingYouTube) {
-        this.sendYouTubeCommand(this.isMuted ? 'mute' : 'unMute');
+    
+    updatePlayUI() {
+      if (this.isPlaying) {
+        this.playIcon.className = 'fas fa-pause';
+        this.overlayPlayBtn.classList.add('hidden');
       } else {
-        this.video.muted = this.isMuted;
+        this.playIcon.className = 'fas fa-play';
+        this.overlayPlayBtn.classList.remove('hidden');
       }
-      this.updateVolumeIcon();
     }
-
-    updateVolume() {
+    
+    handleYouTubeMessage(event) {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.event === 'onStateChange') {
+          const state = data.info;
+          // 1=playing, 2=paused, 0=ended, 3=buffering
+          if (state === 1) {
+            this.isPlaying = true;
+            this.updatePlayUI();
+            this.hideLoading();
+            this.stopCountdown();
+          } else if (state === 2) {
+            this.isPlaying = false;
+            this.updatePlayUI();
+          } else if (state === 0) {
+            this.isPlaying = false;
+            this.updatePlayUI();
+            this.startCountdown();
+          } else if (state === 3) {
+            this.showLoading();
+          }
+        }
+      } catch(e) {}
+    }
+    
+    seek() {
+      if (!this.isYouTube) {
+        const time = (this.progress.value / 100) * this.video.duration;
+        this.video.currentTime = time;
+        this.currentTimeDisplay.textContent = this.formatTime(time);
+      }
+    }
+    
+    updateProgress() {
+      if (!this.isYouTube) {
+        const percent = (this.video.currentTime / this.video.duration) * 100;
+        this.progress.value = percent || 0;
+        this.currentTimeDisplay.textContent = this.formatTime(this.video.currentTime);
+        this.totalTimeDisplay.textContent = this.formatTime(this.video.duration);
+      }
+    }
+    
+    setVolume() {
       this.volume = this.volumeSlider.value / 100;
-      if (this.usingYouTube) {
+      if (this.isYouTube) {
         this.sendYouTubeCommand('setVolume', this.volume * 100);
       } else {
         this.video.volume = this.volume;
@@ -2540,7 +2474,17 @@
       this.isMuted = this.volume === 0;
       this.updateVolumeIcon();
     }
-
+    
+    toggleMute() {
+      this.isMuted = !this.isMuted;
+      if (this.isYouTube) {
+        this.sendYouTubeCommand(this.isMuted ? 'mute' : 'unMute');
+      } else {
+        this.video.muted = this.isMuted;
+      }
+      this.updateVolumeIcon();
+    }
+    
     updateVolumeIcon() {
       if (this.isMuted || this.volume === 0) {
         this.volumeIcon.className = 'fas fa-volume-mute';
@@ -2550,138 +2494,76 @@
         this.volumeIcon.className = 'fas fa-volume-up';
       }
     }
-
-    handleProgressSeek() {
-      if (!this.usingYouTube) {
-        this.isDragging = true;
-        const time = (this.progressBar.value / 100) * this.video.duration;
-        this.video.currentTime = time;
-        this.currentTimeDisplay.textContent = this.formatTime(time);
-      }
-    }
-
-    updateProgress() {
-      if (!this.usingYouTube && !this.isDragging) {
-        const percent = (this.video.currentTime / this.video.duration) * 100;
-        this.progressBar.value = percent || 0;
-        this.currentTimeDisplay.textContent = this.formatTime(this.video.currentTime);
-        this.totalTimeDisplay.textContent = this.formatTime(this.video.duration);
-      }
-    }
-
-    sendYouTubeCommand(command, value) {
-      if (!this.youtubePlayerReady) {
-        // Queue the command for when API is ready
-        this.pendingYouTubeCommand = { command, value };
-        return;
-      }
-      
-      if (this.youtubeIframe && this.youtubeIframe.contentWindow) {
-        try {
-          const args = value !== undefined ? [value] : [];
-          const message = JSON.stringify({
-            event: 'command',
-            func: command,
-            args: args
-          });
-          this.youtubeIframe.contentWindow.postMessage(message, '*');
-        } catch (e) {
-          console.warn('YouTube command failed:', e);
-        }
-      }
-    }
-
-    handleYouTubeMessage(event) {
-      try {
-        // Check if this is a YouTube message
-        if (typeof event.data === 'string') {
-          const data = JSON.parse(event.data);
-          
-          // Handle player state changes
-          if (data.event === 'onStateChange') {
-            const state = data.info;
-            this.handleYouTubeStateChange(state);
-          }
-          
-          // Handle player ready
-          if (data.event === 'onReady') {
-            this.youtubePlayerReady = true;
-            this.hideLoading();
-            // Apply any pending volume settings
-            if (this.volume) {
-              this.sendYouTubeCommand('setVolume', this.volume * 100);
-            }
-          }
-          
-          // Handle errors
-          if (data.event === 'onError') {
-            console.warn('YouTube error:', data.info);
-            this.hideLoading();
-          }
-        }
-      } catch (e) {
-        // Not a JSON message or not from YouTube
-      }
-    }
-
-    handleYouTubeStateChange(state) {
-      // YouTube player states: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=video cued
-      if (state === 1) { // Playing
-        this.isPlaying = true;
-        this.playPauseIcon.className = 'fas fa-pause';
-        this.playBtnOverlay.classList.add('hidden');
-        this.hideLoading();
-        this.stopCountdown();
-      } else if (state === 2) { // Paused
-        this.isPlaying = false;
-        this.playPauseIcon.className = 'fas fa-play';
-        this.playBtnOverlay.classList.remove('hidden');
-      } else if (state === 0) { // Ended
-        this.isPlaying = false;
-        this.playPauseIcon.className = 'fas fa-play';
-        this.playBtnOverlay.classList.remove('hidden');
-        this.startCountdown();
-      } else if (state === 3) { // Buffering
-        this.showLoading();
-      }
-    }
-
+    
     startCountdown() {
-      if (this.currentIndex >= this.playlist.length - 1) {
-        // Last video, don't auto-play
-        return;
-      }
-      this.countdownValue = 3;
-      this.countdownTimerEl.textContent = this.countdownValue;
+      if (this.currentIndex >= this.playlist.length - 1) return;
+      
+      let count = 3;
+      this.countdownTimerEl.textContent = count;
       this.countdownEl.classList.add('show');
       
       this.stopCountdown();
-      this.countdownTimer = setInterval(() => {
-        this.countdownValue--;
-        this.countdownTimerEl.textContent = this.countdownValue;
-        if (this.countdownValue <= 0) {
+      this.countdownInterval = setInterval(() => {
+        count--;
+        this.countdownTimerEl.textContent = count;
+        if (count <= 0) {
           this.stopCountdown();
           this.countdownEl.classList.remove('show');
-          this.nextVideo();
+          this.next();
         }
       }, 1000);
     }
-
+    
     stopCountdown() {
-      if (this.countdownTimer) {
-        clearInterval(this.countdownTimer);
-        this.countdownTimer = null;
+      if (this.countdownInterval) {
+        clearInterval(this.countdownInterval);
+        this.countdownInterval = null;
       }
-      this.countdownEl.classList.remove('show');
     }
-
-    formatTime(time) {
-      if (isNaN(time) || !isFinite(time)) return '0:00';
-      const minutes = Math.floor(time / 60);
-      const seconds = Math.floor(time % 60);
-      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    
+    next() {
+      this.stopCountdown();
+      if (this.currentIndex < this.playlist.length - 1) {
+        this.loadVideo(this.currentIndex + 1);
+      }
     }
-
+    
+    prev() {
+      this.stopCountdown();
+      if (this.currentIndex > 0) {
+        this.loadVideo(this.currentIndex - 1);
+      }
+    }
+    
+    onPlay() {
+      this.isPlaying = true;
+      this.playIcon.className = 'fas fa-pause';
+      this.overlayPlayBtn.classList.add('hidden');
+      this.stopCountdown();
+    }
+    
+    onPause() {
+      this.isPlaying = false;
+      this.playIcon.className = 'fas fa-play';
+      if (!this.video.ended) {
+        this.overlayPlayBtn.classList.remove('hidden');
+      }
+    }
+    
+    onEnded() {
+      this.isPlaying = false;
+      this.playIcon.className = 'fas fa-play';
+      this.overlayPlayBtn.classList.remove('hidden');
+      this.startCountdown();
+    }
+    
+    onLoaded() {
+      this.totalTimeDisplay.textContent = this.formatTime(this.video.duration);
+      this.video.volume = this.volume;
+      this.video.muted = this.isMuted;
+      this.hideLoading();
+    }
+    
     showTitle() {
       this.titleOverlay.classList.remove('hidden');
       clearTimeout(this.titleTimeout);
@@ -2689,45 +2571,22 @@
         this.titleOverlay.classList.add('hidden');
       }, 4000);
     }
-
+    
     showLoading() {
-      this.loading.classList.add('show');
+      this.loadingEl.classList.add('show');
     }
-
+    
     hideLoading() {
-      this.loading.classList.remove('show');
+      this.loadingEl.classList.remove('show');
     }
-
-    onPlay() {
-      this.isPlaying = true;
-      this.playPauseIcon.className = 'fas fa-pause';
-      this.playBtnOverlay.classList.add('hidden');
-      this.hideLoading();
-      this.stopCountdown();
+    
+    formatTime(time) {
+      if (isNaN(time) || !isFinite(time)) return '0:00';
+      const mins = Math.floor(time / 60);
+      const secs = Math.floor(time % 60);
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
-
-    onPause() {
-      this.isPlaying = false;
-      this.playPauseIcon.className = 'fas fa-play';
-      if (!this.video.ended) {
-        this.playBtnOverlay.classList.remove('hidden');
-      }
-    }
-
-    onEnded() {
-      this.isPlaying = false;
-      this.playPauseIcon.className = 'fas fa-play';
-      this.playBtnOverlay.classList.remove('hidden');
-      this.startCountdown();
-    }
-
-    onVideoLoaded() {
-      this.totalTimeDisplay.textContent = this.formatTime(this.video.duration);
-      this.video.volume = this.volume;
-      this.video.muted = this.isMuted;
-      this.hideLoading();
-    }
-
+    
     toggleFullscreen() {
       const wrapper = document.querySelector('.video-wrapper');
       if (document.fullscreenElement) {
@@ -2737,11 +2596,10 @@
       }
     }
   }
-
-  // ===== INITIALIZE VIDEO PLAYER =====
+  
+  // Initialize video player
   document.addEventListener('DOMContentLoaded', () => {
-    const controller = new PlaylistController(videoPlaylist);
-    window.videoController = controller;
+    window.videoPlayer = new VideoController(videoPlaylist);
   });
 
   // ===== HERO IMAGE ROTATION =====
