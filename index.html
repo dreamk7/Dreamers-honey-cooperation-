@@ -876,30 +876,38 @@
       border: 0;
     }
 
-    /* ===== SOURCE BADGE - ICON ONLY ===== */
+    /* Video Source Badge */
     .video-source-badge {
       position: absolute;
       top: 16px;
       right: 16px;
       z-index: 20;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.75);
       backdrop-filter: blur(8px);
-      padding: 6px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      animation: slideInBadge 0.5s ease forwards;
-      pointer-events: none;
-      width: 32px;
-      height: 32px;
+      padding: 6px 14px;
+      border-radius: 20px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
+      gap: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+      animation: slideInBadge 0.5s ease forwards;
+    }
+
+    @keyframes slideInBadge {
+      from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .video-source-badge .source-dot {
-      width: 14px;
-      height: 14px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       display: inline-block;
       transition: all 0.3s ease;
@@ -907,29 +915,19 @@
 
     .video-source-badge .source-dot.youtube {
       background: #FF0000;
-      box-shadow: 0 0 16px rgba(255, 0, 0, 0.4);
-      animation: pulseRed 2s ease-in-out infinite;
+      box-shadow: 0 0 12px rgba(255, 0, 0, 0.3);
     }
 
     .video-source-badge .source-dot.local {
       background: var(--gold);
-      box-shadow: 0 0 16px rgba(233, 162, 59, 0.4);
-      animation: pulseGold 2s ease-in-out infinite;
+      box-shadow: 0 0 12px rgba(233, 162, 59, 0.3);
     }
 
-    @keyframes pulseRed {
-      0%, 100% { transform: scale(1); opacity: 0.8; }
-      50% { transform: scale(1.15); opacity: 1; }
-    }
-
-    @keyframes pulseGold {
-      0%, 100% { transform: scale(1); opacity: 0.8; }
-      50% { transform: scale(1.15); opacity: 1; }
-    }
-
-    @keyframes slideInBadge {
-      from { opacity: 0; transform: translateY(-10px) scale(0.8); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+    .video-source-badge .source-label {
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
     }
 
     /* Video Title Overlay */
@@ -1028,8 +1026,8 @@
     .video-controls-bar {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 14px;
+      gap: 12px;
+      padding: 10px 16px;
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(4px);
       border-top: 1px solid rgba(255, 255, 255, 0.05);
@@ -1048,8 +1046,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: 34px;
-      height: 34px;
+      min-width: 36px;
+      height: 36px;
     }
 
     .video-control-btn:hover {
@@ -1067,7 +1065,6 @@
       color: #fff;
     }
 
-    /* ===== VIDEO PROGRESS & DURATION - FIXED ===== */
     .video-progress-container {
       flex: 1;
       min-width: 80px;
@@ -1078,23 +1075,12 @@
 
     .video-time-current,
     .video-time-total {
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(255, 255, 255, 0.7);
       font-size: 0.7rem;
       font-family: 'Inter', monospace;
-      min-width: 38px;
+      min-width: 40px;
       text-align: center;
       letter-spacing: 0.3px;
-      font-variant-numeric: tabular-nums;
-      font-weight: 500;
-    }
-
-    .video-time-current {
-      color: var(--gold-light);
-      font-weight: 600;
-    }
-
-    .video-time-total {
-      color: rgba(255, 255, 255, 0.4);
     }
 
     .video-progress {
@@ -1102,7 +1088,7 @@
       height: 4px;
       -webkit-appearance: none;
       appearance: none;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.2);
       border-radius: 4px;
       outline: none;
       cursor: pointer;
@@ -1127,7 +1113,6 @@
 
     .video-progress::-webkit-slider-thumb:hover {
       transform: scale(1.2);
-      box-shadow: 0 0 30px rgba(233, 162, 59, 0.5);
     }
 
     .video-progress::-moz-range-thumb {
@@ -1186,11 +1171,11 @@
     /* Playlist Counter */
     .playlist-counter {
       color: rgba(255, 255, 255, 0.5);
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       font-weight: 600;
       font-family: 'Inter', monospace;
       padding: 0 4px;
-      min-width: 44px;
+      min-width: 50px;
       text-align: center;
     }
 
@@ -1246,33 +1231,18 @@
         right: 20px;
       }
       .video-controls-bar {
-        padding: 6px 10px;
-        gap: 6px;
+        padding: 8px 12px;
+        gap: 8px;
         flex-wrap: wrap;
       }
       .video-control-btn {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         padding: 4px 6px;
-        min-width: 30px;
-        height: 30px;
+        min-width: 32px;
+        height: 32px;
       }
       .volume-slider {
         width: 40px;
-      }
-      .video-time-current,
-      .video-time-total {
-        font-size: 0.6rem;
-        min-width: 32px;
-      }
-      .video-source-badge {
-        width: 28px;
-        height: 28px;
-        top: 12px;
-        right: 12px;
-      }
-      .video-source-badge .source-dot {
-        width: 12px;
-        height: 12px;
       }
     }
 
@@ -1300,39 +1270,41 @@
         font-size: 1.5rem;
       }
       .video-controls-bar {
-        padding: 4px 8px;
+        padding: 6px 10px;
         gap: 4px;
         flex-wrap: nowrap;
         overflow-x: auto;
       }
       .video-control-btn {
-        font-size: 0.75rem;
-        padding: 3px 4px;
-        min-width: 26px;
-        height: 26px;
+        font-size: 0.8rem;
+        padding: 3px 5px;
+        min-width: 28px;
+        height: 28px;
       }
       .video-time-current,
       .video-time-total {
-        font-size: 0.5rem;
-        min-width: 26px;
+        font-size: 0.55rem;
+        min-width: 30px;
       }
       .volume-slider {
         width: 30px;
       }
       .video-source-badge {
-        width: 24px;
-        height: 24px;
-        top: 8px;
-        right: 8px;
-        padding: 4px;
+        top: 10px;
+        right: 10px;
+        padding: 4px 10px;
+        gap: 6px;
+      }
+      .video-source-badge .source-label {
+        font-size: 0.6rem;
       }
       .video-source-badge .source-dot {
-        width: 10px;
-        height: 10px;
+        width: 6px;
+        height: 6px;
       }
       .playlist-counter {
-        font-size: 0.55rem;
-        min-width: 36px;
+        font-size: 0.6rem;
+        min-width: 40px;
       }
       .video-next-countdown {
         bottom: 80px;
@@ -1856,7 +1828,7 @@
     </div>
   </section>
 
-  <!-- ===== UPDATED VIDEO SECTION ===== -->
+  <!-- ===== UPDATED VIDEO SECTION WITH FIXED YOUTUBE PAUSE ===== -->
   <section class="video-section fade-section" id="videoSection" aria-label="Beekeeping video gallery">
     <div class="container">
       <div class="section-header">
@@ -1871,21 +1843,22 @@
             Your browser does not support the video tag.
           </video>
           
-          <!-- YouTube Embed -->
+          <!-- YouTube Embed with enablejsapi=1 for proper control -->
           <div id="youtubeEmbedContainer">
             <iframe id="youtubeIframe" 
               width="100%" 
               height="100%" 
-              src="https://www.youtube.com/embed/Ne_jkKDUuC8?autoplay=1&mute=1&modestbranding=1&rel=0&showinfo=0&controls=0&loop=1&playlist=Ne_jkKDUuC8&enablejsapi=1" 
+              src="https://www.youtube.com/embed/Ne_jkKDUuC8?autoplay=1&mute=1&modestbranding=1&rel=0&showinfo=0&controls=0&enablejsapi=1&origin=https://dreamers-honey.netlify.app" 
               frameborder="0" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
               allowfullscreen>
             </iframe>
           </div>
           
-          <!-- ===== SOURCE BADGE - ICON ONLY (UPDATED) ===== -->
-          <div class="video-source-badge" id="videoSourceBadge" data-source="YouTube">
+          <!-- Source Badge -->
+          <div class="video-source-badge" id="videoSourceBadge">
             <span class="source-dot youtube" id="sourceDot"></span>
+            <span class="source-label" id="sourceLabel">YouTube</span>
           </div>
           
           <!-- Title Overlay -->
@@ -1928,7 +1901,7 @@
             <i class="fas fa-forward"></i>
           </button>
           
-          <!-- ===== VIDEO PROGRESS WITH DURATION (UPDATED) ===== -->
+          <!-- Progress -->
           <div class="video-progress-container">
             <span class="video-time-current" id="videoCurrentTime">0:00</span>
             <input type="range" class="video-progress" id="videoProgress" min="0" max="100" value="0">
@@ -2168,7 +2141,7 @@
 </div>
 
 <!-- ============================================================
-     JAVASCRIPT - FULL UPDATED VERSION
+     JAVASCRIPT - FULL UPDATED VERSION WITH FIXED YOUTUBE PAUSE
      ============================================================ -->
 <script>
   // ===== HEADER HIDE/SHOW ON SCROLL =====
@@ -2215,7 +2188,7 @@
   fadeSections.forEach(section => sectionObserver.observe(section));
 
   // ============================================================
-  // UPDATED VIDEO PLAYLIST CONTROLLER - ALL BUGS FIXED
+  // UPDATED VIDEO PLAYLIST CONTROLLER - WITH FIXED YOUTUBE PAUSE
   // ============================================================
 
   // ===== VIDEO PLAYLIST =====
@@ -2246,7 +2219,7 @@
     }
   ];
 
-  // ===== FIXED PLAYLIST CONTROLLER =====
+  // ===== PLAYLIST CONTROLLER =====
   class PlaylistController {
     constructor(playlist) {
       this.playlist = playlist;
@@ -2258,7 +2231,8 @@
       this.isMuted = false;
       this.countdownTimer = null;
       this.countdownValue = 3;
-      this.isLoading = false;
+      this.youtubePlayerReady = false;
+      this.pendingYouTubeCommand = null;
 
       // DOM Elements
       this.video = document.getElementById('mainVideo');
@@ -2282,7 +2256,7 @@
       this.videoTitle = document.getElementById('videoTitle');
       this.videoDescription = document.getElementById('videoDescription');
       this.sourceDot = document.getElementById('sourceDot');
-      this.videoSourceBadge = document.getElementById('videoSourceBadge');
+      this.sourceLabel = document.getElementById('sourceLabel');
       this.loading = document.getElementById('videoLoading');
       this.countdownEl = document.getElementById('videoNextCountdown');
       this.countdownTimerEl = document.getElementById('countdownTimer');
@@ -2293,55 +2267,100 @@
     }
 
     init() {
+      // Set total videos
       this.totalNum.textContent = this.playlist.length;
+
+      // Load first video
       this.loadVideo(0);
+
+      // Setup event listeners
       this.setupEventListeners();
       this.setupKeyboardShortcuts();
-      this.volumeSlider.value = 80;
-      this.video.volume = 0.8;
+      
+      // Setup YouTube API ready check
+      this.checkYouTubeAPI();
+    }
+
+    checkYouTubeAPI() {
+      // Check if YouTube iframe API is ready
+      if (typeof YT !== 'undefined' && YT.Player) {
+        this.youtubePlayerReady = true;
+        if (this.pendingYouTubeCommand) {
+          this.sendYouTubeCommand(this.pendingYouTubeCommand.command, this.pendingYouTubeCommand.value);
+          this.pendingYouTubeCommand = null;
+        }
+      } else {
+        // Listen for YouTube API ready event
+        window.onYouTubeIframeAPIReady = () => {
+          this.youtubePlayerReady = true;
+          if (this.pendingYouTubeCommand) {
+            this.sendYouTubeCommand(this.pendingYouTubeCommand.command, this.pendingYouTubeCommand.value);
+            this.pendingYouTubeCommand = null;
+          }
+        };
+      }
     }
 
     setupEventListeners() {
+      // Play/Pause
       this.playPauseBtn.addEventListener('click', () => this.togglePlay());
       this.playBtnOverlay.addEventListener('click', () => this.togglePlay());
       this.video.addEventListener('click', () => this.togglePlay());
 
+      // Previous/Next
       this.prevBtn.addEventListener('click', () => this.previousVideo());
       this.nextBtn.addEventListener('click', () => this.nextVideo());
 
+      // Progress
       this.progressBar.addEventListener('input', () => this.handleProgressSeek());
       this.progressBar.addEventListener('change', () => this.isDragging = false);
       this.video.addEventListener('timeupdate', () => this.updateProgress());
 
+      // Volume
       this.volumeBtn.addEventListener('click', () => this.toggleMute());
       this.volumeSlider.addEventListener('input', () => this.updateVolume());
 
-      this.video.addEventListener('loadstart', () => this.showLoading());
-      this.video.addEventListener('waiting', () => this.showLoading());
-      this.video.addEventListener('canplay', () => this.hideLoading());
-      this.video.addEventListener('canplaythrough', () => this.hideLoading());
+      // Video events
       this.video.addEventListener('loadeddata', () => this.onVideoLoaded());
       this.video.addEventListener('play', () => this.onPlay());
       this.video.addEventListener('pause', () => this.onPause());
       this.video.addEventListener('ended', () => this.onEnded());
+      this.video.addEventListener('waiting', () => this.showLoading());
+      this.video.addEventListener('canplay', () => this.hideLoading());
 
+      // Fullscreen
       this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
       document.addEventListener('fullscreenchange', () => {
         this.fullscreenIcon.className = document.fullscreenElement ? 'fas fa-compress' : 'fas fa-expand';
       });
 
+      // YouTube messages - improved handling
       window.addEventListener('message', (e) => this.handleYouTubeMessage(e));
+      
+      // Also handle the YouTube player state via polling for reliability
+      this.startYouTubeStatePolling();
+    }
+
+    startYouTubeStatePolling() {
+      // Poll YouTube player state every 500ms for reliability
+      this.pollingInterval = setInterval(() => {
+        if (this.usingYouTube && this.youtubePlayerReady) {
+          this.sendYouTubeCommand('getPlayerState');
+        }
+      }, 500);
     }
 
     setupKeyboardShortcuts() {
       document.addEventListener('keydown', (e) => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
+        // Space = Play/Pause
         if (e.key === ' ' || e.key === 'Space') {
           e.preventDefault();
           this.togglePlay();
         }
 
+        // Arrow keys for seeking (local only)
         if (!this.usingYouTube) {
           if (e.key === 'ArrowRight') {
             this.video.currentTime = Math.min(this.video.currentTime + 10, this.video.duration);
@@ -2351,6 +2370,7 @@
           }
         }
 
+        // Ctrl + Arrows for navigation
         if (e.ctrlKey && e.key === 'ArrowRight') {
           e.preventDefault();
           this.nextVideo();
@@ -2360,41 +2380,45 @@
           this.previousVideo();
         }
 
+        // F = Fullscreen
         if (e.key === 'f' || e.key === 'F') {
           this.toggleFullscreen();
         }
+
+        // M = Mute
         if (e.key === 'm' || e.key === 'M') {
           this.toggleMute();
         }
       });
     }
 
-    // ===== LOAD VIDEO - STOPS PREVIOUS VIDEO =====
     loadVideo(index) {
+      // Validate index
       if (index < 0) index = this.playlist.length - 1;
       if (index >= this.playlist.length) index = 0;
-
-      this.stopAllPlayback();
 
       this.currentIndex = index;
       const video = this.playlist[index];
 
+      // Update UI
       this.currentNum.textContent = index + 1;
       this.videoTitle.textContent = video.title;
       this.videoDescription.textContent = video.description;
       this.showTitle();
 
+      // Update buttons
       this.prevBtn.disabled = this.playlist.length <= 1 || index === 0;
       this.nextBtn.disabled = this.playlist.length <= 1 || index === this.playlist.length - 1;
 
+      // Hide countdown
       this.countdownEl.classList.remove('show');
-      this.showLoading();
-      this.playBtnOverlay.classList.remove('hidden');
+      
+      // Reset playing state
+      this.isPlaying = false;
       this.playPauseIcon.className = 'fas fa-play';
-      this.progressBar.value = 0;
-      this.currentTimeDisplay.textContent = '0:00';
-      this.totalTimeDisplay.textContent = '0:00';
+      this.playBtnOverlay.classList.remove('hidden');
 
+      // Load the video based on source
       if (video.source === 'youtube') {
         this.loadYouTubeVideo(video);
       } else {
@@ -2402,29 +2426,10 @@
       }
     }
 
-    // ===== STOP ALL PLAYBACK =====
-    stopAllPlayback() {
-      this.video.pause();
-      this.video.currentTime = 0;
-      this.video.removeAttribute('src');
-      this.video.load();
-
-      if (this.youtubeIframe && this.youtubeIframe.contentWindow) {
-        this.sendYouTubeCommand('stopVideo');
-        this.sendYouTubeCommand('clearVideo');
-      }
-
-      this.youtubeContainer.style.display = 'none';
-      this.video.style.display = 'none';
-      this.stopCountdown();
-      this.isPlaying = false;
-    }
-
     loadYouTubeVideo(video) {
       this.usingYouTube = true;
-      this.youtubeContainer.style.display = 'block';
-      this.video.style.display = 'none';
-
+      
+      // Build YouTube URL with proper parameters
       const params = new URLSearchParams({
         autoplay: 1,
         mute: this.isMuted ? 1 : 0,
@@ -2433,19 +2438,29 @@
         showinfo: 0,
         controls: 0,
         loop: 0,
-        enablejsapi: 1
+        enablejsapi: 1,
+        origin: window.location.origin
       });
 
       this.youtubeIframe.src = `https://www.youtube.com/embed/${video.youtubeId}?${params.toString()}`;
+      this.youtubeContainer.style.display = 'block';
+      this.video.style.display = 'none';
+      this.video.pause();
 
-      // UPDATE: YouTube badge - RED DOT ONLY
+      // Update source badge
       this.sourceDot.className = 'source-dot youtube';
-      this.videoSourceBadge.setAttribute('data-source', 'YouTube');
-      this.videoSourceBadge.style.borderColor = 'rgba(255, 0, 0, 0.3)';
-      this.videoSourceBadge.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.1)';
+      this.sourceLabel.textContent = 'YouTube';
 
       this.showLoading();
-      setTimeout(() => this.hideLoading(), 5000);
+      
+      // Hide loading after video loads
+      setTimeout(() => {
+        this.hideLoading();
+        // Try to play after load
+        setTimeout(() => {
+          this.sendYouTubeCommand('playVideo');
+        }, 500);
+      }, 2000);
     }
 
     loadLocalVideo(video) {
@@ -2453,39 +2468,38 @@
       this.youtubeContainer.style.display = 'none';
       this.video.style.display = 'block';
 
+      // Update source
       const source = this.video.querySelector('source');
       if (source) {
         source.src = video.localFile;
         this.video.load();
-        this.video.play().catch(() => {
-          this.hideLoading();
-          this.playBtnOverlay.classList.remove('hidden');
-          this.playPauseIcon.className = 'fas fa-play';
-        });
+        this.video.play().catch(() => {});
       }
 
-      // UPDATE: Local badge - ORANGE/GOLD DOT ONLY
+      // Update source badge
       this.sourceDot.className = 'source-dot local';
-      this.videoSourceBadge.setAttribute('data-source', 'Local');
-      this.videoSourceBadge.style.borderColor = 'rgba(233, 162, 59, 0.3)';
-      this.videoSourceBadge.style.boxShadow = '0 0 20px rgba(233, 162, 59, 0.1)';
-
-      this.showLoading();
+      this.sourceLabel.textContent = 'Local';
     }
 
     togglePlay() {
       if (this.usingYouTube) {
+        // For YouTube, we need to check current state and toggle
         if (this.isPlaying) {
           this.sendYouTubeCommand('pauseVideo');
+          this.isPlaying = false;
+          this.playPauseIcon.className = 'fas fa-play';
+          this.playBtnOverlay.classList.remove('hidden');
         } else {
           this.sendYouTubeCommand('playVideo');
+          this.isPlaying = true;
+          this.playPauseIcon.className = 'fas fa-pause';
+          this.playBtnOverlay.classList.add('hidden');
+          this.hideLoading();
+          this.stopCountdown();
         }
       } else {
         if (this.video.paused) {
-          this.video.play().catch(() => {
-            this.playBtnOverlay.classList.remove('hidden');
-            this.playPauseIcon.className = 'fas fa-play';
-          });
+          this.video.play();
         } else {
           this.video.pause();
         }
@@ -2547,7 +2561,7 @@
     }
 
     updateProgress() {
-      if (!this.usingYouTube && !this.isDragging && !this.isLoading) {
+      if (!this.usingYouTube && !this.isDragging) {
         const percent = (this.video.currentTime / this.video.duration) * 100;
         this.progressBar.value = percent || 0;
         this.currentTimeDisplay.textContent = this.formatTime(this.video.currentTime);
@@ -2556,50 +2570,91 @@
     }
 
     sendYouTubeCommand(command, value) {
+      if (!this.youtubePlayerReady) {
+        // Queue the command for when API is ready
+        this.pendingYouTubeCommand = { command, value };
+        return;
+      }
+      
       if (this.youtubeIframe && this.youtubeIframe.contentWindow) {
-        const args = value !== undefined ? [value] : [];
-        this.youtubeIframe.contentWindow.postMessage(JSON.stringify({
-          event: 'command',
-          func: command,
-          args: args
-        }), '*');
+        try {
+          const args = value !== undefined ? [value] : [];
+          const message = JSON.stringify({
+            event: 'command',
+            func: command,
+            args: args
+          });
+          this.youtubeIframe.contentWindow.postMessage(message, '*');
+        } catch (e) {
+          console.warn('YouTube command failed:', e);
+        }
       }
     }
 
     handleYouTubeMessage(event) {
       try {
-        const data = JSON.parse(event.data);
-        if (data.event === 'onStateChange' && this.usingYouTube) {
-          if (data.info === -1) {
-            this.showLoading();
-          } else if (data.info === 1) {
-            this.isPlaying = true;
-            this.playPauseIcon.className = 'fas fa-pause';
-            this.playBtnOverlay.classList.add('hidden');
+        // Check if this is a YouTube message
+        if (typeof event.data === 'string') {
+          const data = JSON.parse(event.data);
+          
+          // Handle player state changes
+          if (data.event === 'onStateChange') {
+            const state = data.info;
+            this.handleYouTubeStateChange(state);
+          }
+          
+          // Handle player ready
+          if (data.event === 'onReady') {
+            this.youtubePlayerReady = true;
             this.hideLoading();
-            this.stopCountdown();
-            this.isLoading = false;
-          } else if (data.info === 2) {
-            this.isPlaying = false;
-            this.playPauseIcon.className = 'fas fa-play';
-            this.playBtnOverlay.classList.remove('hidden');
-          } else if (data.info === 0) {
-            this.isPlaying = false;
-            this.playPauseIcon.className = 'fas fa-play';
-            this.playBtnOverlay.classList.remove('hidden');
-            this.startCountdown();
-          } else if (data.info === 3) {
-            this.showLoading();
+            // Apply any pending volume settings
+            if (this.volume) {
+              this.sendYouTubeCommand('setVolume', this.volume * 100);
+            }
+          }
+          
+          // Handle errors
+          if (data.event === 'onError') {
+            console.warn('YouTube error:', data.info);
+            this.hideLoading();
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        // Not a JSON message or not from YouTube
+      }
+    }
+
+    handleYouTubeStateChange(state) {
+      // YouTube player states: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=video cued
+      if (state === 1) { // Playing
+        this.isPlaying = true;
+        this.playPauseIcon.className = 'fas fa-pause';
+        this.playBtnOverlay.classList.add('hidden');
+        this.hideLoading();
+        this.stopCountdown();
+      } else if (state === 2) { // Paused
+        this.isPlaying = false;
+        this.playPauseIcon.className = 'fas fa-play';
+        this.playBtnOverlay.classList.remove('hidden');
+      } else if (state === 0) { // Ended
+        this.isPlaying = false;
+        this.playPauseIcon.className = 'fas fa-play';
+        this.playBtnOverlay.classList.remove('hidden');
+        this.startCountdown();
+      } else if (state === 3) { // Buffering
+        this.showLoading();
+      }
     }
 
     startCountdown() {
-      if (this.currentIndex >= this.playlist.length - 1) return;
+      if (this.currentIndex >= this.playlist.length - 1) {
+        // Last video, don't auto-play
+        return;
+      }
       this.countdownValue = 3;
       this.countdownTimerEl.textContent = this.countdownValue;
       this.countdownEl.classList.add('show');
+      
       this.stopCountdown();
       this.countdownTimer = setInterval(() => {
         this.countdownValue--;
@@ -2636,13 +2691,11 @@
     }
 
     showLoading() {
-      this.isLoading = true;
-      if (this.loading) this.loading.classList.add('show');
+      this.loading.classList.add('show');
     }
 
     hideLoading() {
-      this.isLoading = false;
-      if (this.loading) this.loading.classList.remove('show');
+      this.loading.classList.remove('show');
     }
 
     onPlay() {
@@ -2651,7 +2704,6 @@
       this.playBtnOverlay.classList.add('hidden');
       this.hideLoading();
       this.stopCountdown();
-      this.isLoading = false;
     }
 
     onPause() {
@@ -2666,7 +2718,6 @@
       this.isPlaying = false;
       this.playPauseIcon.className = 'fas fa-play';
       this.playBtnOverlay.classList.remove('hidden');
-      this.hideLoading();
       this.startCountdown();
     }
 
@@ -2675,7 +2726,6 @@
       this.video.volume = this.volume;
       this.video.muted = this.isMuted;
       this.hideLoading();
-      this.isLoading = false;
     }
 
     toggleFullscreen() {
