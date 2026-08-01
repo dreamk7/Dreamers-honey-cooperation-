@@ -1828,7 +1828,7 @@
     </div>
   </section>
 
-  <!-- ===== VIDEO SECTION WITH FIXED YOUTUBE CONTROLS ===== -->
+  <!-- ===== UPDATED VIDEO SECTION ===== -->
   <section class="video-section fade-section" id="videoSection" aria-label="Beekeeping video gallery">
     <div class="container">
       <div class="section-header">
@@ -1843,12 +1843,12 @@
             Your browser does not support the video tag.
           </video>
           
-          <!-- YouTube Embed -->
+          <!-- YouTube Embed - UPDATED with mute=1 -->
           <div id="youtubeEmbedContainer">
             <iframe id="youtubeIframe" 
               width="100%" 
               height="100%" 
-              src="https://www.youtube.com/embed/Ne_jkKDUuC8?autoplay=1&mute=1&modestbranding=1&rel=0&showinfo=0&controls=0&enablejsapi=1" 
+              src="https://www.youtube.com/embed/Ne_jkKDUuC8?autoplay=1&mute=1&modestbranding=1&rel=0&showinfo=0&controls=0&loop=1&playlist=Ne_jkKDUuC8&enablejsapi=1" 
               frameborder="0" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
               allowfullscreen>
@@ -1880,7 +1880,7 @@
           <!-- Next Video Countdown -->
           <div class="video-next-countdown" id="videoNextCountdown">
             <i class="fas fa-forward"></i>
-            Next video in <span class="countdown-timer" id="countdownTimer">3</span>s
+            Next video in <span class="countdown-timer" id="countdownTimer">2</span>s
           </div>
         </div>
         
@@ -1913,9 +1913,9 @@
             <!-- Volume -->
             <div class="volume-container">
               <button class="video-control-btn" id="videoVolumeBtn" aria-label="Mute/Unmute">
-                <i class="fas fa-volume-up" id="volumeIcon"></i>
+                <i class="fas fa-volume-mute" id="volumeIcon"></i>
               </button>
-              <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80">
+              <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="0">
             </div>
             
             <!-- Playlist Counter -->
@@ -2141,7 +2141,7 @@
 </div>
 
 <!-- ============================================================
-     JAVASCRIPT - SIMPLIFIED AND RELIABLE VIDEO CONTROLLER
+     JAVASCRIPT - FULL UPDATED VERSION
      ============================================================ -->
 <script>
   // ===== HEADER HIDE/SHOW ON SCROLL =====
@@ -2188,9 +2188,10 @@
   fadeSections.forEach(section => sectionObserver.observe(section));
 
   // ============================================================
-  // SIMPLIFIED VIDEO CONTROLLER - WORKS RELIABLY
+  // UPDATED VIDEO PLAYLIST CONTROLLER - FULLY FIXED
   // ============================================================
 
+  // ===== VIDEO PLAYLIST =====
   const videoPlaylist = [
     {
       id: 0,
@@ -2218,179 +2219,236 @@
     }
   ];
 
-  class VideoController {
+  // ===== PLAYLIST CONTROLLER =====
+  class PlaylistController {
     constructor(playlist) {
       this.playlist = playlist;
       this.currentIndex = 0;
       this.isPlaying = false;
-      this.isYouTube = false;
-      this.volume = 0.8;
-      this.isMuted = false;
-      
-      // DOM elements
+      this.usingYouTube = false;
+      this.isDragging = false;
+      this.volume = 0;
+      this.isMuted = true;
+      this.countdownTimer = null;
+      this.countdownValue = 3;
+
+      // DOM Elements
       this.video = document.getElementById('mainVideo');
       this.youtubeContainer = document.getElementById('youtubeEmbedContainer');
       this.youtubeIframe = document.getElementById('youtubeIframe');
-      
-      this.playBtn = document.getElementById('videoPlayPauseBtn');
-      this.playIcon = document.getElementById('playPauseIcon');
-      this.overlayPlayBtn = document.getElementById('videoPlayBtn');
+
+      this.playPauseBtn = document.getElementById('videoPlayPauseBtn');
+      this.playPauseIcon = document.getElementById('playPauseIcon');
+      this.playBtnOverlay = document.getElementById('videoPlayBtn');
       this.prevBtn = document.getElementById('videoPrevBtn');
       this.nextBtn = document.getElementById('videoNextBtn');
-      this.progress = document.getElementById('videoProgress');
+      this.progressBar = document.getElementById('videoProgress');
       this.currentTimeDisplay = document.getElementById('videoCurrentTime');
       this.totalTimeDisplay = document.getElementById('videoTotalTime');
       this.volumeBtn = document.getElementById('videoVolumeBtn');
       this.volumeIcon = document.getElementById('volumeIcon');
       this.volumeSlider = document.getElementById('volumeSlider');
-      this.currentNumEl = document.getElementById('currentVideoNum');
-      this.totalNumEl = document.getElementById('totalVideosNum');
-      this.titleEl = document.getElementById('videoTitle');
-      this.descEl = document.getElementById('videoDescription');
+      this.currentNum = document.getElementById('currentVideoNum');
+      this.totalNum = document.getElementById('totalVideosNum');
       this.titleOverlay = document.getElementById('videoTitleOverlay');
+      this.videoTitle = document.getElementById('videoTitle');
+      this.videoDescription = document.getElementById('videoDescription');
       this.sourceDot = document.getElementById('sourceDot');
       this.sourceLabel = document.getElementById('sourceLabel');
-      this.loadingEl = document.getElementById('videoLoading');
+      this.loading = document.getElementById('videoLoading');
       this.countdownEl = document.getElementById('videoNextCountdown');
       this.countdownTimerEl = document.getElementById('countdownTimer');
       this.fullscreenBtn = document.getElementById('fullscreenBtn');
-      
-      this.countdownInterval = null;
-      this.titleTimeout = null;
-      
+      this.fullscreenIcon = document.getElementById('fullscreenIcon');
+
+      // Set initial volume slider to 0 (muted)
+      this.volumeSlider.value = 0;
+      this.volumeIcon.className = 'fas fa-volume-mute';
+
       this.init();
     }
-    
+
     init() {
-      this.totalNumEl.textContent = this.playlist.length;
+      // Set total videos
+      this.totalNum.textContent = this.playlist.length;
+
+      // Load first video
       this.loadVideo(0);
-      this.setupEvents();
+
+      // Setup event listeners
+      this.setupEventListeners();
+      this.setupKeyboardShortcuts();
     }
-    
-    setupEvents() {
+
+    setupEventListeners() {
       // Play/Pause
-      this.playBtn.addEventListener('click', () => this.togglePlay());
-      this.overlayPlayBtn.addEventListener('click', () => this.togglePlay());
+      this.playPauseBtn.addEventListener('click', () => this.togglePlay());
+      this.playBtnOverlay.addEventListener('click', () => this.togglePlay());
       this.video.addEventListener('click', () => this.togglePlay());
-      
-      // Navigation
-      this.prevBtn.addEventListener('click', () => this.prev());
-      this.nextBtn.addEventListener('click', () => this.next());
-      
+
+      // Previous/Next
+      this.prevBtn.addEventListener('click', () => this.previousVideo());
+      this.nextBtn.addEventListener('click', () => this.nextVideo());
+
       // Progress
-      this.progress.addEventListener('input', () => this.seek());
+      this.progressBar.addEventListener('input', () => this.handleProgressSeek());
+      this.progressBar.addEventListener('change', () => this.isDragging = false);
       this.video.addEventListener('timeupdate', () => this.updateProgress());
-      
+
       // Volume
       this.volumeBtn.addEventListener('click', () => this.toggleMute());
-      this.volumeSlider.addEventListener('input', () => this.setVolume());
-      
+      this.volumeSlider.addEventListener('input', () => this.updateVolume());
+
       // Video events
+      this.video.addEventListener('loadeddata', () => this.onVideoLoaded());
       this.video.addEventListener('play', () => this.onPlay());
       this.video.addEventListener('pause', () => this.onPause());
       this.video.addEventListener('ended', () => this.onEnded());
-      this.video.addEventListener('loadeddata', () => this.onLoaded());
       this.video.addEventListener('waiting', () => this.showLoading());
       this.video.addEventListener('canplay', () => this.hideLoading());
-      
+
       // Fullscreen
       this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
-      
-      // YouTube message listener
+      document.addEventListener('fullscreenchange', () => {
+        this.fullscreenIcon.className = document.fullscreenElement ? 'fas fa-compress' : 'fas fa-expand';
+      });
+
+      // YouTube messages
       window.addEventListener('message', (e) => this.handleYouTubeMessage(e));
-      
-      // Keyboard shortcuts
+    }
+
+    setupKeyboardShortcuts() {
       document.addEventListener('keydown', (e) => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        // Space = Play/Pause
         if (e.key === ' ' || e.key === 'Space') {
           e.preventDefault();
           this.togglePlay();
         }
-        if (e.key === 'f' || e.key === 'F') this.toggleFullscreen();
-        if (e.key === 'm' || e.key === 'M') this.toggleMute();
+
+        // Arrow keys for seeking (local only)
+        if (!this.usingYouTube) {
+          if (e.key === 'ArrowRight') {
+            this.video.currentTime = Math.min(this.video.currentTime + 10, this.video.duration);
+          }
+          if (e.key === 'ArrowLeft') {
+            this.video.currentTime = Math.max(this.video.currentTime - 10, 0);
+          }
+        }
+
+        // Ctrl + Arrows for navigation
+        if (e.ctrlKey && e.key === 'ArrowRight') {
+          e.preventDefault();
+          this.nextVideo();
+        }
+        if (e.ctrlKey && e.key === 'ArrowLeft') {
+          e.preventDefault();
+          this.previousVideo();
+        }
+
+        // F = Fullscreen
+        if (e.key === 'f' || e.key === 'F') {
+          this.toggleFullscreen();
+        }
+
+        // M = Mute
+        if (e.key === 'm' || e.key === 'M') {
+          this.toggleMute();
+        }
       });
     }
-    
+
     loadVideo(index) {
+      // Validate index
       if (index < 0) index = this.playlist.length - 1;
       if (index >= this.playlist.length) index = 0;
-      
+
       this.currentIndex = index;
       const video = this.playlist[index];
-      
+
       // Update UI
-      this.currentNumEl.textContent = index + 1;
-      this.titleEl.textContent = video.title;
-      this.descEl.textContent = video.description;
+      this.currentNum.textContent = index + 1;
+      this.videoTitle.textContent = video.title;
+      this.videoDescription.textContent = video.description;
       this.showTitle();
-      
-      this.prevBtn.disabled = index === 0;
-      this.nextBtn.disabled = index === this.playlist.length - 1;
-      
-      this.isPlaying = false;
-      this.playIcon.className = 'fas fa-play';
-      this.overlayPlayBtn.classList.remove('hidden');
+
+      // Update buttons
+      this.prevBtn.disabled = this.playlist.length <= 1 || index === 0;
+      this.nextBtn.disabled = this.playlist.length <= 1 || index === this.playlist.length - 1;
+
+      // Hide countdown
       this.countdownEl.classList.remove('show');
-      
+
+      // Load the video based on source
       if (video.source === 'youtube') {
-        this.loadYouTube(video);
+        this.loadYouTubeVideo(video);
       } else {
-        this.loadLocal(video);
+        this.loadLocalVideo(video);
       }
     }
-    
-    loadYouTube(video) {
-      this.isYouTube = true;
+
+    loadYouTubeVideo(video) {
+      this.usingYouTube = true;
+      // YouTube iframe already has mute=1 in src, but ensure it's muted
       const params = new URLSearchParams({
         autoplay: 1,
-        mute: this.isMuted ? 1 : 0,
+        mute: 1,
         modestbranding: 1,
         rel: 0,
         showinfo: 0,
         controls: 0,
+        loop: 1,
+        playlist: video.youtubeId,
         enablejsapi: 1
       });
-      
-      this.youtubeIframe.src = `https://www.youtube.com/embed/${video.youtubeId}?${params}`;
+
+      this.youtubeIframe.src = `https://www.youtube.com/embed/${video.youtubeId}?${params.toString()}`;
       this.youtubeContainer.style.display = 'block';
       this.video.style.display = 'none';
       this.video.pause();
-      
+
+      // Update source badge
       this.sourceDot.className = 'source-dot youtube';
       this.sourceLabel.textContent = 'YouTube';
+
+      // Ensure volume icon shows muted
+      this.volumeIcon.className = 'fas fa-volume-mute';
+      this.isMuted = true;
+
       this.showLoading();
-      
       setTimeout(() => this.hideLoading(), 3000);
     }
-    
-    loadLocal(video) {
-      this.isYouTube = false;
+
+    loadLocalVideo(video) {
+      this.usingYouTube = false;
       this.youtubeContainer.style.display = 'none';
       this.video.style.display = 'block';
-      
+
+      // Update source
       const source = this.video.querySelector('source');
       if (source) {
         source.src = video.localFile;
         this.video.load();
+        // Local video starts muted
+        this.video.muted = true;
+        this.video.volume = 0;
         this.video.play().catch(() => {});
       }
-      
+
+      // Update source badge
       this.sourceDot.className = 'source-dot local';
       this.sourceLabel.textContent = 'Local';
+
+      // Ensure volume icon shows muted
+      this.volumeIcon.className = 'fas fa-volume-mute';
+      this.isMuted = true;
+      this.volumeSlider.value = 0;
     }
-    
+
     togglePlay() {
-      if (this.isYouTube) {
-        // Send command to YouTube
-        const command = this.isPlaying ? 'pauseVideo' : 'playVideo';
-        this.sendYouTubeCommand(command);
-        // Toggle state immediately for UI responsiveness
-        this.isPlaying = !this.isPlaying;
-        this.updatePlayUI();
-        if (this.isPlaying) {
-          this.hideLoading();
-          this.stopCountdown();
-        }
+      if (this.usingYouTube) {
+        this.sendYouTubeCommand(this.isPlaying ? 'pauseVideo' : 'playVideo');
       } else {
         if (this.video.paused) {
           this.video.play();
@@ -2399,92 +2457,49 @@
         }
       }
     }
-    
-    sendYouTubeCommand(command) {
-      if (this.youtubeIframe && this.youtubeIframe.contentWindow) {
-        try {
-          this.youtubeIframe.contentWindow.postMessage(JSON.stringify({
-            event: 'command',
-            func: command,
-            args: []
-          }), '*');
-        } catch(e) {}
+
+    nextVideo() {
+      this.stopCountdown();
+      if (this.currentIndex < this.playlist.length - 1) {
+        this.loadVideo(this.currentIndex + 1);
       }
     }
-    
-    updatePlayUI() {
-      if (this.isPlaying) {
-        this.playIcon.className = 'fas fa-pause';
-        this.overlayPlayBtn.classList.add('hidden');
+
+    previousVideo() {
+      this.stopCountdown();
+      if (this.currentIndex > 0) {
+        this.loadVideo(this.currentIndex - 1);
+      }
+    }
+
+    toggleMute() {
+      this.isMuted = !this.isMuted;
+      if (this.usingYouTube) {
+        this.sendYouTubeCommand(this.isMuted ? 'mute' : 'unMute');
       } else {
-        this.playIcon.className = 'fas fa-play';
-        this.overlayPlayBtn.classList.remove('hidden');
-      }
-    }
-    
-    handleYouTubeMessage(event) {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.event === 'onStateChange') {
-          const state = data.info;
-          // 1=playing, 2=paused, 0=ended, 3=buffering
-          if (state === 1) {
-            this.isPlaying = true;
-            this.updatePlayUI();
-            this.hideLoading();
-            this.stopCountdown();
-          } else if (state === 2) {
-            this.isPlaying = false;
-            this.updatePlayUI();
-          } else if (state === 0) {
-            this.isPlaying = false;
-            this.updatePlayUI();
-            this.startCountdown();
-          } else if (state === 3) {
-            this.showLoading();
-          }
+        this.video.muted = this.isMuted;
+        if (!this.isMuted) {
+          this.video.volume = this.volume || 0.5;
+          this.volumeSlider.value = (this.volume || 0.5) * 100;
+        } else {
+          this.volumeSlider.value = 0;
         }
-      } catch(e) {}
-    }
-    
-    seek() {
-      if (!this.isYouTube) {
-        const time = (this.progress.value / 100) * this.video.duration;
-        this.video.currentTime = time;
-        this.currentTimeDisplay.textContent = this.formatTime(time);
       }
+      this.updateVolumeIcon();
     }
-    
-    updateProgress() {
-      if (!this.isYouTube) {
-        const percent = (this.video.currentTime / this.video.duration) * 100;
-        this.progress.value = percent || 0;
-        this.currentTimeDisplay.textContent = this.formatTime(this.video.currentTime);
-        this.totalTimeDisplay.textContent = this.formatTime(this.video.duration);
-      }
-    }
-    
-    setVolume() {
+
+    updateVolume() {
       this.volume = this.volumeSlider.value / 100;
-      if (this.isYouTube) {
+      if (this.usingYouTube) {
         this.sendYouTubeCommand('setVolume', this.volume * 100);
       } else {
         this.video.volume = this.volume;
+        this.video.muted = this.volume === 0;
       }
       this.isMuted = this.volume === 0;
       this.updateVolumeIcon();
     }
-    
-    toggleMute() {
-      this.isMuted = !this.isMuted;
-      if (this.isYouTube) {
-        this.sendYouTubeCommand(this.isMuted ? 'mute' : 'unMute');
-      } else {
-        this.video.muted = this.isMuted;
-      }
-      this.updateVolumeIcon();
-    }
-    
+
     updateVolumeIcon() {
       if (this.isMuted || this.volume === 0) {
         this.volumeIcon.className = 'fas fa-volume-mute';
@@ -2494,76 +2509,96 @@
         this.volumeIcon.className = 'fas fa-volume-up';
       }
     }
-    
+
+    handleProgressSeek() {
+      if (!this.usingYouTube) {
+        this.isDragging = true;
+        const time = (this.progressBar.value / 100) * this.video.duration;
+        this.video.currentTime = time;
+        this.currentTimeDisplay.textContent = this.formatTime(time);
+      }
+    }
+
+    updateProgress() {
+      if (!this.usingYouTube && !this.isDragging) {
+        const percent = (this.video.currentTime / this.video.duration) * 100;
+        this.progressBar.value = percent || 0;
+        this.currentTimeDisplay.textContent = this.formatTime(this.video.currentTime);
+        this.totalTimeDisplay.textContent = this.formatTime(this.video.duration);
+      }
+    }
+
+    sendYouTubeCommand(command, value) {
+      if (this.youtubeIframe && this.youtubeIframe.contentWindow) {
+        const args = value !== undefined ? [value] : [];
+        this.youtubeIframe.contentWindow.postMessage(JSON.stringify({
+          event: 'command',
+          func: command,
+          args: args
+        }), '*');
+      }
+    }
+
+    handleYouTubeMessage(event) {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.event === 'onStateChange' && this.usingYouTube) {
+          if (data.info === 1) { // Playing
+            this.isPlaying = true;
+            this.playPauseIcon.className = 'fas fa-pause';
+            this.playBtnOverlay.classList.add('hidden');
+            this.hideLoading();
+            this.stopCountdown();
+          } else if (data.info === 2) { // Paused
+            this.isPlaying = false;
+            this.playPauseIcon.className = 'fas fa-play';
+            this.playBtnOverlay.classList.remove('hidden');
+          } else if (data.info === 0) { // Ended
+            this.isPlaying = false;
+            this.playPauseIcon.className = 'fas fa-play';
+            this.playBtnOverlay.classList.remove('hidden');
+            this.startCountdown();
+          }
+        }
+      } catch (e) {}
+    }
+
     startCountdown() {
-      if (this.currentIndex >= this.playlist.length - 1) return;
-      
-      let count = 3;
-      this.countdownTimerEl.textContent = count;
+      if (this.currentIndex >= this.playlist.length - 1) {
+        // Last video, don't auto-play
+        return;
+      }
+      this.countdownValue = 3;
+      this.countdownTimerEl.textContent = this.countdownValue;
       this.countdownEl.classList.add('show');
       
       this.stopCountdown();
-      this.countdownInterval = setInterval(() => {
-        count--;
-        this.countdownTimerEl.textContent = count;
-        if (count <= 0) {
+      this.countdownTimer = setInterval(() => {
+        this.countdownValue--;
+        this.countdownTimerEl.textContent = this.countdownValue;
+        if (this.countdownValue <= 0) {
           this.stopCountdown();
           this.countdownEl.classList.remove('show');
-          this.next();
+          this.nextVideo();
         }
       }, 1000);
     }
-    
+
     stopCountdown() {
-      if (this.countdownInterval) {
-        clearInterval(this.countdownInterval);
-        this.countdownInterval = null;
+      if (this.countdownTimer) {
+        clearInterval(this.countdownTimer);
+        this.countdownTimer = null;
       }
+      this.countdownEl.classList.remove('show');
     }
-    
-    next() {
-      this.stopCountdown();
-      if (this.currentIndex < this.playlist.length - 1) {
-        this.loadVideo(this.currentIndex + 1);
-      }
+
+    formatTime(time) {
+      if (isNaN(time) || !isFinite(time)) return '0:00';
+      const minutes = Math.floor(time / 60);
+      const seconds = Math.floor(time % 60);
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     }
-    
-    prev() {
-      this.stopCountdown();
-      if (this.currentIndex > 0) {
-        this.loadVideo(this.currentIndex - 1);
-      }
-    }
-    
-    onPlay() {
-      this.isPlaying = true;
-      this.playIcon.className = 'fas fa-pause';
-      this.overlayPlayBtn.classList.add('hidden');
-      this.stopCountdown();
-    }
-    
-    onPause() {
-      this.isPlaying = false;
-      this.playIcon.className = 'fas fa-play';
-      if (!this.video.ended) {
-        this.overlayPlayBtn.classList.remove('hidden');
-      }
-    }
-    
-    onEnded() {
-      this.isPlaying = false;
-      this.playIcon.className = 'fas fa-play';
-      this.overlayPlayBtn.classList.remove('hidden');
-      this.startCountdown();
-    }
-    
-    onLoaded() {
-      this.totalTimeDisplay.textContent = this.formatTime(this.video.duration);
-      this.video.volume = this.volume;
-      this.video.muted = this.isMuted;
-      this.hideLoading();
-    }
-    
+
     showTitle() {
       this.titleOverlay.classList.remove('hidden');
       clearTimeout(this.titleTimeout);
@@ -2571,22 +2606,45 @@
         this.titleOverlay.classList.add('hidden');
       }, 4000);
     }
-    
+
     showLoading() {
-      this.loadingEl.classList.add('show');
+      this.loading.classList.add('show');
     }
-    
+
     hideLoading() {
-      this.loadingEl.classList.remove('show');
+      this.loading.classList.remove('show');
     }
-    
-    formatTime(time) {
-      if (isNaN(time) || !isFinite(time)) return '0:00';
-      const mins = Math.floor(time / 60);
-      const secs = Math.floor(time % 60);
-      return `${mins}:${secs.toString().padStart(2, '0')}`;
+
+    onPlay() {
+      this.isPlaying = true;
+      this.playPauseIcon.className = 'fas fa-pause';
+      this.playBtnOverlay.classList.add('hidden');
+      this.hideLoading();
+      this.stopCountdown();
     }
-    
+
+    onPause() {
+      this.isPlaying = false;
+      this.playPauseIcon.className = 'fas fa-play';
+      if (!this.video.ended) {
+        this.playBtnOverlay.classList.remove('hidden');
+      }
+    }
+
+    onEnded() {
+      this.isPlaying = false;
+      this.playPauseIcon.className = 'fas fa-play';
+      this.playBtnOverlay.classList.remove('hidden');
+      this.startCountdown();
+    }
+
+    onVideoLoaded() {
+      this.totalTimeDisplay.textContent = this.formatTime(this.video.duration);
+      this.video.volume = 0;
+      this.video.muted = true;
+      this.hideLoading();
+    }
+
     toggleFullscreen() {
       const wrapper = document.querySelector('.video-wrapper');
       if (document.fullscreenElement) {
@@ -2596,10 +2654,11 @@
       }
     }
   }
-  
-  // Initialize video player
+
+  // ===== INITIALIZE VIDEO PLAYER =====
   document.addEventListener('DOMContentLoaded', () => {
-    window.videoPlayer = new VideoController(videoPlaylist);
+    const controller = new PlaylistController(videoPlaylist);
+    window.videoController = controller;
   });
 
   // ===== HERO IMAGE ROTATION =====
