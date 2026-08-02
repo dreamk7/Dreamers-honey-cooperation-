@@ -2518,6 +2518,13 @@
     toggleDropdown.classList.remove('open');
   });
 
+  // ===== FIX: Toggle "Books of wisdom" now scrolls to section-learn =====
+  document.getElementById('toggleBooksofwisdom').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('section-learn').scrollIntoView({ behavior: 'smooth' });
+    toggleDropdown.classList.remove('open');
+  });
+
   const navMenu = document.getElementById('navMenu');
   document.addEventListener('click', (e) => {
     const isNavLink = e.target.closest('.nav-links a');
@@ -2544,6 +2551,8 @@
         document.getElementById('section-products').scrollIntoView({ behavior: 'smooth' });
       } else if (text.includes('BEEKEEPING 101') || text.includes('EDUCATION HUB') || text.includes('HIVE TOOLS') || text.includes('HONEY EXTRACTORS') || text.includes('MITICIDES')) {
         document.getElementById('section-equipment').scrollIntoView({ behavior: 'smooth' });
+      } else if (text.includes('Books of wisdom')) {
+        document.getElementById('section-learn').scrollIntoView({ behavior: 'smooth' });
       } else {
         alert(`✨ ${text} — explore our beekeeping categories.`);
       }
@@ -2919,6 +2928,21 @@
   });
   
   window.addEventListener('scroll', () => { if(!popupShown) { const scrollPercent = window.scrollY / (document.body.scrollHeight - window.innerHeight); if(scrollPercent > 0.4) showPopup(); } });
+  
+  // ===== FIX: YouTube video - autoplay only when user clicks play =====
+  // We remove the autoplay param from the iframe src and let the user click to play.
+  // The iframe src is updated to remove autoplay=1 and mute=1.
+  const videoIframe = document.querySelector('.video-wrapper iframe');
+  if (videoIframe) {
+    // Remove autoplay and mute parameters so it only starts on user interaction
+    const originalSrc = videoIframe.src;
+    // Replace autoplay=1 with autoplay=0 and remove mute=1
+    let newSrc = originalSrc
+      .replace(/autoplay=1/g, 'autoplay=0')
+      .replace(/mute=1/g, 'mute=0');
+    // Also ensure loop works without autoplay
+    videoIframe.src = newSrc;
+  }
 </script>
 </body>
 </html>
